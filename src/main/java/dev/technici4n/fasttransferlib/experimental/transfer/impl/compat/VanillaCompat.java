@@ -6,7 +6,7 @@ import dev.technici4n.fasttransferlib.experimental.transfer.api.lookup.BlockLook
 import dev.technici4n.fasttransferlib.experimental.transfer.impl.compat.fluid.BottleParticipant;
 import dev.technici4n.fasttransferlib.experimental.transfer.impl.compat.fluid.BucketParticipant;
 import dev.technici4n.fasttransferlib.experimental.transfer.impl.compat.fluid.CauldronParticipant;
-import dev.technici4n.fasttransferlib.experimental.transfer.impl.compat.item.InventorySidedView;
+import dev.technici4n.fasttransferlib.experimental.transfer.impl.compat.item.SidedInventoryParticipant;
 import net.fabricmc.fabric.api.provider.v1.block.BlockApiLookup;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.ChestBlock;
@@ -32,7 +32,7 @@ public enum VanillaCompat {
         static {
             BlockApiLookup.BlockEntityApiProvider<Participant, BlockLookupContext> inventoryProvider = (blockEntity, context) -> {
                 if (blockEntity instanceof Inventory) {
-                    return new InventorySidedView((Inventory) blockEntity, context.getDirection());
+                    return new SidedInventoryParticipant((Inventory) blockEntity, context.getDirection());
                 } else {
                     return null;
                 }
@@ -45,7 +45,7 @@ public enum VanillaCompat {
                     BlockEntityType.SHULKER_BOX);
             TransferApi.BLOCK.registerForBlocks((world, pos, state, context) -> {
                 Inventory inv = ChestBlock.getInventory((ChestBlock) state.getBlock(), state, world, pos, true);
-                return inv == null ? null : new InventorySidedView(inv, context.getDirection());
+                return inv == null ? null : new SidedInventoryParticipant(inv, context.getDirection());
             }, Blocks.CHEST, Blocks.TRAPPED_CHEST);
 
             // Fallback for vanilla interfaces
@@ -54,7 +54,7 @@ public enum VanillaCompat {
                 if (state.getBlock() instanceof InventoryProvider) {
                     Inventory inv = ((InventoryProvider) state.getBlock()).getInventory(state, world, pos);
 
-                    if (inv != null) return new InventorySidedView(inv, context.getDirection());
+                    if (inv != null) return new SidedInventoryParticipant(inv, context.getDirection());
                 }
 
                 return null;

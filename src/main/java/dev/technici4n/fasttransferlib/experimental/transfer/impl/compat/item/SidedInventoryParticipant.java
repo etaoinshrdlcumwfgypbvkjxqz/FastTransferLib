@@ -13,7 +13,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.Direction;
 
-public class InventorySidedView
+public class SidedInventoryParticipant
 		extends SingleCategoryParticipant<Item> {
 	private final Inventory wrapped;
 	private final SidedInventory wrappedSided;
@@ -21,7 +21,7 @@ public class InventorySidedView
 	private final int size;
 	private final Direction direction;
 
-	public InventorySidedView(Inventory wrapped, Direction direction) {
+	public SidedInventoryParticipant(Inventory wrapped, Direction direction) {
 		super(Item.class);
 		this.wrapped = wrapped;
 		this.wrappedSided = wrapped instanceof SidedInventory ? (SidedInventory) wrapped : null;
