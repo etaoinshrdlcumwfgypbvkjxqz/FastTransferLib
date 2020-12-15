@@ -1,10 +1,10 @@
 package dev.technici4n.fasttransferlib.experimental.impl.compat.fluid;
 
 import dev.technici4n.fasttransferlib.api.fluid.FluidConstants;
-import dev.technici4n.fasttransferlib.experimental.api.Instance;
+import dev.technici4n.fasttransferlib.experimental.api.Content;
 import dev.technici4n.fasttransferlib.experimental.api.lookup.ItemLookupContext;
 import dev.technici4n.fasttransferlib.experimental.api.transfer.Context;
-import dev.technici4n.fasttransferlib.experimental.impl.instance.ItemInstance;
+import dev.technici4n.fasttransferlib.experimental.impl.instance.ItemContent;
 import dev.technici4n.fasttransferlib.experimental.impl.transfer.participant.SingleCategoryParticipant;
 import dev.technici4n.fasttransferlib.impl.mixin.BucketItemAccess;
 import net.minecraft.fluid.Fluid;
@@ -30,20 +30,20 @@ public class BucketParticipant
     }
 
     @Override
-    protected long insert(Context context, Instance instance, Fluid type, long maxAmount) {
+    protected long insert(Context context, Content content, Fluid type, long maxAmount) {
         if (lookupContext.getCount() == 0) return maxAmount;
         if (!(item.asItem() instanceof BucketItem)) return maxAmount;
         if (getFluid() != Fluids.EMPTY) return maxAmount;
         if (maxAmount < FluidConstants.BUCKET) return maxAmount;
-        if (!lookupContext.set(context, ItemInstance.of(type.getBucketItem()), 1L)) return maxAmount;
+        if (!lookupContext.set(context, ItemContent.of(type.getBucketItem()), 1L)) return maxAmount;
         return maxAmount - FluidConstants.BUCKET;
     }
 
     @Override
-    protected long extract(Context context, Instance instance, Fluid type, long maxAmount) {
+    protected long extract(Context context, Content content, Fluid type, long maxAmount) {
         if (lookupContext.getCount() == 0) return 0;
         if (getFluid() == Fluids.EMPTY || getFluid() != type) return 0;
-        if (!lookupContext.set(context, ItemInstance.of(Items.BUCKET), 1L)) return 0;
+        if (!lookupContext.set(context, ItemContent.of(Items.BUCKET), 1L)) return 0;
         return FluidConstants.BUCKET;
     }
 }

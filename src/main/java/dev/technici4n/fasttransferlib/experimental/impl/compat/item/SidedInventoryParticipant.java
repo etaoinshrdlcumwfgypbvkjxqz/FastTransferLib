@@ -1,7 +1,7 @@
 package dev.technici4n.fasttransferlib.experimental.impl.compat.item;
 
 import com.google.common.primitives.Ints;
-import dev.technici4n.fasttransferlib.experimental.api.Instance;
+import dev.technici4n.fasttransferlib.experimental.api.Content;
 import dev.technici4n.fasttransferlib.experimental.api.transfer.Context;
 import dev.technici4n.fasttransferlib.experimental.impl.transfer.participant.SingleCategoryParticipant;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
@@ -31,7 +31,7 @@ public class SidedInventoryParticipant
 	}
 
 	@Override
-	protected long insert(Context context, Instance instance, Item type, long maxAmount) {
+	protected long insert(Context context, Content content, Item type, long maxAmount) {
 		int size = this.size;
 		int[] slots = this.slots;
 		boolean sided = wrappedSided != null;
@@ -86,7 +86,7 @@ public class SidedInventoryParticipant
 	}
 
 	@Override
-	protected long extract(Context context, Instance instance, Item type, long maxAmount) {
+	protected long extract(Context context, Content content, Item type, long maxAmount) {
 		long leftoverAmount = maxAmount;
 
 		int size = this.size;

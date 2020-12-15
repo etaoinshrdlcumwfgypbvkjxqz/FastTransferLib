@@ -1,6 +1,6 @@
 package dev.technici4n.fasttransferlib.experimental.impl.compat.fluid;
 
-import dev.technici4n.fasttransferlib.experimental.api.Instance;
+import dev.technici4n.fasttransferlib.experimental.api.Content;
 import dev.technici4n.fasttransferlib.experimental.api.transfer.Context;
 import dev.technici4n.fasttransferlib.experimental.impl.transfer.participant.SingleCategoryParticipant;
 import net.minecraft.block.BlockState;
@@ -23,7 +23,7 @@ public class CauldronParticipant
     }
 
     @Override
-    protected long insert(Context context, Instance instance, Fluid type, long maxAmount) {
+    protected long insert(Context context, Content content, Fluid type, long maxAmount) {
         if (type != Fluids.WATER)
             return maxAmount;
 
@@ -46,7 +46,7 @@ public class CauldronParticipant
     }
 
     @Override
-    protected long extract(Context context, Instance instance, Fluid type, long maxAmount) {
+    protected long extract(Context context, Content content, Fluid type, long maxAmount) {
         if (type != Fluids.WATER)
             return 0L;
 

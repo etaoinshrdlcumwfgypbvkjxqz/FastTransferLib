@@ -1,6 +1,6 @@
 package dev.technici4n.fasttransferlib.experimental.api;
 
-public interface Instance {
+public interface Content {
     Object getType();
 
     Object getData();
