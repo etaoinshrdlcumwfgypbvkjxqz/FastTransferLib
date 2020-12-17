@@ -1,4 +1,4 @@
-package dev.technici4n.fasttransferlib.experimental.impl.transfer.context;
+package dev.technici4n.fasttransferlib.experimental.impl.context;
 
 import com.google.common.primitives.Ints;
 import dev.technici4n.fasttransferlib.experimental.api.Context;

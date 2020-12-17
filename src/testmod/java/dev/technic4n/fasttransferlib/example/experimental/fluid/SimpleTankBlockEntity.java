@@ -3,7 +3,7 @@ package dev.technic4n.fasttransferlib.example.experimental.fluid;
 import dev.technici4n.fasttransferlib.api.fluid.FluidConstants;
 import dev.technici4n.fasttransferlib.experimental.api.transfer.TransferApi;
 import dev.technici4n.fasttransferlib.experimental.api.view.ViewApi;
-import dev.technici4n.fasttransferlib.experimental.impl.compat.fluid.MonoFluidStorage;
+import dev.technici4n.fasttransferlib.experimental.impl.base.MonoFluidStorage;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.nbt.CompoundTag;

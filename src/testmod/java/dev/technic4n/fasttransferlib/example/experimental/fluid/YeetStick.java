@@ -7,8 +7,9 @@ import dev.technici4n.fasttransferlib.experimental.api.Content;
 import dev.technici4n.fasttransferlib.experimental.api.view.Atom;
 import dev.technici4n.fasttransferlib.experimental.api.view.View;
 import dev.technici4n.fasttransferlib.experimental.api.view.ViewApi;
+import dev.technici4n.fasttransferlib.experimental.impl.context.ExecutionContext;
 import dev.technici4n.fasttransferlib.experimental.impl.lookup.BlockLookupContextImpl;
-import dev.technici4n.fasttransferlib.experimental.impl.transfer.context.ExecutionContext;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.text.LiteralText;
@@ -29,15 +30,17 @@ public class YeetStick extends Item {
 					Content content = atom.getContent();
 					long extracted = atom.extract(ExecutionContext.getInstance(), content, 2 * FluidConstants.BOTTLE);
 					if (extracted > 0L) {
-						context.getPlayer().sendMessage(
-								new LiteralText(String.format("Extracted %s millibuckets of %s",
-										FluidTextHelper.getUnicodeMillibuckets(extracted, true), content)),
-								false);
-						context.getPlayer().sendMessage(
-								new LiteralText(String.format("Extracted %s millibuckets of %s",
-										FluidTextHelper.getUnicodeMillibuckets(extracted, false), content)),
-								false);
-
+						PlayerEntity player = context.getPlayer();
+						if (player != null) {
+							player.sendMessage(
+									new LiteralText(String.format("Extracted %s millibuckets of %s",
+											FluidTextHelper.getUnicodeMillibuckets(extracted, true), content)),
+									false);
+							player.sendMessage(
+									new LiteralText(String.format("Extracted %s millibuckets of %s",
+											FluidTextHelper.getUnicodeMillibuckets(extracted, false), content)),
+									false);
+						}
 						return ActionResult.SUCCESS;
 					}
 				}

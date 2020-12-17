@@ -1,7 +1,6 @@
-package dev.technici4n.fasttransferlib.experimental.impl.view;
+package dev.technici4n.fasttransferlib.experimental.impl.base;
 
 import dev.technici4n.fasttransferlib.experimental.api.view.Atom;
-import dev.technici4n.fasttransferlib.experimental.impl.transfer.participant.AbstractMonoCategoryParticipant;
 
 public abstract class AbstractMonoCategoryAtom<T>
         extends AbstractMonoCategoryParticipant<T>

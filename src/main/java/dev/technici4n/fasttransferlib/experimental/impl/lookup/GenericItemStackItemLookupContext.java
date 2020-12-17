@@ -5,7 +5,7 @@ import dev.technici4n.fasttransferlib.experimental.api.ContentStack;
 import dev.technici4n.fasttransferlib.experimental.api.Context;
 import dev.technici4n.fasttransferlib.experimental.api.lookup.ItemLookupContext;
 import dev.technici4n.fasttransferlib.experimental.impl.content.ContentStackImpl;
-import dev.technici4n.fasttransferlib.experimental.impl.transfer.context.TransactionContext;
+import dev.technici4n.fasttransferlib.experimental.impl.context.TransactionContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import org.jetbrains.annotations.Nullable;

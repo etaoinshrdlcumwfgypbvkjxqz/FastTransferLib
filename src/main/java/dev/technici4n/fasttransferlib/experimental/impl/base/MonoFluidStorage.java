@@ -1,10 +1,9 @@
-package dev.technici4n.fasttransferlib.experimental.impl.compat.fluid;
+package dev.technici4n.fasttransferlib.experimental.impl.base;
 
 import dev.technici4n.fasttransferlib.experimental.api.Content;
 import dev.technici4n.fasttransferlib.experimental.api.Context;
 import dev.technici4n.fasttransferlib.experimental.impl.content.EmptyContent;
 import dev.technici4n.fasttransferlib.experimental.impl.content.FluidContent;
-import dev.technici4n.fasttransferlib.experimental.impl.view.AbstractMonoCategoryAtom;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Identifier;

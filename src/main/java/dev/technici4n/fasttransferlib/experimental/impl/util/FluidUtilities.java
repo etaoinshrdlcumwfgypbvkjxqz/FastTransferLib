@@ -1,11 +1,11 @@
-package dev.technici4n.fasttransferlib.experimental.impl.view;
+package dev.technici4n.fasttransferlib.experimental.impl.util;
 
 import dev.technici4n.fasttransferlib.experimental.api.Content;
 import dev.technici4n.fasttransferlib.experimental.api.Context;
 import dev.technici4n.fasttransferlib.experimental.api.transfer.Participant;
 import dev.technici4n.fasttransferlib.experimental.api.view.Atom;
 import dev.technici4n.fasttransferlib.experimental.api.view.View;
-import dev.technici4n.fasttransferlib.experimental.impl.transfer.context.TransactionContext;
+import dev.technici4n.fasttransferlib.experimental.impl.context.TransactionContext;
 
 import java.util.Iterator;
 import java.util.function.Predicate;
