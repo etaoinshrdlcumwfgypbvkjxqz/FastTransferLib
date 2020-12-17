@@ -42,7 +42,7 @@ public class SimpleTankBlock extends Block implements BlockEntityProvider {
 		View view = ViewApi.BLOCK.get(world, pos, BlockLookupContextImpl.of(hit.getSide()));
 		View itemView = ViewApi.ITEM.get(player.getStackInHand(hand).getItem(), PlayerHandItemLookupContext.of(player, hand));
 		if (participant != null && view != null && itemView != null && view.estimateAtomSize() >= 1L) {
-			FluidUtilities.moveAll(itemView, participant, content -> content.getCategory() == Fluid.class);
+			FluidUtilities.moveAll(ExecutionContext.getInstance(), itemView, participant, content -> content.getCategory() == Fluid.class);
 			view.getAmounts().forEach((content, amount) -> {
 				player.sendMessage(
 						new LiteralText(String.format("Tank Now At %s millibuckets of %s",

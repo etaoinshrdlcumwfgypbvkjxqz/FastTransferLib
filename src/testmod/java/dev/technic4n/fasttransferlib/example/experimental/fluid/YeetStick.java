@@ -23,24 +23,22 @@ public class YeetStick extends Item {
 	public ActionResult useOnBlock(ItemUsageContext context) {
 		if (!context.getWorld().isClient()) {
 			View view = ViewApi.BLOCK.get(context.getWorld(), context.getBlockPos(), BlockLookupContextImpl.of(context.getSide()));
-			if (view != null) {
-				if (view.estimateAtomSize() >= 1L) {
-					Atom atom = Iterators.getNext(view.getAtomIterator(), null);
-					if (atom != null) {
-						Content content = atom.getContent();
-						long extracted = atom.extract(ExecutionContext.getInstance(), content, 2 * FluidConstants.BOTTLE);
-						if (extracted > 0L) {
-							context.getPlayer().sendMessage(
-									new LiteralText(String.format("Extracted %s millibuckets of %s",
-											FluidTextHelper.getUnicodeMillibuckets(extracted, true), content)),
-									false);
-							context.getPlayer().sendMessage(
-									new LiteralText(String.format("Extracted %s millibuckets of %s",
-											FluidTextHelper.getUnicodeMillibuckets(extracted, false), content)),
-									false);
+			if (view != null && view.estimateAtomSize() >= 1L) {
+				Atom atom = Iterators.getNext(view.getAtomIterator(), null);
+				if (atom != null) {
+					Content content = atom.getContent();
+					long extracted = atom.extract(ExecutionContext.getInstance(), content, 2 * FluidConstants.BOTTLE);
+					if (extracted > 0L) {
+						context.getPlayer().sendMessage(
+								new LiteralText(String.format("Extracted %s millibuckets of %s",
+										FluidTextHelper.getUnicodeMillibuckets(extracted, true), content)),
+								false);
+						context.getPlayer().sendMessage(
+								new LiteralText(String.format("Extracted %s millibuckets of %s",
+										FluidTextHelper.getUnicodeMillibuckets(extracted, false), content)),
+								false);
 
-							return ActionResult.SUCCESS;
-						}
+						return ActionResult.SUCCESS;
 					}
 				}
 			}

@@ -55,6 +55,7 @@ public class InventoryViewParticipant
 				Util.identityHashStrategy()
 		);
 
+		// transaction not needed - each slot only contributes to one operation and slots are independent of each other
 		for (int index = 0; index < size; ++index) {
 			int slot = index;
 			ItemStack stack = delegate.getStack(slot);
@@ -165,7 +166,7 @@ public class InventoryViewParticipant
 		return Object2LongMaps.unmodifiable(
 				IntStream.range(0, size)
 						.mapToObj(delegate::getStack)
-						.collect(() -> new Object2LongOpenHashMap<Content>(size),
+						.collect(() -> new Object2LongOpenHashMap<>(size),
 								(container, value) -> container.mergeLong(ItemContent.of(value), value.getCount(), Long::sum),
 								ViewImplUtilities.getAmountMapsMerger())
 		);
