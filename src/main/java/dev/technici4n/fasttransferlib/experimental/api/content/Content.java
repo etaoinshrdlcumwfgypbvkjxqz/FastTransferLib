@@ -1,4 +1,4 @@
-package dev.technici4n.fasttransferlib.experimental.api;
+package dev.technici4n.fasttransferlib.experimental.api.content;
 
 import org.jetbrains.annotations.Nullable;
 

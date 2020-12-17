@@ -1,7 +1,7 @@
 package dev.technici4n.fasttransferlib.experimental.impl.compat.vanilla.item;
 
-import dev.technici4n.fasttransferlib.experimental.api.Content;
 import dev.technici4n.fasttransferlib.experimental.api.Context;
+import dev.technici4n.fasttransferlib.experimental.api.content.Content;
 import dev.technici4n.fasttransferlib.experimental.impl.base.AbstractMonoCategoryAtom;
 import dev.technici4n.fasttransferlib.experimental.impl.content.ItemContent;
 import net.minecraft.inventory.SidedInventory;

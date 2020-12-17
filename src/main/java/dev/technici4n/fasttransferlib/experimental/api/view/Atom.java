@@ -2,7 +2,7 @@ package dev.technici4n.fasttransferlib.experimental.api.view;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterators;
-import dev.technici4n.fasttransferlib.experimental.api.Content;
+import dev.technici4n.fasttransferlib.experimental.api.content.Content;
 import dev.technici4n.fasttransferlib.experimental.api.transfer.Participant;
 import dev.technici4n.fasttransferlib.experimental.api.view.model.Model;
 import it.unimi.dsi.fastutil.objects.Object2LongMap;

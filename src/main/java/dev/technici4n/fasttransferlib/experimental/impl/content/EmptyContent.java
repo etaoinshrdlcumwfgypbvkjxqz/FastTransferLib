@@ -1,6 +1,6 @@
 package dev.technici4n.fasttransferlib.experimental.impl.content;
 
-import dev.technici4n.fasttransferlib.experimental.api.Content;
+import dev.technici4n.fasttransferlib.experimental.api.content.Content;
 
 import java.util.StringJoiner;
 

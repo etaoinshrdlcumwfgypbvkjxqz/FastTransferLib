@@ -1,7 +1,7 @@
 package dev.technici4n.fasttransferlib.experimental.impl.content;
 
-import dev.technici4n.fasttransferlib.experimental.api.Content;
-import dev.technici4n.fasttransferlib.experimental.api.ContentStack;
+import dev.technici4n.fasttransferlib.experimental.api.content.Content;
+import dev.technici4n.fasttransferlib.experimental.api.content.ContentStack;
 
 public final class ContentStackImpl
         implements ContentStack {

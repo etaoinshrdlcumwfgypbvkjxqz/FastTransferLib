@@ -1,8 +1,8 @@
 package dev.technici4n.fasttransferlib.experimental.impl.compat.vanilla.fluid;
 
 import dev.technici4n.fasttransferlib.api.fluid.FluidConstants;
-import dev.technici4n.fasttransferlib.experimental.api.Content;
 import dev.technici4n.fasttransferlib.experimental.api.Context;
+import dev.technici4n.fasttransferlib.experimental.api.content.Content;
 import dev.technici4n.fasttransferlib.experimental.api.view.Atom;
 import dev.technici4n.fasttransferlib.experimental.impl.base.AbstractMonoCategoryAtom;
 import dev.technici4n.fasttransferlib.experimental.impl.content.EmptyContent;

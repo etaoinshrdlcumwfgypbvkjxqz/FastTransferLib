@@ -3,7 +3,7 @@ package dev.technici4n.fasttransferlib.experimental.impl.content;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import dev.technici4n.fasttransferlib.experimental.api.Content;
+import dev.technici4n.fasttransferlib.experimental.api.content.Content;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;

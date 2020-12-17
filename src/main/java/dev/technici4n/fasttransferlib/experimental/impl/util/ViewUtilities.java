@@ -1,7 +1,7 @@
 package dev.technici4n.fasttransferlib.experimental.impl.util;
 
-import dev.technici4n.fasttransferlib.experimental.api.Content;
 import dev.technici4n.fasttransferlib.experimental.api.Context;
+import dev.technici4n.fasttransferlib.experimental.api.content.Content;
 import dev.technici4n.fasttransferlib.experimental.api.view.Atom;
 import dev.technici4n.fasttransferlib.experimental.api.view.View;
 import dev.technici4n.fasttransferlib.experimental.impl.context.TransactionContext;

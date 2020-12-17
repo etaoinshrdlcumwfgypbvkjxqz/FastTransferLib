@@ -3,7 +3,7 @@ package dev.technic4n.fasttransferlib.example.experimental.fluid;
 import com.google.common.collect.Iterators;
 import dev.technici4n.fasttransferlib.api.fluid.FluidConstants;
 import dev.technici4n.fasttransferlib.api.fluid.FluidTextHelper;
-import dev.technici4n.fasttransferlib.experimental.api.Content;
+import dev.technici4n.fasttransferlib.experimental.api.content.Content;
 import dev.technici4n.fasttransferlib.experimental.api.view.Atom;
 import dev.technici4n.fasttransferlib.experimental.api.view.View;
 import dev.technici4n.fasttransferlib.experimental.api.view.ViewApi;

@@ -1,7 +1,7 @@
 package dev.technici4n.fasttransferlib.experimental.impl.base;
 
-import dev.technici4n.fasttransferlib.experimental.api.Content;
 import dev.technici4n.fasttransferlib.experimental.api.Context;
+import dev.technici4n.fasttransferlib.experimental.api.content.Content;
 import dev.technici4n.fasttransferlib.experimental.api.transfer.Participant;
 
 public abstract class AbstractMonoCategoryParticipant<T>

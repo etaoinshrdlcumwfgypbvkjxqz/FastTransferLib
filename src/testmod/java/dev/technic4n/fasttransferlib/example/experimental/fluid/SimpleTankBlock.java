@@ -1,7 +1,7 @@
 package dev.technic4n.fasttransferlib.example.experimental.fluid;
 
 import dev.technici4n.fasttransferlib.api.fluid.FluidTextHelper;
-import dev.technici4n.fasttransferlib.experimental.api.Content;
+import dev.technici4n.fasttransferlib.experimental.api.content.Content;
 import dev.technici4n.fasttransferlib.experimental.api.transfer.Participant;
 import dev.technici4n.fasttransferlib.experimental.api.transfer.TransferApi;
 import dev.technici4n.fasttransferlib.experimental.api.view.View;
