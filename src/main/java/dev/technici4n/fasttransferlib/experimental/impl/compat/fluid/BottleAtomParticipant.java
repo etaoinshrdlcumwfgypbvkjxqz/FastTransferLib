@@ -26,27 +26,27 @@ public class BottleAtomParticipant
     }
 
     protected Fluid getFluid() {
-        return PotionUtil.getPotion(getLookupContext().getTag()) == Potions.WATER ? Fluids.WATER : Fluids.EMPTY;
+        return PotionUtil.getPotion(getLookupContext().getData()) == Potions.WATER ? Fluids.WATER : Fluids.EMPTY;
     }
 
     @Override
     protected long insert(Context context, Content content, Fluid type, long maxAmount) {
         ItemLookupContext lookupContext = getLookupContext();
-        if (lookupContext.getCount() == 0) return maxAmount;
-        if (PotionUtil.getPotion(lookupContext.getTag()) != Potions.EMPTY) return maxAmount;
+        if (lookupContext.getAmount() == 0) return maxAmount;
+        if (PotionUtil.getPotion(lookupContext.getData()) != Potions.EMPTY) return maxAmount;
         if (maxAmount < FluidConstants.BOTTLE) return maxAmount;
         if (type != Fluids.WATER) return maxAmount;
-        if (!lookupContext.set(context, ItemContent.of(Items.POTION), 1L)) return maxAmount;
+        if (!lookupContext.transform(context, 1L, ItemContent.of(Items.POTION), 1L)) return maxAmount;
         return maxAmount - FluidConstants.BOTTLE;
     }
 
     @Override
     protected long extract(Context context, Content content, Fluid type, long maxAmount) {
         ItemLookupContext lookupContext = getLookupContext();
-        if (lookupContext.getCount() == 0) return 0;
-        if (PotionUtil.getPotion(lookupContext.getTag()) != Potions.WATER) return 0;
+        if (lookupContext.getAmount() == 0) return 0;
+        if (PotionUtil.getPotion(lookupContext.getData()) != Potions.WATER) return 0;
         if (maxAmount < FluidConstants.BOTTLE) return 0;
-        if (!lookupContext.set(context, ItemContent.of(Items.GLASS_BOTTLE), 1L)) return 0;
+        if (!lookupContext.transform(context, 1L, ItemContent.of(Items.GLASS_BOTTLE), 1L)) return 0;
         return FluidConstants.BOTTLE;
     }
 
@@ -56,7 +56,7 @@ public class BottleAtomParticipant
 
     @Override
     public Content getContent() {
-        return PotionUtil.getPotion(lookupContext.getTag()) == Potions.WATER
+        return PotionUtil.getPotion(lookupContext.getData()) == Potions.WATER
                 ? FluidContent.of(Fluids.WATER)
                 : EmptyContent.INSTANCE;
     }

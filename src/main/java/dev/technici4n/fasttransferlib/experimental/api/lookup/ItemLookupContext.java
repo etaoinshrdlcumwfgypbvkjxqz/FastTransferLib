@@ -4,12 +4,10 @@ import dev.technici4n.fasttransferlib.experimental.api.Content;
 import dev.technici4n.fasttransferlib.experimental.api.Context;
 import net.minecraft.nbt.CompoundTag;
 
-// TODO set is not a good solution
 public interface ItemLookupContext {
-    long getCount();
+    long getAmount();
 
-    CompoundTag getTag();
+    CompoundTag getData();
 
-    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-    boolean set(Context context, Content content, long count);
+    boolean transform(Context context, long fromCount, Content to, long toCount);
 }

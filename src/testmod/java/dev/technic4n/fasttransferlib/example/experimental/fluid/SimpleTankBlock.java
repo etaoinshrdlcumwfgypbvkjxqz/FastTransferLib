@@ -6,7 +6,8 @@ import dev.technici4n.fasttransferlib.experimental.api.transfer.TransferApi;
 import dev.technici4n.fasttransferlib.experimental.api.view.View;
 import dev.technici4n.fasttransferlib.experimental.api.view.ViewApi;
 import dev.technici4n.fasttransferlib.experimental.impl.lookup.BlockLookupContextImpl;
-import dev.technici4n.fasttransferlib.experimental.impl.lookup.PlayerHandItemLookupContext;
+import dev.technici4n.fasttransferlib.experimental.impl.lookup.PlayerItemLookupContext;
+import dev.technici4n.fasttransferlib.experimental.impl.transfer.context.ExecutionContext;
 import dev.technici4n.fasttransferlib.experimental.impl.view.FluidUtilities;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
@@ -40,7 +41,7 @@ public class SimpleTankBlock extends Block implements BlockEntityProvider {
 			return ActionResult.CONSUME;
 		Participant participant = TransferApi.BLOCK.get(world, pos, BlockLookupContextImpl.of(hit.getSide()));
 		View view = ViewApi.BLOCK.get(world, pos, BlockLookupContextImpl.of(hit.getSide()));
-		View itemView = ViewApi.ITEM.get(player.getStackInHand(hand).getItem(), PlayerHandItemLookupContext.of(player, hand));
+		View itemView = ViewApi.ITEM.get(player.getStackInHand(hand).getItem(), PlayerItemLookupContext.ofHand(player, hand));
 		if (participant != null && view != null && itemView != null && view.estimateAtomSize() >= 1L) {
 			FluidUtilities.moveAll(ExecutionContext.getInstance(), itemView, participant, content -> content.getCategory() == Fluid.class);
 			view.getAmounts().forEach((content, amount) -> {

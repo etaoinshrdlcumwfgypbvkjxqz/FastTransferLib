@@ -33,19 +33,19 @@ public class BucketAtomParticipant
 
     @Override
     protected long insert(Context context, Content content, Fluid type, long maxAmount) {
-        if (getLookupContext().getCount() == 0) return maxAmount;
+        if (getLookupContext().getAmount() == 0) return maxAmount;
         if (!(getItem().asItem() instanceof BucketItem)) return maxAmount;
         if (getFluid() != Fluids.EMPTY) return maxAmount;
         if (maxAmount < FluidConstants.BUCKET) return maxAmount;
-        if (!getLookupContext().set(context, ItemContent.of(type.getBucketItem()), 1L)) return maxAmount;
+        if (!getLookupContext().transform(context, 1L, ItemContent.of(type.getBucketItem()), 1L)) return maxAmount;
         return maxAmount - FluidConstants.BUCKET;
     }
 
     @Override
     protected long extract(Context context, Content content, Fluid type, long maxAmount) {
-        if (getLookupContext().getCount() == 0) return 0;
+        if (getLookupContext().getAmount() == 0) return 0;
         if (getFluid() == Fluids.EMPTY || getFluid() != type) return 0;
-        if (!getLookupContext().set(context, ItemContent.of(Items.BUCKET), 1L)) return 0;
+        if (!getLookupContext().transform(context, 1L, ItemContent.of(Items.BUCKET), 1L)) return 0;
         return FluidConstants.BUCKET;
     }
 
