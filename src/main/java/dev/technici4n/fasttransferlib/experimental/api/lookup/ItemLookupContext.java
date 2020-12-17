@@ -10,4 +10,8 @@ public interface ItemLookupContext {
     CompoundTag getData();
 
     boolean transform(Context context, long fromCount, Content to, long toCount);
+
+    static boolean isInvalid(ItemLookupContext instance) {
+        return instance.getAmount() == 0L;
+    }
 }

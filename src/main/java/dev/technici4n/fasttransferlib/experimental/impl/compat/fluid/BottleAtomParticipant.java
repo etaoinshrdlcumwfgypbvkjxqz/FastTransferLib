@@ -4,23 +4,22 @@ import dev.technici4n.fasttransferlib.api.fluid.FluidConstants;
 import dev.technici4n.fasttransferlib.experimental.api.Content;
 import dev.technici4n.fasttransferlib.experimental.api.Context;
 import dev.technici4n.fasttransferlib.experimental.api.lookup.ItemLookupContext;
-import dev.technici4n.fasttransferlib.experimental.impl.content.EmptyContent;
 import dev.technici4n.fasttransferlib.experimental.impl.content.FluidContent;
 import dev.technici4n.fasttransferlib.experimental.impl.content.ItemContent;
 import dev.technici4n.fasttransferlib.experimental.impl.view.AbstractMonoCategoryAtom;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
-import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.Items;
 import net.minecraft.potion.PotionUtil;
 import net.minecraft.potion.Potions;
 
-// TODO improvement
+import java.util.Optional;
+
 public class BottleAtomParticipant
         extends AbstractMonoCategoryAtom<Fluid> {
     private final ItemLookupContext lookupContext;
 
-    public BottleAtomParticipant(@SuppressWarnings("unused") ItemConvertible item, ItemLookupContext lookupContext) {
+    public BottleAtomParticipant(ItemLookupContext lookupContext) {
         super(Fluid.class);
         this.lookupContext = lookupContext;
     }
@@ -32,21 +31,23 @@ public class BottleAtomParticipant
     @Override
     protected long insert(Context context, Content content, Fluid type, long maxAmount) {
         ItemLookupContext lookupContext = getLookupContext();
-        if (lookupContext.getAmount() == 0) return maxAmount;
-        if (PotionUtil.getPotion(lookupContext.getData()) != Potions.EMPTY) return maxAmount;
-        if (maxAmount < FluidConstants.BOTTLE) return maxAmount;
-        if (type != Fluids.WATER) return maxAmount;
-        if (!lookupContext.transform(context, 1L, ItemContent.of(Items.POTION), 1L)) return maxAmount;
+        if (maxAmount < FluidConstants.BOTTLE
+                || !getContent().isEmpty()
+                || !getContentAsItemContent()
+                .filter(itemContent -> lookupContext.transform(context, 1L, itemContent, 1L))
+                .isPresent())
+            return maxAmount;
         return maxAmount - FluidConstants.BOTTLE;
     }
 
     @Override
     protected long extract(Context context, Content content, Fluid type, long maxAmount) {
         ItemLookupContext lookupContext = getLookupContext();
-        if (lookupContext.getAmount() == 0) return 0;
-        if (PotionUtil.getPotion(lookupContext.getData()) != Potions.WATER) return 0;
-        if (maxAmount < FluidConstants.BOTTLE) return 0;
-        if (!lookupContext.transform(context, 1L, ItemContent.of(Items.GLASS_BOTTLE), 1L)) return 0;
+        if (maxAmount < FluidConstants.BOTTLE
+                || getContent().isEmpty()
+                || !content.equals(getContent())
+                || !lookupContext.transform(context, 1L, ItemContent.of(Items.GLASS_BOTTLE), 1L))
+            return 0L;
         return FluidConstants.BOTTLE;
     }
 
@@ -56,13 +57,20 @@ public class BottleAtomParticipant
 
     @Override
     public Content getContent() {
-        return PotionUtil.getPotion(lookupContext.getData()) == Potions.WATER
-                ? FluidContent.of(Fluids.WATER)
-                : EmptyContent.INSTANCE;
+        return FluidContent.of(getFluid());
     }
 
     @Override
     public long getAmount() {
         return getContent().isEmpty() ? 0L : FluidConstants.BOTTLE;
+    }
+
+    protected Optional<? extends Content> getContentAsItemContent() {
+        if (getContent().equals(FluidContent.of(Fluids.WATER)))
+            return Optional.of(ItemContent.of(Items.POTION));
+
+        // for mixins, should be a better way to do this
+
+        return Optional.empty();
     }
 }

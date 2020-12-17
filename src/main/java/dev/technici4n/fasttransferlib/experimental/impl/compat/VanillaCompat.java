@@ -101,12 +101,12 @@ public enum VanillaCompat {
         static {
             TransferApi.BLOCK.registerForBlocks(FluidCompat::getCauldronViewParticipant,
                     Blocks.CAULDRON);
-            TransferApi.ITEM.register(BottleAtomParticipant::new, Items.POTION, Items.GLASS_BOTTLE);
+            TransferApi.ITEM.register(FluidCompat::getBottleAtomParticipant, Items.POTION, Items.GLASS_BOTTLE);
             TransferApi.ITEM.registerFallback(FluidCompat::getBucketFallbackViewParticipant);
 
             ViewApi.BLOCK.registerForBlocks(FluidCompat::getCauldronViewParticipant,
                     Blocks.CAULDRON);
-            ViewApi.ITEM.register(BottleAtomParticipant::new, Items.POTION, Items.GLASS_BOTTLE);
+            ViewApi.ITEM.register(FluidCompat::getBottleAtomParticipant, Items.POTION, Items.GLASS_BOTTLE);
             ViewApi.ITEM.registerFallback(FluidCompat::getBucketFallbackViewParticipant);
         }
 
@@ -114,13 +114,17 @@ public enum VanillaCompat {
 
         private static BucketAtomParticipant getBucketFallbackViewParticipant(ItemConvertible item, ItemLookupContext context) {
             Item item1 = item.asItem();
-            if (!(item1 instanceof BucketItem)) return null;
-            if (item1 instanceof FishBucketItem) return null;
-            return new BucketAtomParticipant(item1, context);
+            if (item1 instanceof BucketItem && !(item1 instanceof FishBucketItem))
+                return new BucketAtomParticipant(item1, context);
+            return null;
         }
 
         private static CauldronAtomParticipant getCauldronViewParticipant(World world, BlockPos pos, BlockState state, BlockLookupContext direction) {
             return new CauldronAtomParticipant(world, pos);
+        }
+
+        private static BottleAtomParticipant getBottleAtomParticipant(ItemConvertible item, ItemLookupContext lookupContext) {
+            return new BottleAtomParticipant(lookupContext);
         }
     }
 }
