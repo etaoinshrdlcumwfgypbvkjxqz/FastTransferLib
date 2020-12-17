@@ -97,7 +97,7 @@ public class SidedInventoryViewParticipant
 					});
 				} else
 					amount = 0;
-			} else if (stack.getItem() == type) {
+			} else if (content.equals(ItemContent.of(stack))) {
 				amount = Math.toIntExact(Math.min(maxAmount, maxCount - stack.getCount()));
 				incrementalActions.put(stack, amount);
 			} else
@@ -139,7 +139,7 @@ public class SidedInventoryViewParticipant
 
 		for (int index = 0; index < size; ++index) {
 			ItemStack stack = delegate.getStack(slots[index]);
-			if (!stack.isEmpty() && stack.getItem() == type && delegate.canExtract(index, stack, direction)) {
+			if (!stack.isEmpty() && content.equals(ItemContent.of(stack)) && delegate.canExtract(index, stack, direction)) {
 				// stack is not empty, item matches, can extract
 				int amount = Math.toIntExact(Math.min(leftoverAmount, stack.getCount())); // COMMENT should be in int range, negative excluded
 				incrementalActions.put(stack, amount);

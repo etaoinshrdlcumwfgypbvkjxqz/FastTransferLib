@@ -55,7 +55,7 @@ public class SidedInventorySlotAtom
                 });
             } else
                 amount = 0;
-        } else if (stack.getItem() == type) {
+        } else if (content.equals(ItemContent.of(stack))) {
             amount = Math.toIntExact(Math.min(maxAmount, maxCount - stack.getCount()));
             context.execute(() -> {
                 stack.increment(amount);
@@ -76,7 +76,7 @@ public class SidedInventorySlotAtom
         int slot = getSlot();
         ItemStack stack = inventory.getStack(slot);
 
-        if (!stack.isEmpty() && stack.getItem() == type && inventory.canExtract(slot, stack, getDirection())) {
+        if (!stack.isEmpty() && content.equals(ItemContent.of(stack)) && inventory.canExtract(slot, stack, getDirection())) {
             // stack is not empty, item matches, can extract
             int amount = Math.toIntExact(Math.min(maxAmount, stack.getCount())); // COMMENT should be in int range, negative excluded
             context.execute(() -> {

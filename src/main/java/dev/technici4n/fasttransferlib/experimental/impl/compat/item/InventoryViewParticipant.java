@@ -69,7 +69,7 @@ public class InventoryViewParticipant
 					delegate.setStack(slot, stack);
 					delegate.markDirty();
 				});
-			} else if (stack.getItem() == type) {
+			} else if (content.equals(ItemContent.of(stack))) {
 				amount = Math.toIntExact(Math.min(maxAmount, maxCount - stack.getCount()));
 				incrementalActions.put(stack, amount);
 			} else
@@ -109,7 +109,7 @@ public class InventoryViewParticipant
 
 		for (int index = 0; index < size; ++index) {
 			ItemStack stack = delegate.getStack(index);
-			if (!stack.isEmpty() && stack.getItem() == type) {
+			if (!stack.isEmpty() && content.equals(ItemContent.of(stack))) {
 				// stack is not empty, item matches, can extract
 				int amount = Math.toIntExact(Math.min(leftoverAmount, stack.getCount())); // COMMENT should be in int range, negative excluded
 				incrementalActions.put(stack, amount);

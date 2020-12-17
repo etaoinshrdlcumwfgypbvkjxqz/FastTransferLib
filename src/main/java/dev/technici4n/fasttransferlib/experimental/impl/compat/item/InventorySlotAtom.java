@@ -55,7 +55,7 @@ public class InventorySlotAtom
                 inventory.setStack(slot, stack);
                 inventory.markDirty();
             });
-        } else if (stack.getItem() == type) {
+        } else if (content.equals(ItemContent.of(stack))) {
             amount = Math.toIntExact(Math.min(maxAmount, maxCount - stack.getCount()));
             context.execute(() -> {
                 stack.increment(amount);
@@ -73,7 +73,7 @@ public class InventorySlotAtom
     @Override
     protected long extract(Context context, Content content, Item type, long maxAmount) {
         ItemStack stack = getInventory().getStack(getSlot());
-        if (!stack.isEmpty() && stack.getItem() == type) {
+        if (!stack.isEmpty() && content.equals(ItemContent.of(stack))) {
             // stack is not empty, item matches, can extract
             int amount = Math.toIntExact(Math.min(maxAmount, stack.getCount())); // COMMENT should be in int range, negative excluded
             context.execute(() -> {
