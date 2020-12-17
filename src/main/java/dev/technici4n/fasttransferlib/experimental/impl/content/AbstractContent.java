@@ -8,13 +8,22 @@ import java.util.StringJoiner;
 
 public abstract class AbstractContent<T>
         implements Content {
+    private final T type;
+    public static final Object NO_DATA = new Object();
+
+    protected AbstractContent(T type) {
+        this.type = type;
+    }
+
     @Override
     @NotNull
     public abstract Class<T> getCategory();
 
     @Override
     @NotNull
-    public abstract T getType();
+    public final T getType() {
+        return type;
+    }
 
     @Override
     @NotNull

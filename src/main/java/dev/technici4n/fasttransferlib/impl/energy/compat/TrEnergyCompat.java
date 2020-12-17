@@ -10,10 +10,8 @@ public class TrEnergyCompat {
 
 	static {
 		EnergyApi.SIDED.registerBlockEntityFallback((blockEntity, direction) -> {
-			if (Energy.valid(blockEntity)) {
+			if (Energy.valid(blockEntity))
 				return new TrWrappedEnergyHandler(Energy.of(blockEntity), direction);
-			}
-
 			return null;
 		});
 	}

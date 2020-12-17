@@ -17,11 +17,10 @@ public final class ItemContent
             .concurrencyLevel(1)
             .initialCapacity(16)
             .build(CacheLoader.from(key -> new ItemContent(key, NO_DATA)));
-    private final Item type;
     private final CompoundTag data;
 
     private ItemContent(Item type, CompoundTag data) {
-        this.type = type;
+        super(type);
         this.data = data;
     }
 
@@ -45,11 +44,6 @@ public final class ItemContent
         ItemStack result = new ItemStack((Item) content.getType(), amount);
         result.setTag((CompoundTag) content.getData());
         return result;
-    }
-
-    @Override
-    public @NotNull Item getType() {
-        return type;
     }
 
     @Override

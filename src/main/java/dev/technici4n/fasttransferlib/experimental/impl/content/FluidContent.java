@@ -10,15 +10,13 @@ import org.jetbrains.annotations.NotNull;
 
 public final class FluidContent
         extends AbstractContent<Fluid> {
-    private static final Object NO_DATA = new Object();
     private static final LoadingCache<Fluid, FluidContent> CACHE = CacheBuilder.newBuilder()
             .concurrencyLevel(1)
             .initialCapacity(16)
             .build(CacheLoader.from(FluidContent::new));
-    private final Fluid type;
 
     private FluidContent(Fluid type) {
-        this.type = type;
+        super(type);
     }
 
     public static Content of(Fluid type) {
@@ -26,13 +24,8 @@ public final class FluidContent
     }
 
     @Override
-    public @NotNull Fluid getType() {
-        return type;
-    }
-
-    @Override
     public @NotNull Object getData() {
-        return NO_DATA;
+        return AbstractContent.NO_DATA;
     }
 
     @Override
