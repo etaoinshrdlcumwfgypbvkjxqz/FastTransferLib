@@ -1,6 +1,6 @@
 package dev.technici4n.fasttransferlib.experimental.impl;
 
-import dev.technici4n.fasttransferlib.experimental.impl.compat.VanillaCompat;
+import dev.technici4n.fasttransferlib.experimental.impl.compat.vanilla.VanillaCompat;
 import net.fabricmc.loader.api.FabricLoader;
 
 import java.lang.reflect.Method;
@@ -12,7 +12,7 @@ public enum ApiInit {
         VanillaCompat.initializeClass();
         if (FabricLoader.getInstance().isModLoaded("libblockattributes_items")) {
             try {
-                Class<?> clazz = Class.forName("dev.technici4n.fasttransferlib.experimental.impl.compat.LbaCompat$ItemCompat");
+                Class<?> clazz = Class.forName("dev.technici4n.fasttransferlib.experimental.impl.compat.lba.LbaCompat$ItemCompat");
                 Method init = clazz.getMethod("initializeClass");
                 init.invoke(null);
             } catch (Exception ex) {
@@ -21,7 +21,7 @@ public enum ApiInit {
         }
         if (FabricLoader.getInstance().isModLoaded("libblockattributes_fluids")) {
             try {
-                Class<?> clazz = Class.forName("dev.technici4n.fasttransferlib.experimental.impl.compat.LbaCompat$FluidCompat");
+                Class<?> clazz = Class.forName("dev.technici4n.fasttransferlib.experimental.impl.compat.lba.LbaCompat$FluidCompat");
                 Method init = clazz.getMethod("initializeClass");
                 init.invoke(null);
             } catch (Exception ex) {

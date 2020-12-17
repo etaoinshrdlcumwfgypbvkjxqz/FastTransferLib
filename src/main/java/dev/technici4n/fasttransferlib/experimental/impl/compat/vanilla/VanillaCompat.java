@@ -1,4 +1,4 @@
-package dev.technici4n.fasttransferlib.experimental.impl.compat;
+package dev.technici4n.fasttransferlib.experimental.impl.compat.vanilla;
 
 import dev.technici4n.fasttransferlib.experimental.api.lookup.BlockLookupContext;
 import dev.technici4n.fasttransferlib.experimental.api.lookup.ItemLookupContext;
@@ -6,10 +6,10 @@ import dev.technici4n.fasttransferlib.experimental.api.transfer.Participant;
 import dev.technici4n.fasttransferlib.experimental.api.transfer.TransferApi;
 import dev.technici4n.fasttransferlib.experimental.api.view.View;
 import dev.technici4n.fasttransferlib.experimental.api.view.ViewApi;
-import dev.technici4n.fasttransferlib.experimental.impl.compat.fluid.BottleAtomParticipant;
-import dev.technici4n.fasttransferlib.experimental.impl.compat.fluid.BucketAtomParticipant;
-import dev.technici4n.fasttransferlib.experimental.impl.compat.fluid.CauldronAtomParticipant;
-import dev.technici4n.fasttransferlib.experimental.impl.compat.item.SidedInventoryViewParticipant;
+import dev.technici4n.fasttransferlib.experimental.impl.compat.vanilla.fluid.BottleAtomParticipant;
+import dev.technici4n.fasttransferlib.experimental.impl.compat.vanilla.fluid.BucketAtomParticipant;
+import dev.technici4n.fasttransferlib.experimental.impl.compat.vanilla.fluid.CauldronAtomParticipant;
+import dev.technici4n.fasttransferlib.experimental.impl.compat.vanilla.item.SidedInventoryViewParticipant;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.ChestBlock;

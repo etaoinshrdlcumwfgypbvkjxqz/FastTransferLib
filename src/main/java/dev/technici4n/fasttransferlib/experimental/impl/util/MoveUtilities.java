@@ -8,12 +8,12 @@ import dev.technici4n.fasttransferlib.experimental.api.view.View;
 import dev.technici4n.fasttransferlib.experimental.impl.context.TransactionContext;
 
 import java.util.Iterator;
-import java.util.function.Predicate;
+import java.util.function.Function;
 
-public enum FluidUtilities {
+public enum MoveUtilities {
     ;
 
-    public static long moveAll(Context context, View from, Participant to, Predicate<? super Content> filter) {
+    public static long moveAll(Context context, View from, Participant to, Function<? super Atom, ? extends Content> filter) {
         long result = 0L;
         try (TransactionContext transaction = new TransactionContext(from.estimateAtomSize())) {
             // need transaction, extract and insert may have unknown side effect
@@ -21,8 +21,8 @@ public enum FluidUtilities {
             for (Iterator<? extends Atom> fromIterator = from.getAtomIterator();
                  fromIterator.hasNext();) {
                 Atom fromAtom = fromIterator.next();
-                Content content = fromAtom.getContent();
-                if (filter.test(content)) {
+                Content content = filter.apply(fromAtom);
+                if (content != null) {
                     while (true) {
                         long actualExtract;
                         try (TransactionContext atomTransactionTest = new TransactionContext(2L)) {

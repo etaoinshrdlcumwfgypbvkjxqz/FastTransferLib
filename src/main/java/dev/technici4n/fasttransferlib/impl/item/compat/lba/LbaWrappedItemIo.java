@@ -7,10 +7,9 @@ import alexiil.mc.lib.attributes.item.filter.ItemFilter;
 import dev.technici4n.fasttransferlib.api.item.ItemIo;
 import dev.technici4n.fasttransferlib.api.item.ItemKey;
 import dev.technici4n.fasttransferlib.impl.compat.LbaUtil;
-
 import net.minecraft.item.ItemStack;
 
-class LbaWrappedItemIo implements FixedItemInvView, ItemTransferable {
+public class LbaWrappedItemIo implements FixedItemInvView, ItemTransferable {
 	private final ItemIo io;
 
 	LbaWrappedItemIo(ItemIo io) {

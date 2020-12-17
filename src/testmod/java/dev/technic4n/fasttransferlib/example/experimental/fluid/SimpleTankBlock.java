@@ -1,6 +1,7 @@
 package dev.technic4n.fasttransferlib.example.experimental.fluid;
 
 import dev.technici4n.fasttransferlib.api.fluid.FluidTextHelper;
+import dev.technici4n.fasttransferlib.experimental.api.Content;
 import dev.technici4n.fasttransferlib.experimental.api.transfer.Participant;
 import dev.technici4n.fasttransferlib.experimental.api.transfer.TransferApi;
 import dev.technici4n.fasttransferlib.experimental.api.view.View;
@@ -8,7 +9,7 @@ import dev.technici4n.fasttransferlib.experimental.api.view.ViewApi;
 import dev.technici4n.fasttransferlib.experimental.impl.context.ExecutionContext;
 import dev.technici4n.fasttransferlib.experimental.impl.lookup.BlockLookupContextImpl;
 import dev.technici4n.fasttransferlib.experimental.impl.lookup.PlayerItemLookupContext;
-import dev.technici4n.fasttransferlib.experimental.impl.util.FluidUtilities;
+import dev.technici4n.fasttransferlib.experimental.impl.util.MoveUtilities;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
@@ -42,7 +43,10 @@ public class SimpleTankBlock extends Block implements BlockEntityProvider {
 		View itemView = ViewApi.ITEM.get(player.getStackInHand(hand).getItem(), PlayerItemLookupContext.ofHand(player, hand));
 		if (participant != null && view != null && itemView != null) {
 			if (!world.isClient()) {
-				FluidUtilities.moveAll(ExecutionContext.getInstance(), itemView, participant, content -> content.getCategory() == Fluid.class);
+				MoveUtilities.moveAll(ExecutionContext.getInstance(), itemView, participant, atom -> {
+					Content content = atom.getContent();
+					return content.getCategory() == Fluid.class ? content : null;
+				});
 				view.getAmounts().forEach((content, amount) -> {
 					player.sendMessage(
 							new LiteralText(String.format("Tank Now At %s millibuckets of %s",

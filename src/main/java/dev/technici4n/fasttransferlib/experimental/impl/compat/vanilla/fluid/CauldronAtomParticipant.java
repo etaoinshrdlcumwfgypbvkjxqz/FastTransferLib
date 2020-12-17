@@ -1,4 +1,4 @@
-package dev.technici4n.fasttransferlib.experimental.impl.compat.fluid;
+package dev.technici4n.fasttransferlib.experimental.impl.compat.vanilla.fluid;
 
 import dev.technici4n.fasttransferlib.api.fluid.FluidConstants;
 import dev.technici4n.fasttransferlib.experimental.api.Content;

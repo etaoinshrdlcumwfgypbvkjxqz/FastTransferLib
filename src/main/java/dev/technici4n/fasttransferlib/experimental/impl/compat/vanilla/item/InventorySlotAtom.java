@@ -1,4 +1,4 @@
-package dev.technici4n.fasttransferlib.experimental.impl.compat.item;
+package dev.technici4n.fasttransferlib.experimental.impl.compat.vanilla.item;
 
 import dev.technici4n.fasttransferlib.experimental.api.Content;
 import dev.technici4n.fasttransferlib.experimental.api.Context;

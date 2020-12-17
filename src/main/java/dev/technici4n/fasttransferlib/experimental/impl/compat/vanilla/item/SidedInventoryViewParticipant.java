@@ -1,4 +1,4 @@
-package dev.technici4n.fasttransferlib.experimental.impl.compat.item;
+package dev.technici4n.fasttransferlib.experimental.impl.compat.vanilla.item;
 
 import com.google.common.base.Suppliers;
 import com.google.common.collect.ImmutableList;
