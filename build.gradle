@@ -48,6 +48,8 @@ dependencies {
     modApi "net.fabricmc.fabric-api:fabric-provider-api-v1:${project.api_provider_version}"
     include "net.fabricmc.fabric-api:fabric-provider-api-v1:${project.api_provider_version}"
     modImplementation "alexiil.mc.lib:libblockattributes-all:${project.lba_version}"
+    modImplementation "teamreborn:energy:${project.tr_energy_version}"
+    include "teamreborn:energy:${project.tr_energy_version}"
 
     afterEvaluate {
         testmodImplementation sourceSets.main.output
@@ -108,6 +110,9 @@ publishing {
     // Select the repositories you want to publish to
     // To publish to maven local, no extra repositories are necessary. Just use the task `publishToMavenLocal`.
     repositories {
+        maven {
+            url = System.getenv("MAVEN_URL")
+        }
         // See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
     }
 }
