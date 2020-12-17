@@ -10,11 +10,8 @@ import net.minecraft.nbt.CompoundTag;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Objects;
-import java.util.StringJoiner;
-
 public final class ItemContent
-        implements Content {
+        extends AbstractContent<Item> {
     private static final CompoundTag NO_DATA = new CompoundTag();
     private static final LoadingCache<Item, ItemContent> CACHE = CacheBuilder.newBuilder()
             .concurrencyLevel(1)
@@ -43,7 +40,7 @@ public final class ItemContent
     }
 
     @Override
-    public Item getType() {
+    public @NotNull Item getType() {
         return type;
     }
 
@@ -54,33 +51,7 @@ public final class ItemContent
     }
 
     @Override
-    public Class<?> getCategory() {
+    public @NotNull Class<Item> getCategory() {
         return Item.class;
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return false;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Content)) return false;
-        Content that = (Content) o;
-        return getType().equals(that.getType()) && getData().equals(that.getData());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getType(), getData());
-    }
-
-    @Override
-    public String toString() {
-        return new StringJoiner(", ", ItemContent.class.getSimpleName() + "[", "]")
-                .add("type=" + getType())
-                .add("data=" + getData())
-                .toString();
     }
 }

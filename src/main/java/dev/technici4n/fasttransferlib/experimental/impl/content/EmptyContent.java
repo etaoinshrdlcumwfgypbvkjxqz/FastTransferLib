@@ -9,7 +9,7 @@ public enum EmptyContent
     INSTANCE;
 
     @Override
-    public Object getType() {
+    public Void getType() {
         return null;
     }
 
@@ -19,7 +19,7 @@ public enum EmptyContent
     }
 
     @Override
-    public Class<?> getCategory() {
+    public Class<Void> getCategory() {
         return Void.class;
     }
 
@@ -30,7 +30,7 @@ public enum EmptyContent
 
     @Override
     public String toString() {
-        return new StringJoiner(", ", EmptyContent.class.getSimpleName() + "[", "]")
+        return new StringJoiner(", ", getClass().getSimpleName() + "[", "]")
                 .toString();
     }
 }

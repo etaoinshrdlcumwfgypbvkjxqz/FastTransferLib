@@ -6,12 +6,10 @@ import com.google.common.cache.LoadingCache;
 import dev.technici4n.fasttransferlib.experimental.api.Content;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
-
-import java.util.Objects;
-import java.util.StringJoiner;
+import org.jetbrains.annotations.NotNull;
 
 public final class FluidContent
-        implements Content {
+        extends AbstractContent<Fluid> {
     private static final Object NO_DATA = new Object();
     private static final LoadingCache<Fluid, FluidContent> CACHE = CacheBuilder.newBuilder()
             .concurrencyLevel(1)
@@ -28,43 +26,17 @@ public final class FluidContent
     }
 
     @Override
-    public Fluid getType() {
+    public @NotNull Fluid getType() {
         return type;
     }
 
     @Override
-    public Object getData() {
+    public @NotNull Object getData() {
         return NO_DATA;
     }
 
     @Override
-    public Class<?> getCategory() {
+    public @NotNull Class<Fluid> getCategory() {
         return Fluid.class;
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return false;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Content)) return false;
-        Content that = (Content) o;
-        return getType().equals(that.getType());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getType());
-    }
-
-    @Override
-    public String toString() {
-        return new StringJoiner(", ", FluidContent.class.getSimpleName() + "[", "]")
-                .add("type=" + getType())
-                .add("data=" + getData())
-                .toString();
     }
 }
