@@ -5,7 +5,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.primitives.Ints;
 import dev.technici4n.fasttransferlib.experimental.api.Content;
 import dev.technici4n.fasttransferlib.experimental.api.Context;
-import dev.technici4n.fasttransferlib.experimental.api.transfer.Participant;
 import dev.technici4n.fasttransferlib.experimental.api.view.Atom;
 import dev.technici4n.fasttransferlib.experimental.api.view.View;
 import dev.technici4n.fasttransferlib.experimental.api.view.model.ListModel;
@@ -14,63 +13,41 @@ import dev.technici4n.fasttransferlib.experimental.impl.content.ItemContent;
 import dev.technici4n.fasttransferlib.experimental.impl.util.ViewImplUtilities;
 import it.unimi.dsi.fastutil.objects.*;
 import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Util;
-import net.minecraft.util.math.Direction;
 
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Supplier;
+import java.util.stream.IntStream;
 
-public class SidedInventoryViewParticipant
+public class InventoryViewParticipant
 		extends AbstractMonoCategoryParticipant<Item>
 		implements View, ListModel {
-	private final SidedInventory delegate;
-	private final Direction direction;
-	private final int[] slots;
+	private final Inventory delegate;
 	private final Supplier<? extends List<? extends Atom>> atomList;
 
 	@SuppressWarnings("UnstableApiUsage")
-	protected SidedInventoryViewParticipant(SidedInventory delegate, Direction direction) {
+	protected InventoryViewParticipant(Inventory delegate) {
 		super(Item.class);
-		// SidedInventory violates the substitution principle, so do NOT extend InventoryViewParticipant
 		this.delegate = delegate;
-		this.direction = direction;
-		this.slots = delegate.getAvailableSlots(direction);
 		this.atomList = Suppliers.memoize(() -> {
-			SidedInventory delegate1 = getDelegate();
-			Direction direction1 = getDirection();
-			return Arrays.stream(getSlots())
-					.mapToObj(slot -> new SidedInventorySlotAtom(delegate1, direction1, slot))
+			Inventory delegate1 = getDelegate();
+			return IntStream.range(0, delegate1.size())
+					.mapToObj(slot -> new InventorySlotAtom(delegate1, slot))
 					.collect(ImmutableList.toImmutableList());
 		});
 	}
 
-	private static SidedInventoryViewParticipant of(SidedInventory delegate, Direction direction) {
-		return new SidedInventoryViewParticipant(delegate, direction);
-	}
-
-	public static Participant ofParticipant(Inventory delegate, Direction direction) {
-		if (delegate instanceof SidedInventory)
-			return of((SidedInventory) delegate, direction);
-		return InventoryViewParticipant.of(delegate);
-	}
-
-	public static View ofView(Inventory delegate, Direction direction) {
-		if (delegate instanceof SidedInventory)
-			return of((SidedInventory) delegate, direction);
-		return InventoryViewParticipant.of(delegate);
+	static InventoryViewParticipant of(Inventory delegate) {
+		return new InventoryViewParticipant(delegate);
 	}
 
 	@Override
 	protected long insert(Context context, Content content, Item type, long maxAmount) {
-		SidedInventory delegate = getDelegate();
-		int[] slots = getSlots();
-		int size = slots.length;
-		Direction direction = getDirection();
+		Inventory delegate = getDelegate();
+		int size = delegate.size();
 
 		int maxCount = Math.min(delegate.getMaxCountPerStack(), type.getMaxCount());
 		Object2IntMap<ItemStack> incrementalActions = new Object2IntOpenCustomHashMap<>(
@@ -78,25 +55,21 @@ public class SidedInventoryViewParticipant
 				Util.identityHashStrategy()
 		);
 
+		// transaction not needed - each slot only contributes to one operation and slots are independent of each other
 		for (int index = 0; index < size; ++index) {
-			int slot = slots[index];
+			int slot = index;
 			ItemStack stack = delegate.getStack(slot);
 
 			int amount;
 			if (stack.isEmpty())  {
-				ItemStack nextStack = new ItemStack(type);
-				if (delegate.canInsert(index, nextStack, direction)) {
-					amount = Math.toIntExact(Math.min(maxAmount, maxCount));
-					nextStack.setCount(amount);
-					context.execute(() -> {
-						delegate.setStack(slot, nextStack);
-						delegate.markDirty();
-					}, () -> {
-						delegate.setStack(slot, stack);
-						delegate.markDirty();
-					});
-				} else
-					amount = 0;
+				amount = Math.toIntExact(Math.min(maxAmount, maxCount));
+				context.execute(() -> {
+					delegate.setStack(slot, ItemContent.asStack(content, amount));
+					delegate.markDirty();
+				}, () -> {
+					delegate.setStack(slot, stack);
+					delegate.markDirty();
+				});
 			} else if (content.equals(ItemContent.of(stack))) {
 				amount = Math.toIntExact(Math.min(maxAmount, maxCount - stack.getCount()));
 				incrementalActions.put(stack, amount);
@@ -126,10 +99,8 @@ public class SidedInventoryViewParticipant
 	protected long extract(Context context, Content content, Item type, long maxAmount) {
 		long leftoverAmount = maxAmount;
 
-		SidedInventory delegate = getDelegate();
-		int[] slots = getSlots();
-		int size = slots.length;
-		Direction direction = getDirection();
+		Inventory delegate = getDelegate();
+		int size = delegate.size();
 
 		int maxCount = Math.min(delegate.getMaxCountPerStack(), type.getMaxCount());
 		Object2IntMap<ItemStack> incrementalActions = new Object2IntOpenCustomHashMap<>(
@@ -138,8 +109,8 @@ public class SidedInventoryViewParticipant
 		);
 
 		for (int index = 0; index < size; ++index) {
-			ItemStack stack = delegate.getStack(slots[index]);
-			if (!stack.isEmpty() && content.equals(ItemContent.of(stack)) && delegate.canExtract(index, stack, direction)) {
+			ItemStack stack = delegate.getStack(index);
+			if (!stack.isEmpty() && content.equals(ItemContent.of(stack))) {
 				// stack is not empty, item matches, can extract
 				int amount = Math.toIntExact(Math.min(leftoverAmount, stack.getCount())); // COMMENT should be in int range, negative excluded
 				incrementalActions.put(stack, amount);
@@ -170,7 +141,7 @@ public class SidedInventoryViewParticipant
 
 	@Override
 	public long getAtomSize() {
-		return getSlots().length;
+		return getDelegate().size();
 	}
 
 	@Override
@@ -180,8 +151,9 @@ public class SidedInventoryViewParticipant
 
 	@Override
 	public long getAmount(Content content) {
-		return Arrays.stream(getSlots())
-				.mapToObj(getDelegate()::getStack)
+		Inventory delegate = getDelegate();
+		return IntStream.range(0, delegate.size())
+				.mapToObj(delegate::getStack)
 				.filter(stack -> ItemContent.of(stack).equals(content))
 				.mapToLong(ItemStack::getCount)
 				.sum();
@@ -189,11 +161,12 @@ public class SidedInventoryViewParticipant
 
 	@Override
 	public Object2LongMap<Content> getAmounts() {
-		int[] slots = getSlots();
+		Inventory delegate = getDelegate();
+		int size = delegate.size();
 		return Object2LongMaps.unmodifiable(
-				Arrays.stream(slots)
-						.mapToObj(getDelegate()::getStack)
-						.collect(() -> new Object2LongOpenHashMap<>(slots.length),
+				IntStream.range(0, size)
+						.mapToObj(delegate::getStack)
+						.collect(() -> new Object2LongOpenHashMap<>(size),
 								(container, value) -> container.mergeLong(ItemContent.of(value), value.getCount(), Long::sum),
 								ViewImplUtilities.getAmountMapsMerger())
 		);
@@ -204,16 +177,8 @@ public class SidedInventoryViewParticipant
 		return this;
 	}
 
-	protected SidedInventory getDelegate() {
+	protected Inventory getDelegate() {
 		return delegate;
-	}
-
-	protected Direction getDirection() {
-		return direction;
-	}
-
-	protected int[] getSlots() {
-		return slots;
 	}
 
 	@Override

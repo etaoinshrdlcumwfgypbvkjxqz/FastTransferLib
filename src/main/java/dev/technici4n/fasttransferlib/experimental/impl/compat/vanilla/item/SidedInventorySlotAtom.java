@@ -4,18 +4,21 @@ import dev.technici4n.fasttransferlib.experimental.api.Content;
 import dev.technici4n.fasttransferlib.experimental.api.Context;
 import dev.technici4n.fasttransferlib.experimental.impl.base.AbstractMonoCategoryAtom;
 import dev.technici4n.fasttransferlib.experimental.impl.content.ItemContent;
-import net.minecraft.inventory.Inventory;
+import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.math.Direction;
 
-public class InventorySlotAtom
+public class SidedInventorySlotAtom
         extends AbstractMonoCategoryAtom<Item> {
-    private final Inventory inventory;
+    private final SidedInventory inventory;
+    private final Direction direction;
     private final int slot;
 
-    public InventorySlotAtom(Inventory inventory, int slot) {
+    public SidedInventorySlotAtom(SidedInventory inventory, Direction direction, int slot) {
         super(Item.class);
         this.inventory = inventory;
+        this.direction = direction;
         this.slot = slot;
     }
 
@@ -29,17 +32,9 @@ public class InventorySlotAtom
         return getInventory().getStack(getSlot()).getCount();
     }
 
-    protected Inventory getInventory() {
-        return inventory;
-    }
-
-    protected int getSlot() {
-        return slot;
-    }
-
     @Override
     protected long insert(Context context, Content content, Item type, long maxAmount) {
-        Inventory inventory = getInventory();
+        SidedInventory inventory = getInventory();
         int slot = getSlot();
         ItemStack stack = inventory.getStack(slot);
 
@@ -47,14 +42,20 @@ public class InventorySlotAtom
 
         int amount;
         if (stack.isEmpty())  {
-            amount = Math.toIntExact(Math.min(maxAmount, maxCount));
-            context.execute(() -> {
-                inventory.setStack(slot, new ItemStack(type, amount));
-                inventory.markDirty();
-            }, () -> {
-                inventory.setStack(slot, stack);
-                inventory.markDirty();
-            });
+            int amount1 = Math.toIntExact(Math.min(maxAmount, maxCount));
+            ItemStack nextStack = ItemContent.asStack(content, amount1);
+            if (inventory.canInsert(slot, nextStack, getDirection())) {
+                amount = amount1;
+                nextStack.setCount(amount);
+                context.execute(() -> {
+                    inventory.setStack(slot, nextStack);
+                    inventory.markDirty();
+                }, () -> {
+                    inventory.setStack(slot, stack);
+                    inventory.markDirty();
+                });
+            } else
+                amount = 0;
         } else if (content.equals(ItemContent.of(stack))) {
             amount = Math.toIntExact(Math.min(maxAmount, maxCount - stack.getCount()));
             context.execute(() -> {
@@ -72,8 +73,11 @@ public class InventorySlotAtom
 
     @Override
     protected long extract(Context context, Content content, Item type, long maxAmount) {
-        ItemStack stack = getInventory().getStack(getSlot());
-        if (!stack.isEmpty() && content.equals(ItemContent.of(stack))) {
+        SidedInventory inventory = getInventory();
+        int slot = getSlot();
+        ItemStack stack = inventory.getStack(slot);
+
+        if (!stack.isEmpty() && content.equals(ItemContent.of(stack)) && inventory.canExtract(slot, stack, getDirection())) {
             // stack is not empty, item matches, can extract
             int amount = Math.toIntExact(Math.min(maxAmount, stack.getCount())); // COMMENT should be in int range, negative excluded
             context.execute(() -> {
@@ -86,5 +90,17 @@ public class InventorySlotAtom
             return amount;
         }
         return 0L;
+    }
+
+    protected SidedInventory getInventory() {
+        return inventory;
+    }
+
+    protected Direction getDirection() {
+        return direction;
+    }
+
+    protected int getSlot() {
+        return slot;
     }
 }

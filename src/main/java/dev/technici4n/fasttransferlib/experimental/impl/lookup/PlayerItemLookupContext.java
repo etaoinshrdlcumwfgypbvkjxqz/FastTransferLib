@@ -6,7 +6,6 @@ import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
 
@@ -33,7 +32,7 @@ public enum PlayerItemLookupContext {
                     int amount1 = Math.toIntExact(amount);
                     if (amount == amount1) {
                         ItemStack targetStack = targetStackGetter.apply(player);
-                        ItemStack stack1 = new ItemStack((Item) stack.getContent().getType(), amount1);
+                        ItemStack stack1 = ItemContent.asStack(stack.getContent(), amount1);
                         int maxCount = Math.min(stack1.getMaxCount(), player.inventory.getMaxCountPerStack());
 
                         // check target stack first

@@ -39,6 +39,14 @@ public final class ItemContent
         return stack.isEmpty() ? EmptyContent.INSTANCE : of(stack.getItem(), stack.getTag());
     }
 
+    public static ItemStack asStack(Content content, int amount) {
+        if (content.getCategory() != Item.class)
+            throw new IllegalArgumentException();
+        ItemStack result = new ItemStack((Item) content.getType(), amount);
+        result.setTag((CompoundTag) content.getData());
+        return result;
+    }
+
     @Override
     public @NotNull Item getType() {
         return type;

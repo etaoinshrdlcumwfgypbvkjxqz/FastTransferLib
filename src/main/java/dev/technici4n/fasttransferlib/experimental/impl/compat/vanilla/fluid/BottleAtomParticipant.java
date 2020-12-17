@@ -33,7 +33,7 @@ public class BottleAtomParticipant
         ItemLookupContext lookupContext = getLookupContext();
         if (maxAmount < FluidConstants.BOTTLE
                 || !getContent().isEmpty()
-                || !getContentAsItemContent()
+                || !getFluidContentAsItemContent(content)
                 .filter(itemContent -> lookupContext.transform(context, 1L, itemContent, 1L))
                 .isPresent())
             return maxAmount;
@@ -65,8 +65,8 @@ public class BottleAtomParticipant
         return getContent().isEmpty() ? 0L : FluidConstants.BOTTLE;
     }
 
-    protected Optional<? extends Content> getContentAsItemContent() {
-        if (getContent().equals(FluidContent.of(Fluids.WATER)))
+    protected static Optional<? extends Content> getFluidContentAsItemContent(Content fluidContent) {
+        if (fluidContent.equals(FluidContent.of(Fluids.WATER)))
             return Optional.of(ItemContent.of(Items.POTION));
 
         // for mixins, should be a better way to do this
