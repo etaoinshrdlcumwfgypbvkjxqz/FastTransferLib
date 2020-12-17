@@ -4,8 +4,9 @@ import dev.technici4n.fasttransferlib.experimental.api.Content;
 import dev.technici4n.fasttransferlib.experimental.api.transfer.Context;
 import net.minecraft.nbt.CompoundTag;
 
+// TODO set is not a good solution
 public interface ItemLookupContext {
-    int getCount();
+    long getCount();
 
     CompoundTag getTag();
 

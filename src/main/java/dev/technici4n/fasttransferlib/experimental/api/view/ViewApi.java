@@ -1,4 +1,4 @@
-package dev.technici4n.fasttransferlib.experimental.api.transfer;
+package dev.technici4n.fasttransferlib.experimental.api.view;
 
 import dev.technici4n.fasttransferlib.experimental.api.lookup.BlockLookupContext;
 import dev.technici4n.fasttransferlib.experimental.api.lookup.ItemLookupContext;
@@ -9,13 +9,13 @@ import net.fabricmc.fabric.api.provider.v1.block.BlockApiLookup;
 import net.fabricmc.fabric.api.provider.v1.block.BlockApiLookupRegistry;
 import net.minecraft.util.Identifier;
 
-public enum TransferApi {
+public enum ViewApi {
     ;
 
-    public static final BlockApiLookup<Participant, BlockLookupContext> BLOCK =
-            BlockApiLookupRegistry.getLookup(new Identifier("fasttransferlib:block_participant"), Participant.class, BlockLookupContext.class);
-    public static final ItemApiLookup<Participant, ItemLookupContext> ITEM =
-            ItemApiLookupRegistry.getLookup(new Identifier("fasttransferlib:item_participant"), Participant.class, ItemLookupContext.class);
+    public static final BlockApiLookup<View, BlockLookupContext> BLOCK =
+            BlockApiLookupRegistry.getLookup(new Identifier("fasttransferlib:block_view"), View.class, BlockLookupContext.class);
+    public static final ItemApiLookup<View, ItemLookupContext> ITEM =
+            ItemApiLookupRegistry.getLookup(new Identifier("fasttransferlib:item_view"), View.class, ItemLookupContext.class);
 
     static {
         ApiInit.initializeClass();

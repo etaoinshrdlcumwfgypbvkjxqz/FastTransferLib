@@ -1,13 +1,10 @@
 package dev.technici4n.fasttransferlib.experimental.impl.transfer.context;
 
-import dev.technici4n.fasttransferlib.experimental.api.transfer.Context;
-
 import java.util.ArrayDeque;
 import java.util.Deque;
 
 public class TransactionContext
-        extends ExecutionContext
-        implements Context {
+        extends ExecutionContext {
     private final Deque<Runnable> rollbackActions;
 
     public TransactionContext(int initialCapacity) {
