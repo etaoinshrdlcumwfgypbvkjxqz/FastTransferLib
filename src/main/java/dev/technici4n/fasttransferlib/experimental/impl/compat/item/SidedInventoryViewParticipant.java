@@ -4,7 +4,7 @@ import com.google.common.base.Suppliers;
 import com.google.common.collect.ImmutableList;
 import com.google.common.primitives.Ints;
 import dev.technici4n.fasttransferlib.experimental.api.Content;
-import dev.technici4n.fasttransferlib.experimental.api.transfer.Context;
+import dev.technici4n.fasttransferlib.experimental.api.Context;
 import dev.technici4n.fasttransferlib.experimental.api.transfer.Participant;
 import dev.technici4n.fasttransferlib.experimental.api.view.Atom;
 import dev.technici4n.fasttransferlib.experimental.api.view.View;

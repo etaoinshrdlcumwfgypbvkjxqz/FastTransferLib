@@ -2,8 +2,8 @@ package dev.technici4n.fasttransferlib.experimental.impl.compat.fluid;
 
 import dev.technici4n.fasttransferlib.api.fluid.FluidConstants;
 import dev.technici4n.fasttransferlib.experimental.api.Content;
+import dev.technici4n.fasttransferlib.experimental.api.Context;
 import dev.technici4n.fasttransferlib.experimental.api.lookup.ItemLookupContext;
-import dev.technici4n.fasttransferlib.experimental.api.transfer.Context;
 import dev.technici4n.fasttransferlib.experimental.impl.content.FluidContent;
 import dev.technici4n.fasttransferlib.experimental.impl.content.ItemContent;
 import dev.technici4n.fasttransferlib.experimental.impl.view.AbstractMonoCategoryAtom;

@@ -2,8 +2,8 @@ package dev.technici4n.fasttransferlib.experimental.impl.lookup;
 
 import com.google.common.primitives.Ints;
 import dev.technici4n.fasttransferlib.experimental.api.Content;
+import dev.technici4n.fasttransferlib.experimental.api.Context;
 import dev.technici4n.fasttransferlib.experimental.api.lookup.ItemLookupContext;
-import dev.technici4n.fasttransferlib.experimental.api.transfer.Context;
 import dev.technici4n.fasttransferlib.experimental.impl.content.ItemContent;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
