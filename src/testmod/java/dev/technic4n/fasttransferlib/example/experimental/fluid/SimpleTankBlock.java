@@ -37,25 +37,26 @@ public class SimpleTankBlock extends Block implements BlockEntityProvider {
 	@Override
 	@Deprecated
 	public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-		if (world.isClient())
-			return ActionResult.CONSUME;
 		Participant participant = TransferApi.BLOCK.get(world, pos, BlockLookupContextImpl.of(hit.getSide()));
 		View view = ViewApi.BLOCK.get(world, pos, BlockLookupContextImpl.of(hit.getSide()));
 		View itemView = ViewApi.ITEM.get(player.getStackInHand(hand).getItem(), PlayerItemLookupContext.ofHand(player, hand));
-		if (participant != null && view != null && itemView != null && view.estimateAtomSize() >= 1L) {
-			FluidUtilities.moveAll(ExecutionContext.getInstance(), itemView, participant, content -> content.getCategory() == Fluid.class);
-			view.getAmounts().forEach((content, amount) -> {
-				player.sendMessage(
-						new LiteralText(String.format("Tank Now At %s millibuckets of %s",
-								FluidTextHelper.getUnicodeMillibuckets(amount, true), content)),
-						false);
-				player.sendMessage(
-						new LiteralText(String.format("Tank Now At %s millibuckets of %s",
-								FluidTextHelper.getUnicodeMillibuckets(amount, false), content)),
-						false);
-			});
+		if (participant != null && view != null && itemView != null) {
+			if (!world.isClient()) {
+				FluidUtilities.moveAll(ExecutionContext.getInstance(), itemView, participant, content -> content.getCategory() == Fluid.class);
+				view.getAmounts().forEach((content, amount) -> {
+					player.sendMessage(
+							new LiteralText(String.format("Tank Now At %s millibuckets of %s",
+									FluidTextHelper.getUnicodeMillibuckets(amount, true), content)),
+							false);
+					player.sendMessage(
+							new LiteralText(String.format("Tank Now At %s millibuckets of %s",
+									FluidTextHelper.getUnicodeMillibuckets(amount, false), content)),
+							false);
+				});
+			}
+			return ActionResult.SUCCESS;
 		}
 
-		return ActionResult.CONSUME;
+		return ActionResult.PASS;
 	}
 }
