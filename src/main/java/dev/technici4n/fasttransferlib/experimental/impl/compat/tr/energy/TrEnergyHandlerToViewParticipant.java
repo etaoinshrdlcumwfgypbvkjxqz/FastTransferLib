@@ -3,7 +3,7 @@ package dev.technici4n.fasttransferlib.experimental.impl.compat.tr.energy;
 import com.google.common.math.DoubleMath;
 import dev.technici4n.fasttransferlib.experimental.api.Context;
 import dev.technici4n.fasttransferlib.experimental.api.content.Content;
-import dev.technici4n.fasttransferlib.experimental.api.content.energy.EnergyType;
+import dev.technici4n.fasttransferlib.experimental.api.content.EnergyType;
 import dev.technici4n.fasttransferlib.experimental.api.view.View;
 import dev.technici4n.fasttransferlib.experimental.impl.base.AbstractMonoCategoryAtom;
 import dev.technici4n.fasttransferlib.experimental.impl.content.EmptyContent;

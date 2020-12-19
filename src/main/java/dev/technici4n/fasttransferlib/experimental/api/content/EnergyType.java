@@ -1,4 +1,4 @@
-package dev.technici4n.fasttransferlib.experimental.api.content.energy;
+package dev.technici4n.fasttransferlib.experimental.api.content;
 
 import net.minecraft.util.Identifier;
 

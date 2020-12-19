@@ -1,6 +1,6 @@
 package dev.technici4n.fasttransferlib.experimental.impl.compat.tr.energy;
 
-import dev.technici4n.fasttransferlib.experimental.api.content.energy.EnergyType;
+import dev.technici4n.fasttransferlib.experimental.api.content.EnergyType;
 import net.minecraft.util.Identifier;
 
 public enum TrEnergyType

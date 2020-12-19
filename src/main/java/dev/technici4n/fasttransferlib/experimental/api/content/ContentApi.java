@@ -15,6 +15,9 @@ public enum ContentApi {
     // TODO better solution
     public static final ConcurrentMap<Identifier, Function<? super CompoundTag, ? extends Content>> DESERIALIZERS =
             new MapMaker().concurrencyLevel(1).initialCapacity(16).makeMap();
+    public static final ConcurrentMap<Identifier, EnergyType> ENERGY_DESERIALIZERS =
+            new MapMaker().concurrencyLevel(1).initialCapacity(16).makeMap();
+
     public static final Identifier EMPTY_KEY = new Identifier(ApiInit.MOD_ID, "empty");
     public static final Identifier ENERGY_KEY = new Identifier(ApiInit.MOD_ID, "energy");
 

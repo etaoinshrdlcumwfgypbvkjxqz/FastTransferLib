@@ -5,8 +5,7 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import dev.technici4n.fasttransferlib.experimental.api.content.Content;
 import dev.technici4n.fasttransferlib.experimental.api.content.ContentApi;
-import dev.technici4n.fasttransferlib.experimental.api.content.energy.EnergyApi;
-import dev.technici4n.fasttransferlib.experimental.api.content.energy.EnergyType;
+import dev.technici4n.fasttransferlib.experimental.api.content.EnergyType;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
@@ -55,7 +54,7 @@ public final class EnergyContent
 
     public static Content deserialize(CompoundTag serialized) {
         if (serialized.contains("type")) {
-            EnergyType type = EnergyApi.DESERIALIZERS.get(new Identifier(serialized.getString("type")));
+            EnergyType type = ContentApi.ENERGY_DESERIALIZERS.get(new Identifier(serialized.getString("type")));
             if (type != null)
                 return EnergyContent.of(type);
         }
