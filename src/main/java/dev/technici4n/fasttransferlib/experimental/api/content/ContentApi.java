@@ -33,11 +33,10 @@ public enum ContentApi {
     }
 
     public static Content deserialize(CompoundTag serialized) {
-        if (serialized.contains("identifier") && serialized.contains("content")) {
-            Function<? super CompoundTag, ? extends Content> deserializer = DESERIALIZERS.get(new Identifier(serialized.getString("identifier")));
-            if (deserializer != null)
-                return deserializer.apply(serialized.getCompound("content"));
-        }
+        if (serialized.contains("identifier") && serialized.contains("content"))
+            DESERIALIZERS.getOrDefault(new Identifier(serialized.getString("identifier")),
+                    tag -> EmptyContent.INSTANCE)
+                    .apply(serialized.getCompound("content"));
         return EmptyContent.INSTANCE;
     }
 }
