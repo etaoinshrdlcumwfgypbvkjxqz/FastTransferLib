@@ -29,6 +29,8 @@ public abstract class AbstractContent<T>
     @NotNull
     public abstract Object getData();
 
+    protected abstract Object getInternalData();
+
     @Override
     public final boolean isEmpty() {
         return false;
@@ -39,19 +41,26 @@ public abstract class AbstractContent<T>
         if (this == o) return true;
         if (!(o instanceof Content)) return false;
         Content that = (Content) o;
-        return getType().equals(that.getType()) && getData().equals(that.getData());
+
+        Object thatData;
+        if (that instanceof AbstractContent) {
+            AbstractContent<?> that1 = (AbstractContent<?>) that;
+            thatData = that1.getInternalData();
+        } else thatData = that.getData();
+
+        return getType().equals(that.getType()) && getInternalData().equals(thatData);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getType(), getData());
+        return Objects.hash(getType(), getInternalData());
     }
 
     @Override
     public String toString() {
         return new StringJoiner(", ", getClass().getSimpleName() + "[", "]")
                 .add("type=" + getType())
-                .add("data=" + getData())
+                .add("data=" + getInternalData())
                 .toString();
     }
 }

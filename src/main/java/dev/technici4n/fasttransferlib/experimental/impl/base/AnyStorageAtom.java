@@ -2,28 +2,25 @@ package dev.technici4n.fasttransferlib.experimental.impl.base;
 
 import dev.technici4n.fasttransferlib.experimental.api.Context;
 import dev.technici4n.fasttransferlib.experimental.api.content.Content;
+import dev.technici4n.fasttransferlib.experimental.api.content.ContentApi;
+import dev.technici4n.fasttransferlib.experimental.api.view.Atom;
 import dev.technici4n.fasttransferlib.experimental.impl.content.EmptyContent;
-import dev.technici4n.fasttransferlib.experimental.impl.content.FluidContent;
-import net.minecraft.fluid.Fluid;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 
-public class MonoFluidStorage
-        extends AbstractMonoCategoryAtom<Fluid> {
-    private Content fluidContent = EmptyContent.INSTANCE;
+public class AnyStorageAtom
+        implements Atom {
+    private Content content = EmptyContent.INSTANCE;
     private final long capacity;
     private long amount;
 
-    public MonoFluidStorage(long capacity) {
-        super(Fluid.class);
+    public AnyStorageAtom(long capacity) {
         assert capacity >= 0L;
         this.capacity = capacity;
     }
 
     @Override
     public Content getContent() {
-        return getFluidContent();
+        return content;
     }
 
     @Override
@@ -32,17 +29,17 @@ public class MonoFluidStorage
     }
 
     @Override
-    protected long insert(Context context, Content content, Fluid type, long maxAmount) {
-        Content fluidContent = getFluidContent();
+    public long insert(Context context, Content content, long maxAmount) {
+        Content currentContent = getContent();
 
         long inserted;
-        if (fluidContent.isEmpty()) {
+        if (currentContent.isEmpty()) {
             inserted = Math.min(maxAmount, getCapacity());
             context.execute(() -> {
-                setFluidContent(content);
+                setContent(content);
                 setAmount(inserted);
             }, () -> setAmount(0L));
-        } else if (fluidContent.equals(content)) {
+        } else if (currentContent.equals(content)) {
             long amount = getAmount();
             inserted = Math.min(maxAmount, getCapacity() - amount);
             context.execute(() -> setAmount(amount + inserted), () -> setAmount(amount));
@@ -52,11 +49,11 @@ public class MonoFluidStorage
     }
 
     @Override
-    protected long extract(Context context, Content content, Fluid type, long maxAmount) {
-        Content fluidContent = getFluidContent();
+    public long extract(Context context, Content content, long maxAmount) {
+        Content currentContent = getContent();
 
         long extracted;
-        if (fluidContent.equals(content)) {
+        if (currentContent.equals(content)) {
             long amount = getAmount();
             extracted = Math.min(maxAmount, amount);
             context.execute(() -> setAmount(amount - extracted), () -> setAmount(amount));
@@ -69,37 +66,27 @@ public class MonoFluidStorage
         return capacity;
     }
 
-    protected Content getFluidContent() {
-        return fluidContent;
-    }
-
-    protected void setFluidContent(Content fluidContent) {
-        assert fluidContent.getCategory() == Fluid.class || fluidContent.isEmpty();
-        this.fluidContent = fluidContent;
+    protected void setContent(Content content) {
+        this.content = content;
     }
 
     protected void setAmount(long amount) {
         assert amount >= 0L;
         assert amount <= getCapacity();
         if ((this.amount = amount) == 0L)
-            setFluidContent(EmptyContent.INSTANCE);
-        else assert !getFluidContent().isEmpty();
+            setContent(EmptyContent.INSTANCE);
+        else assert !getContent().isEmpty();
     }
 
     public CompoundTag toTag() {
         CompoundTag result = new CompoundTag();
-        Content fluidContent = getFluidContent();
-        if (!fluidContent.isEmpty())
-            result.putString("fluidContent",  Registry.FLUID.getId((Fluid) fluidContent.getType()).toString());
+        result.put("content", ContentApi.serialize(getContent()));
         result.putLong("amount", getAmount());
         return result;
     }
 
     public void fromTag(CompoundTag tag) {
-        if (tag.contains("fluidContent"))
-            setFluidContent(FluidContent.of(Registry.FLUID.get(new Identifier(tag.getString("fluidContent")))));
-        else
-            setFluidContent(EmptyContent.INSTANCE);
+        setContent(ContentApi.deserialize(tag.getCompound("content")));
         setAmount(tag.getLong("amount"));
     }
 }

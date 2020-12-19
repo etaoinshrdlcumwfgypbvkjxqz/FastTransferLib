@@ -1,6 +1,7 @@
 package dev.technici4n.fasttransferlib.experimental.impl;
 
 import dev.technici4n.fasttransferlib.experimental.impl.compat.vanilla.VanillaCompat;
+import dev.technici4n.fasttransferlib.experimental.impl.content.ContentInit;
 import net.fabricmc.loader.api.FabricLoader;
 
 import java.lang.reflect.Method;
@@ -8,7 +9,12 @@ import java.lang.reflect.Method;
 public enum ApiInit {
     ;
 
+    public static final String MOD_ID = "fasttransferlib";
+
     static {
+        // Content
+        ContentInit.initializeClass();
+
         // Vanilla
         VanillaCompat.initializeClass();
 

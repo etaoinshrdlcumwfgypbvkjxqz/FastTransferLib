@@ -3,31 +3,62 @@ package dev.technici4n.fasttransferlib.experimental.impl.content;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import dev.technici4n.fasttransferlib.experimental.api.content.Energy;
+import dev.technici4n.fasttransferlib.experimental.api.content.Content;
+import dev.technici4n.fasttransferlib.experimental.api.content.ContentApi;
+import dev.technici4n.fasttransferlib.experimental.api.content.energy.EnergyApi;
+import dev.technici4n.fasttransferlib.experimental.api.content.energy.EnergyType;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
 
 public final class EnergyContent
-        extends AbstractContent<Energy> {
-    private static final LoadingCache<Energy, EnergyContent> CACHE = CacheBuilder.newBuilder()
+        extends AbstractContent<EnergyType> {
+    private static final LoadingCache<EnergyType, EnergyContent> CACHE = CacheBuilder.newBuilder()
             .concurrencyLevel(1)
             .initialCapacity(16)
             .build(CacheLoader.from(EnergyContent::new));
 
-    private EnergyContent(Energy type) {
+    private EnergyContent(EnergyType type) {
         super(type);
     }
 
-    public static EnergyContent of(Energy type) {
+    public static EnergyContent of(EnergyType type) {
         return CACHE.getUnchecked(type);
     }
 
     @Override
-    public @NotNull Class<Energy> getCategory() {
-        return Energy.class;
+    public @NotNull Class<EnergyType> getCategory() {
+        return EnergyType.class;
     }
 
     @Override
     public @NotNull Object getData() {
+        return getInternalData();
+    }
+
+    @Override
+    protected Object getInternalData() {
         return AbstractContent.NO_DATA;
+    }
+
+    @Override
+    public Identifier getIdentifier() {
+        return ContentApi.ENERGY_KEY;
+    }
+
+    @Override
+    public CompoundTag serialize() {
+        CompoundTag result = new CompoundTag();
+        result.putString("type", getType().getIdentifier().toString());
+        return result;
+    }
+
+    public static Content deserialize(CompoundTag serialized) {
+        if (serialized.contains("type")) {
+            EnergyType type = EnergyApi.DESERIALIZERS.get(new Identifier(serialized.getString("type")));
+            if (type != null)
+                return EnergyContent.of(type);
+        }
+        return EmptyContent.INSTANCE;
     }
 }

@@ -7,6 +7,8 @@ import dev.technici4n.fasttransferlib.experimental.api.content.Content;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -17,11 +19,11 @@ public final class ItemContent
             .concurrencyLevel(1)
             .initialCapacity(16)
             .build(CacheLoader.from(key -> new ItemContent(key, NO_DATA)));
-    private final CompoundTag data;
+    private final CompoundTag internalData;
 
     private ItemContent(Item type, CompoundTag data) {
         super(type);
-        this.data = data;
+        this.internalData = data.copy();
     }
 
     public static ItemContent of(Item type, @Nullable CompoundTag data) {
@@ -49,11 +51,38 @@ public final class ItemContent
     @Override
     @NotNull
     public CompoundTag getData() {
-        return data.copy();
+        return getInternalData().copy();
+    }
+
+    @Override
+    protected CompoundTag getInternalData() {
+        return internalData;
     }
 
     @Override
     public @NotNull Class<Item> getCategory() {
         return Item.class;
+    }
+
+    @Override
+    public CompoundTag serialize() {
+        CompoundTag result = new CompoundTag();
+        result.putString("type", Registry.ITEM.getId(getType()).toString());
+        result.put("data", getInternalData().copy());
+        return result;
+    }
+
+    public static Content deserialize(CompoundTag serialized) {
+        if (serialized.contains("type")) {
+            Item type = Registry.ITEM.get(new Identifier(serialized.getString("type")));
+            CompoundTag data = serialized.contains("data") ? serialized.getCompound("data") : null;
+            return ItemContent.of(type, data);
+        }
+        return EmptyContent.INSTANCE;
+    }
+
+    @Override
+    public Identifier getIdentifier() {
+        return Registry.ITEM_KEY.getValue();
     }
 }

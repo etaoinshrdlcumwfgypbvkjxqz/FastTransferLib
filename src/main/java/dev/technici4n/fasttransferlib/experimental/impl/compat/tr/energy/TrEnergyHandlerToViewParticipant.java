@@ -3,7 +3,7 @@ package dev.technici4n.fasttransferlib.experimental.impl.compat.tr.energy;
 import com.google.common.math.DoubleMath;
 import dev.technici4n.fasttransferlib.experimental.api.Context;
 import dev.technici4n.fasttransferlib.experimental.api.content.Content;
-import dev.technici4n.fasttransferlib.experimental.api.content.Energy;
+import dev.technici4n.fasttransferlib.experimental.api.content.energy.EnergyType;
 import dev.technici4n.fasttransferlib.experimental.api.view.View;
 import dev.technici4n.fasttransferlib.experimental.impl.base.AbstractMonoCategoryAtom;
 import dev.technici4n.fasttransferlib.experimental.impl.content.EmptyContent;
@@ -16,12 +16,12 @@ import team.reborn.energy.EnergyStorage;
 import java.math.RoundingMode;
 
 public class TrEnergyHandlerToViewParticipant
-        extends AbstractMonoCategoryAtom<Energy>
+        extends AbstractMonoCategoryAtom<EnergyType>
         implements View {
     private final EnergyHandler delegate;
 
     protected TrEnergyHandlerToViewParticipant(EnergyHandler delegate) {
-        super(Energy.class);
+        super(EnergyType.class);
         this.delegate = delegate.simulate();
     }
 
@@ -40,7 +40,7 @@ public class TrEnergyHandlerToViewParticipant
 
     @Override
     public Content getContent() {
-        return getAmount() == 0L ? EmptyContent.INSTANCE : EnergyContent.of(TrEnergy.INSTANCE);
+        return getAmount() == 0L ? EmptyContent.INSTANCE : EnergyContent.of(TrEnergyType.INSTANCE);
     }
 
     @Override
@@ -49,8 +49,8 @@ public class TrEnergyHandlerToViewParticipant
     }
 
     @Override
-    protected long insert(Context context, Content content, Energy type, long maxAmount) {
-        if (!content.equals(EnergyContent.of(TrEnergy.INSTANCE)))
+    protected long insert(Context context, Content content, EnergyType type, long maxAmount) {
+        if (!content.equals(EnergyContent.of(TrEnergyType.INSTANCE)))
             return maxAmount;
 
         /* note
@@ -71,8 +71,8 @@ public class TrEnergyHandlerToViewParticipant
     }
 
     @Override
-    protected long extract(Context context, Content content, Energy type, long maxAmount) {
-        if (!content.equals(EnergyContent.of(TrEnergy.INSTANCE)))
+    protected long extract(Context context, Content content, EnergyType type, long maxAmount) {
+        if (!content.equals(EnergyContent.of(TrEnergyType.INSTANCE)))
             return 0L;
 
         /* note

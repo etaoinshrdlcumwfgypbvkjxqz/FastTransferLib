@@ -1,5 +1,7 @@
 package dev.technici4n.fasttransferlib.experimental.api.content;
 
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 public interface Content {
@@ -14,4 +16,8 @@ public interface Content {
     boolean isEmpty();
 
     boolean equals(Object obj);
+
+    CompoundTag serialize();
+
+    Identifier getIdentifier();
 }

@@ -1,7 +1,9 @@
 package dev.technici4n.fasttransferlib.experimental.impl.compat.tr;
 
+import dev.technici4n.fasttransferlib.experimental.api.content.energy.EnergyApi;
 import dev.technici4n.fasttransferlib.experimental.api.transfer.TransferApi;
 import dev.technici4n.fasttransferlib.experimental.impl.compat.tr.energy.TrEnergyHandlerToViewParticipant;
+import dev.technici4n.fasttransferlib.experimental.impl.compat.tr.energy.TrEnergyType;
 import team.reborn.energy.Energy;
 
 public enum TrCompat {
@@ -11,6 +13,8 @@ public enum TrCompat {
         ;
 
         static {
+            EnergyApi.DESERIALIZERS.put(TrEnergyType.INSTANCE.getIdentifier(), TrEnergyType.INSTANCE);
+
             TransferApi.BLOCK.registerBlockEntityFallback((blockEntity, context) -> {
                 if (Energy.valid(blockEntity)) {
                     return TrEnergyHandlerToViewParticipant.of(Energy.of(blockEntity).side(context.getDirection()));
