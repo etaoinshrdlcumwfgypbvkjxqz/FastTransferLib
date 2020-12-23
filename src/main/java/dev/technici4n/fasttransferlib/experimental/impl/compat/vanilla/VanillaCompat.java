@@ -20,6 +20,7 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.item.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 
 public enum VanillaCompat {
     ;
@@ -34,35 +35,37 @@ public enum VanillaCompat {
 
         static {
             // Vanilla containers, for optimal performance
-            TransferApi.BLOCK.registerForBlockEntities(ItemCompat::getBlockEntityFallbackParticipant,
+            TransferApi.BLOCK.registerForBlockEntities(ItemCompat::getBlockEntityParticipant,
                     BlockEntityType.DISPENSER, BlockEntityType.DROPPER, BlockEntityType.FURNACE, BlockEntityType.BLAST_FURNACE,
                     BlockEntityType.SMOKER, BlockEntityType.BARREL, BlockEntityType.BREWING_STAND, BlockEntityType.HOPPER,
                     BlockEntityType.SHULKER_BOX);
             TransferApi.BLOCK.registerForBlocks(ItemCompat::getChestParticipant, Blocks.CHEST, Blocks.TRAPPED_CHEST);
 
-            ViewApi.BLOCK.registerForBlockEntities(ItemCompat::getBlockEntityFallbackView,
+            ViewApi.BLOCK.registerForBlockEntities(ItemCompat::getBlockEntityView,
                     BlockEntityType.DISPENSER, BlockEntityType.DROPPER, BlockEntityType.FURNACE, BlockEntityType.BLAST_FURNACE,
                     BlockEntityType.SMOKER, BlockEntityType.BARREL, BlockEntityType.BREWING_STAND, BlockEntityType.HOPPER,
                     BlockEntityType.SHULKER_BOX);
             ViewApi.BLOCK.registerForBlocks(ItemCompat::getChestView, Blocks.CHEST, Blocks.TRAPPED_CHEST);
 
             // Fallback for vanilla interfaces
-            TransferApi.BLOCK.registerBlockEntityFallback(ItemCompat::getBlockEntityFallbackParticipant);
-            TransferApi.BLOCK.registerBlockFallback(ItemCompat::getBlockFallbackParticipant);
-
-            ViewApi.BLOCK.registerBlockEntityFallback(ItemCompat::getBlockEntityFallbackView);
-            ViewApi.BLOCK.registerBlockFallback(ItemCompat::getBlockFallbackView);
+            TransferApi.BLOCK.registerFallback(ItemCompat::getBlockFallbackParticipant);
+            ViewApi.BLOCK.registerFallback(ItemCompat::getBlockFallbackView);
         }
 
         public static void initializeClass() {}
 
-        private static Participant getBlockEntityFallbackParticipant(BlockEntity blockEntity, BlockLookupContext context) {
-            return blockEntity instanceof Inventory
-                    ? SidedInventoryViewParticipant.ofParticipant((Inventory) blockEntity, context.getDirection())
-                    : null;
+        private static Participant getBlockEntityParticipant(BlockEntity entity, BlockLookupContext context) {
+            if (entity instanceof Inventory)
+                return SidedInventoryViewParticipant.ofParticipant((Inventory) entity, context.getDirection());
+            return null;
         }
 
-        private static Participant getBlockFallbackParticipant(World world, BlockPos pos, BlockState state, BlockLookupContext context) {
+        private static Participant getBlockFallbackParticipant(World world, BlockPos pos, BlockState state, @Nullable BlockEntity entity, BlockLookupContext context) {
+            if (entity != null) {
+                Participant result = getBlockEntityParticipant(entity, context);
+                if (result != null)
+                    return result;
+            }
             if (state.getBlock() instanceof InventoryProvider) {
                 Inventory inv = ((InventoryProvider) state.getBlock()).getInventory(state, world, pos);
                 if (inv != null) return SidedInventoryViewParticipant.ofParticipant(inv, context.getDirection());
@@ -70,23 +73,28 @@ public enum VanillaCompat {
             return null;
         }
 
-        private static Participant getChestParticipant(World world, BlockPos pos, BlockState state, BlockLookupContext context) {
-            Inventory inv = ChestBlock.getInventory((ChestBlock) state.getBlock(), state, world, pos, true);
-            return inv == null ? null : SidedInventoryViewParticipant.ofParticipant(inv, context.getDirection());
+        private static View getBlockEntityView(BlockEntity entity, BlockLookupContext context) {
+            if (entity instanceof Inventory)
+                return SidedInventoryViewParticipant.ofView((Inventory) entity, context.getDirection());
+            return null;
         }
 
-        private static View getBlockEntityFallbackView(BlockEntity blockEntity, BlockLookupContext context) {
-            return blockEntity instanceof Inventory
-                    ? SidedInventoryViewParticipant.ofView((Inventory) blockEntity, context.getDirection())
-                    : null;
-        }
-
-        private static View getBlockFallbackView(World world, BlockPos pos, BlockState state, BlockLookupContext context) {
+        private static View getBlockFallbackView(World world, BlockPos pos, BlockState state, @Nullable BlockEntity entity, BlockLookupContext context) {
+            if (entity != null) {
+                View result = getBlockEntityView(entity, context);
+                if (result != null)
+                    return result;
+            }
             if (state.getBlock() instanceof InventoryProvider) {
                 Inventory inv = ((InventoryProvider) state.getBlock()).getInventory(state, world, pos);
                 if (inv != null) return SidedInventoryViewParticipant.ofView(inv, context.getDirection());
             }
             return null;
+        }
+
+        private static Participant getChestParticipant(World world, BlockPos pos, BlockState state, BlockLookupContext context) {
+            Inventory inv = ChestBlock.getInventory((ChestBlock) state.getBlock(), state, world, pos, true);
+            return inv == null ? null : SidedInventoryViewParticipant.ofParticipant(inv, context.getDirection());
         }
 
         private static View getChestView(World world, BlockPos pos, BlockState state, BlockLookupContext context) {

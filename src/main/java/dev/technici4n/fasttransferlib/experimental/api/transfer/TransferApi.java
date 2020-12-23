@@ -5,8 +5,8 @@ import dev.technici4n.fasttransferlib.experimental.api.lookup.ItemLookupContext;
 import dev.technici4n.fasttransferlib.experimental.api.lookup.item.ItemApiLookup;
 import dev.technici4n.fasttransferlib.experimental.api.lookup.item.ItemApiLookupRegistry;
 import dev.technici4n.fasttransferlib.experimental.impl.ApiInit;
-import net.fabricmc.fabric.api.provider.v1.block.BlockApiLookup;
-import net.fabricmc.fabric.api.provider.v1.block.BlockApiLookupRegistry;
+import net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookup;
+import net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookupRegistry;
 import net.minecraft.util.Identifier;
 
 public enum TransferApi {

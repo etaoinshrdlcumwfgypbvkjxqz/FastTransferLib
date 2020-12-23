@@ -17,7 +17,7 @@
 package dev.technici4n.fasttransferlib.experimental.impl.lookup.item;
 
 import dev.technici4n.fasttransferlib.experimental.api.lookup.item.ItemApiLookup;
-import net.fabricmc.fabric.api.provider.v1.ApiLookupMap;
+import net.fabricmc.fabric.api.lookup.v1.ApiLookupMap;
 import net.minecraft.util.Identifier;
 
 public enum ItemApiLookupRegistryImpl {
@@ -25,8 +25,8 @@ public enum ItemApiLookupRegistryImpl {
 
 	private static final ApiLookupMap<ItemApiLookupImpl<?, ?>> PROVIDERS = ApiLookupMap.create(ItemApiLookupImpl::new);
 
+	@SuppressWarnings("unchecked")
 	public static <T, C> ItemApiLookup<T, C> getLookup(Identifier lookupId, Class<T> apiClass, Class<C> contextClass) {
-		//noinspection unchecked
 		return (ItemApiLookup<T, C>) PROVIDERS.getLookup(lookupId, apiClass, contextClass);
 	}
 }

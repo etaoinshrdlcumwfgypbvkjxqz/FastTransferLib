@@ -17,7 +17,7 @@
 package dev.technici4n.fasttransferlib.experimental.impl.lookup.item;
 
 import dev.technici4n.fasttransferlib.experimental.api.lookup.item.ItemApiLookup;
-import net.fabricmc.fabric.api.provider.v1.ApiProviderMap;
+import net.fabricmc.fabric.api.lookup.v1.ApiProviderMap;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemConvertible;
 import net.minecraft.util.registry.Registry;

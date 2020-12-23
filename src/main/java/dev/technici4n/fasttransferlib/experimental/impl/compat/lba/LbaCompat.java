@@ -16,6 +16,7 @@ import dev.technici4n.fasttransferlib.experimental.impl.compat.lba.item.LbaItemT
 import dev.technici4n.fasttransferlib.experimental.impl.compat.lba.item.LbaItemTransferableFromView;
 import dev.technici4n.fasttransferlib.experimental.impl.lookup.BlockLookupContextImpl;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
@@ -27,6 +28,7 @@ public enum LbaCompat {
     public enum ItemCompat {
         ;
 
+        @SuppressWarnings("unused")
         public static void initializeClass() {}
 
         private static boolean inCompat = false;
@@ -37,8 +39,8 @@ public enum LbaCompat {
         }
 
         private static void registerLbaInFtl() {
-            TransferApi.BLOCK.registerBlockFallback(ItemCompat::getBlockFallbackViewParticipant);
-            ViewApi.BLOCK.registerBlockFallback(ItemCompat::getBlockFallbackViewParticipant);
+            TransferApi.BLOCK.registerFallback(ItemCompat::getBlockFallbackViewParticipant);
+            ViewApi.BLOCK.registerFallback(ItemCompat::getBlockFallbackViewParticipant);
         }
 
         private static void registerFtlInLba() {
@@ -61,7 +63,7 @@ public enum LbaCompat {
             }
         }
 
-        private static LbaItemToViewParticipant getBlockFallbackViewParticipant(World world, BlockPos pos, BlockState state, BlockLookupContext context) {
+        private static LbaItemToViewParticipant getBlockFallbackViewParticipant(World world, BlockPos pos, BlockState state, @Nullable BlockEntity entity, BlockLookupContext context) {
             if (inCompat) return null;
 
             Direction direction = context.getDirection();
@@ -79,6 +81,7 @@ public enum LbaCompat {
     public enum FluidCompat {
         ;
 
+        @SuppressWarnings("unused")
         public static void initializeClass() {}
 
         private static boolean inCompat = false;
@@ -89,8 +92,8 @@ public enum LbaCompat {
         }
 
         private static void registerLbaInFtl() {
-            TransferApi.BLOCK.registerBlockFallback(FluidCompat::getBlockFallbackViewParticipant);
-            ViewApi.BLOCK.registerBlockFallback(FluidCompat::getBlockFallbackViewParticipant);
+            TransferApi.BLOCK.registerFallback(FluidCompat::getBlockFallbackViewParticipant);
+            ViewApi.BLOCK.registerFallback(FluidCompat::getBlockFallbackViewParticipant);
         }
 
         private static void registerFtlInLba() {
@@ -113,7 +116,7 @@ public enum LbaCompat {
             }
         }
 
-        private static LbaFluidToViewParticipant getBlockFallbackViewParticipant(World world, BlockPos pos, BlockState state, BlockLookupContext context) {
+        private static LbaFluidToViewParticipant getBlockFallbackViewParticipant(World world, BlockPos pos, BlockState state, @Nullable BlockEntity entity, BlockLookupContext context) {
             if (inCompat) return null;
 
             Direction direction = context.getDirection();
