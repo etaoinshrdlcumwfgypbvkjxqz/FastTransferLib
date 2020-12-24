@@ -23,35 +23,35 @@ import java.util.function.Supplier;
 public class LbaFluidToViewParticipant
         extends AbstractMonoCategoryParticipant<Fluid>
         implements View, ListModel {
-    private final FixedFluidInv lbaDelegate;
+    private final FixedFluidInv delegate;
     private final Supplier<? extends List<? extends Atom>> atomList;
 
     @SuppressWarnings("UnstableApiUsage")
-    protected LbaFluidToViewParticipant(FixedFluidInv lbaDelegate) {
+    protected LbaFluidToViewParticipant(FixedFluidInv delegate) {
         super(Fluid.class);
-        this.lbaDelegate = lbaDelegate;
+        this.delegate = delegate;
         this.atomList = Suppliers.memoize(() ->
-                Streams.stream(getLbaDelegate().tankIterable())
+                Streams.stream(getDelegate().tankIterable())
                         .map(SingleFluidTankAtom::of)
                         .collect(ImmutableList.toImmutableList()));
     }
 
-    public static LbaFluidToViewParticipant of(FixedFluidInv lbaDelegate) {
-        return new LbaFluidToViewParticipant(lbaDelegate);
+    public static LbaFluidToViewParticipant of(FixedFluidInv delegate) {
+        return new LbaFluidToViewParticipant(delegate);
     }
 
     @Override
     protected long insert(Context context, Content content, Fluid type, long maxAmount) {
-        return SingleFluidTankAtom.insertImpl(getLbaDelegate().getTransferable(), context, content, maxAmount);
+        return SingleFluidTankAtom.insertImpl(getDelegate().getTransferable(), context, content, maxAmount);
     }
 
     @Override
     protected long extract(Context context, Content content, Fluid type, long maxAmount) {
-        return SingleFluidTankAtom.extractImpl(getLbaDelegate().getTransferable(), context, content, maxAmount);
+        return SingleFluidTankAtom.extractImpl(getDelegate().getTransferable(), context, content, maxAmount);
     }
 
-    protected FixedFluidInv getLbaDelegate() {
-        return lbaDelegate;
+    protected FixedFluidInv getDelegate() {
+        return delegate;
     }
 
     @Override
@@ -61,7 +61,7 @@ public class LbaFluidToViewParticipant
 
     @Override
     public long getAtomSize() {
-        return getLbaDelegate().getTankCount();
+        return getDelegate().getTankCount();
     }
 
     @Override
@@ -72,7 +72,7 @@ public class LbaFluidToViewParticipant
     @SuppressWarnings("UnstableApiUsage")
     @Override
     public long getAmount(Content content) {
-        return Streams.stream(getLbaDelegate().fluidIterable()).unordered()
+        return Streams.stream(getDelegate().fluidIterable()).unordered()
                 .filter(stack -> content.equals(LbaCompatUtil.asFluidContent(stack)))
                 .mapToLong(LbaCompatUtil::asAmount)
                 .sum();
@@ -81,7 +81,7 @@ public class LbaFluidToViewParticipant
     @SuppressWarnings("UnstableApiUsage")
     @Override
     public Object2LongMap<Content> getAmounts() {
-        FixedFluidInv delegate = getLbaDelegate();
+        FixedFluidInv delegate = getDelegate();
         return Streams.stream(delegate.fluidIterable()).unordered()
                 .collect(() -> new Object2LongOpenHashMap<>(delegate.getTankCount()),
                         (container, value) -> container.mergeLong(LbaCompatUtil.asFluidContent(value), LbaCompatUtil.asAmount(value), Long::sum),

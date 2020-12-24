@@ -24,35 +24,35 @@ import java.util.function.Supplier;
 public class LbaItemToViewParticipant
         extends AbstractMonoCategoryParticipant<Item>
         implements View, ListModel {
-    private final FixedItemInv lbaDelegate;
+    private final FixedItemInv delegate;
     private final Supplier<? extends List<? extends Atom>> atomList;
 
     @SuppressWarnings("UnstableApiUsage")
-    protected LbaItemToViewParticipant(FixedItemInv lbaDelegate) {
+    protected LbaItemToViewParticipant(FixedItemInv delegate) {
         super(Item.class);
-        this.lbaDelegate = lbaDelegate;
+        this.delegate = delegate;
         this.atomList = Suppliers.memoize(() ->
-                Streams.stream(getLbaDelegate().slotIterable())
+                Streams.stream(getDelegate().slotIterable())
                         .map(SingleItemSlotAtom::of)
                         .collect(ImmutableList.toImmutableList()));
     }
 
-    public static LbaItemToViewParticipant of(FixedItemInv lbaDelegate) {
-        return new LbaItemToViewParticipant(lbaDelegate);
+    public static LbaItemToViewParticipant of(FixedItemInv delegate) {
+        return new LbaItemToViewParticipant(delegate);
     }
 
     @Override
     protected long insert(Context context, Content content, Item type, long maxAmount) {
-        return SingleItemSlotAtom.insertImpl(getLbaDelegate().getTransferable(), context, content, maxAmount);
+        return SingleItemSlotAtom.insertImpl(getDelegate().getTransferable(), context, content, maxAmount);
     }
 
     @Override
     protected long extract(Context context, Content content, Item type, long maxAmount) {
-        return SingleItemSlotAtom.extractImpl(getLbaDelegate().getTransferable(), context, content, maxAmount);
+        return SingleItemSlotAtom.extractImpl(getDelegate().getTransferable(), context, content, maxAmount);
     }
 
-    protected FixedItemInv getLbaDelegate() {
-        return lbaDelegate;
+    protected FixedItemInv getDelegate() {
+        return delegate;
     }
 
     @Override
@@ -62,7 +62,7 @@ public class LbaItemToViewParticipant
 
     @Override
     public long getAtomSize() {
-        return getLbaDelegate().getSlotCount();
+        return getDelegate().getSlotCount();
     }
 
     @Override
@@ -73,7 +73,7 @@ public class LbaItemToViewParticipant
     @SuppressWarnings("UnstableApiUsage")
     @Override
     public long getAmount(Content content) {
-        return Streams.stream(getLbaDelegate().stackIterable()).unordered()
+        return Streams.stream(getDelegate().stackIterable()).unordered()
                 .filter(stack -> content.equals(ItemContent.of(stack)))
                 .mapToLong(ItemStack::getCount)
                 .sum();
@@ -82,7 +82,7 @@ public class LbaItemToViewParticipant
     @SuppressWarnings("UnstableApiUsage")
     @Override
     public Object2LongMap<Content> getAmounts() {
-        FixedItemInv delegate = getLbaDelegate();
+        FixedItemInv delegate = getDelegate();
         return Streams.stream(delegate.stackIterable()).unordered()
                 .collect(() -> new Object2LongOpenHashMap<>(delegate.getSlotCount()),
                         (container, value) -> container.mergeLong(ItemContent.of(value), value.getCount(), Long::sum),

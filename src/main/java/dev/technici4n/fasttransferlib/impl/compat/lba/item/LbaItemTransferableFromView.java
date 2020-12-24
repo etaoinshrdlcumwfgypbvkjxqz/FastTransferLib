@@ -1,20 +1,19 @@
 package dev.technici4n.fasttransferlib.impl.compat.lba.item;
 
 import alexiil.mc.lib.attributes.Simulation;
-import alexiil.mc.lib.attributes.fluid.FluidTransferable;
-import alexiil.mc.lib.attributes.fluid.amount.FluidAmount;
-import alexiil.mc.lib.attributes.fluid.filter.FluidFilter;
-import alexiil.mc.lib.attributes.fluid.volume.FluidKeys;
-import alexiil.mc.lib.attributes.fluid.volume.FluidVolume;
+import alexiil.mc.lib.attributes.item.ItemTransferable;
+import alexiil.mc.lib.attributes.item.filter.ItemFilter;
 import dev.technici4n.fasttransferlib.api.Context;
 import dev.technici4n.fasttransferlib.api.content.Content;
 import dev.technici4n.fasttransferlib.api.view.View;
 import dev.technici4n.fasttransferlib.impl.compat.lba.LbaCompatUtil;
+import dev.technici4n.fasttransferlib.impl.content.ItemContent;
 import dev.technici4n.fasttransferlib.impl.util.ViewUtilities;
-import net.minecraft.fluid.Fluid;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 
 public class LbaItemTransferableFromView
-        implements FluidTransferable {
+        implements ItemTransferable {
     private final View delegate;
 
     protected LbaItemTransferableFromView(View delegate) {
@@ -26,47 +25,48 @@ public class LbaItemTransferableFromView
         return new LbaItemTransferableFromView(delegate);
     }
 
-    @Override
-    public FluidVolume attemptInsertion(FluidVolume fluid, Simulation simulation) {
-        Context context = LbaCompatUtil.asContext(simulation);
-
-        long insert = LbaCompatUtil.asAmount(fluid);
-        long leftover = ViewUtilities.insert(getDelegate(),
-                context,
-                LbaCompatUtil.asFluidContent(fluid),
-                insert);
-        long inserted = insert - leftover;
-
-        return fluid.withAmount(fluid.getAmount_F().sub(LbaCompatUtil.asFluidAmount(inserted)));
+    protected View getDelegate() {
+        return delegate;
     }
 
     @Override
-    public FluidVolume attemptExtraction(FluidFilter filter, FluidAmount maxAmount, Simulation simulation) {
+    public ItemStack attemptExtraction(ItemFilter itemFilter, int maxAmount, Simulation simulation) {
         Context context = LbaCompatUtil.asContext(simulation);
 
         Content[] contentLock = {null};
         long extracted = ViewUtilities.extract(getDelegate(),
                 context,
-                LbaCompatUtil.asAmount(maxAmount),
+                maxAmount,
                 atom -> {
                     Content content = atom.getContent();
-                    if (content.isEmpty() || content.getCategory() != Fluid.class)
+                    if (content.isEmpty() || content.getCategory() != Item.class)
                         return null;
                     Content contentLock1 = contentLock[0];
-                    if (contentLock1 == null && filter.matches(LbaCompatUtil.asFluidKey(content))) {
+                    if (contentLock1 == null && itemFilter.matches(ItemContent.asStack(content, 1))) {
                         return contentLock[0] = content;
                     }
                     return contentLock1;
                 });
+        int extracted1 = Math.toIntExact(extracted); // within int range
 
         Content contentLock1 = contentLock[0];
         if (contentLock1 == null)
-            return FluidKeys.EMPTY.withAmount(LbaCompatUtil.asFluidAmount(extracted));
-        assert contentLock1.getCategory() == Fluid.class;
-        return LbaCompatUtil.asFluidVolume(contentLock1, extracted);
+            return ItemStack.EMPTY;
+        assert contentLock1.getCategory() == Item.class;
+        return ItemContent.asStack(contentLock1, extracted1);
     }
 
-    protected View getDelegate() {
-        return delegate;
+    @Override
+    public ItemStack attemptInsertion(ItemStack itemStack, Simulation simulation) {
+        Context context = LbaCompatUtil.asContext(simulation);
+
+        Content content = ItemContent.of(itemStack);
+        long leftover = ViewUtilities.insert(getDelegate(),
+                context,
+                content,
+                itemStack.getCount());
+        int leftover1 = Math.toIntExact(leftover); // within int range
+
+        return ItemContent.asStack(content, leftover1);
     }
 }

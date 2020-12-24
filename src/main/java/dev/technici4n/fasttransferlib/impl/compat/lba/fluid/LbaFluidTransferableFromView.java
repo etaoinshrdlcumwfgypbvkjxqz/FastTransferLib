@@ -1,19 +1,20 @@
 package dev.technici4n.fasttransferlib.impl.compat.lba.fluid;
 
 import alexiil.mc.lib.attributes.Simulation;
-import alexiil.mc.lib.attributes.item.ItemTransferable;
-import alexiil.mc.lib.attributes.item.filter.ItemFilter;
+import alexiil.mc.lib.attributes.fluid.FluidTransferable;
+import alexiil.mc.lib.attributes.fluid.amount.FluidAmount;
+import alexiil.mc.lib.attributes.fluid.filter.FluidFilter;
+import alexiil.mc.lib.attributes.fluid.volume.FluidKeys;
+import alexiil.mc.lib.attributes.fluid.volume.FluidVolume;
 import dev.technici4n.fasttransferlib.api.Context;
 import dev.technici4n.fasttransferlib.api.content.Content;
 import dev.technici4n.fasttransferlib.api.view.View;
 import dev.technici4n.fasttransferlib.impl.compat.lba.LbaCompatUtil;
-import dev.technici4n.fasttransferlib.impl.content.ItemContent;
 import dev.technici4n.fasttransferlib.impl.util.ViewUtilities;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
+import net.minecraft.fluid.Fluid;
 
 public class LbaFluidTransferableFromView
-        implements ItemTransferable {
+        implements FluidTransferable {
     private final View delegate;
 
     protected LbaFluidTransferableFromView(View delegate) {
@@ -30,43 +31,42 @@ public class LbaFluidTransferableFromView
     }
 
     @Override
-    public ItemStack attemptExtraction(ItemFilter itemFilter, int maxAmount, Simulation simulation) {
+    public FluidVolume attemptInsertion(FluidVolume fluid, Simulation simulation) {
+        Context context = LbaCompatUtil.asContext(simulation);
+
+        long insert = LbaCompatUtil.asAmount(fluid);
+        long leftover = ViewUtilities.insert(getDelegate(),
+                context,
+                LbaCompatUtil.asFluidContent(fluid),
+                insert);
+        long inserted = insert - leftover;
+
+        return fluid.withAmount(fluid.getAmount_F().sub(LbaCompatUtil.asFluidAmount(inserted)));
+    }
+
+    @Override
+    public FluidVolume attemptExtraction(FluidFilter filter, FluidAmount maxAmount, Simulation simulation) {
         Context context = LbaCompatUtil.asContext(simulation);
 
         Content[] contentLock = {null};
         long extracted = ViewUtilities.extract(getDelegate(),
                 context,
-                maxAmount,
+                LbaCompatUtil.asAmount(maxAmount),
                 atom -> {
                     Content content = atom.getContent();
-                    if (content.isEmpty() || content.getCategory() != Item.class)
+                    if (content.isEmpty() || content.getCategory() != Fluid.class)
                         return null;
                     Content contentLock1 = contentLock[0];
-                    if (contentLock1 == null && itemFilter.matches(ItemContent.asStack(content, 1))) {
+                    if (contentLock1 == null && filter.matches(LbaCompatUtil.asFluidKey(content))) {
                         return contentLock[0] = content;
                     }
                     return contentLock1;
                 });
-        int extracted1 = Math.toIntExact(extracted); // within int range
 
         Content contentLock1 = contentLock[0];
         if (contentLock1 == null)
-            return ItemStack.EMPTY;
-        assert contentLock1.getCategory() == Item.class;
-        return ItemContent.asStack(contentLock1, extracted1);
-    }
-
-    @Override
-    public ItemStack attemptInsertion(ItemStack itemStack, Simulation simulation) {
-        Context context = LbaCompatUtil.asContext(simulation);
-
-        Content content = ItemContent.of(itemStack);
-        long leftover = ViewUtilities.insert(getDelegate(),
-                context,
-                content,
-                itemStack.getCount());
-        int leftover1 = Math.toIntExact(leftover); // within int range
-
-        return ItemContent.asStack(content, leftover1);
+            return FluidKeys.EMPTY.withAmount(LbaCompatUtil.asFluidAmount(extracted));
+        assert contentLock1.getCategory() == Fluid.class;
+        return LbaCompatUtil.asFluidVolume(contentLock1, extracted);
     }
 }
