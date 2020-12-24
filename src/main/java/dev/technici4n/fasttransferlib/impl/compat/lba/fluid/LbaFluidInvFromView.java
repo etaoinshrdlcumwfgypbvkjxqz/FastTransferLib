@@ -32,7 +32,7 @@ public class LbaFluidTransferableFromView
 
     @Override
     public FluidVolume attemptInsertion(FluidVolume fluid, Simulation simulation) {
-        Context context = LbaCompatUtil.asContext(simulation);
+        Context context = LbaCompatUtil.asStatelessContext(simulation);
 
         long insert = LbaCompatUtil.asAmount(fluid);
         long leftover = ViewUtilities.insert(getDelegate(),
@@ -46,7 +46,7 @@ public class LbaFluidTransferableFromView
 
     @Override
     public FluidVolume attemptExtraction(FluidFilter filter, FluidAmount maxAmount, Simulation simulation) {
-        Context context = LbaCompatUtil.asContext(simulation);
+        Context context = LbaCompatUtil.asStatelessContext(simulation);
 
         Content[] contentLock = {null};
         long extracted = ViewUtilities.extract(getDelegate(),

@@ -5,12 +5,13 @@ import alexiil.mc.lib.attributes.fluid.amount.FluidAmount;
 import alexiil.mc.lib.attributes.fluid.volume.FluidKey;
 import alexiil.mc.lib.attributes.fluid.volume.FluidKeys;
 import alexiil.mc.lib.attributes.fluid.volume.FluidVolume;
-import dev.technici4n.fasttransferlib.api.Context;
 import dev.technici4n.fasttransferlib.api.content.Content;
 import dev.technici4n.fasttransferlib.api.content.FluidConstants;
+import dev.technici4n.fasttransferlib.api.context.StatelessContext;
 import dev.technici4n.fasttransferlib.impl.content.FluidContent;
 import dev.technici4n.fasttransferlib.impl.context.ExecutionContext;
 import dev.technici4n.fasttransferlib.impl.context.SimulationContext;
+import it.unimi.dsi.fastutil.longs.LongIterator;
 import net.minecraft.fluid.Fluid;
 
 import java.math.RoundingMode;
@@ -47,7 +48,7 @@ public enum LbaCompatUtil {
         return asFluidKey(fluidContent).withAmount(asFluidAmount(amount));
     }
 
-    public static Context asContext(Simulation simulation) {
+    public static StatelessContext asStatelessContext(Simulation simulation) {
         switch (simulation) {
             case SIMULATE:
                 return SimulationContext.getInstance();

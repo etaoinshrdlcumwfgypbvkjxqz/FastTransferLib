@@ -1,9 +1,9 @@
 package dev.technici4n.fasttransferlib.impl.compat.tr.energy;
 
 import com.google.common.math.DoubleMath;
-import dev.technici4n.fasttransferlib.api.Context;
 import dev.technici4n.fasttransferlib.api.content.Content;
 import dev.technici4n.fasttransferlib.api.content.EnergyType;
+import dev.technici4n.fasttransferlib.api.context.Context;
 import dev.technici4n.fasttransferlib.api.view.View;
 import dev.technici4n.fasttransferlib.impl.base.AbstractMonoCategoryAtom;
 import dev.technici4n.fasttransferlib.impl.content.EmptyContent;

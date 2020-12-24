@@ -1,14 +1,8 @@
 package dev.technici4n.fasttransferlib.impl.compat.lba.fluid;
 
-import alexiil.mc.lib.attributes.Simulation;
-import alexiil.mc.lib.attributes.fluid.FluidTransferable;
-import alexiil.mc.lib.attributes.fluid.SingleFluidTank;
-import alexiil.mc.lib.attributes.fluid.amount.FluidAmount;
-import alexiil.mc.lib.attributes.fluid.filter.ExactFluidFilter;
-import alexiil.mc.lib.attributes.fluid.volume.FluidKey;
-import alexiil.mc.lib.attributes.fluid.volume.FluidVolume;
-import dev.technici4n.fasttransferlib.api.Context;
+import alexiil.mc.lib.attributes.fluid.SingleFluidTankView;
 import dev.technici4n.fasttransferlib.api.content.Content;
+import dev.technici4n.fasttransferlib.api.context.Context;
 import dev.technici4n.fasttransferlib.impl.base.AbstractMonoCategoryAtom;
 import dev.technici4n.fasttransferlib.impl.compat.lba.LbaCompatUtil;
 import net.minecraft.fluid.Fluid;

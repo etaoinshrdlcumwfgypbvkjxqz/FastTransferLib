@@ -1,9 +1,9 @@
 package dev.technici4n.fasttransferlib.impl.context;
 
-import dev.technici4n.fasttransferlib.api.Context;
+import dev.technici4n.fasttransferlib.api.context.StatelessContext;
 
 public class ExecutionContext
-        implements Context {
+        implements StatelessContext {
     private static final ExecutionContext INSTANCE = new ExecutionContext();
 
     public static ExecutionContext getInstance() {

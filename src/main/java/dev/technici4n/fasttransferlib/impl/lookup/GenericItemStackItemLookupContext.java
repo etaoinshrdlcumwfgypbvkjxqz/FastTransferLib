@@ -1,8 +1,8 @@
 package dev.technici4n.fasttransferlib.impl.lookup;
 
-import dev.technici4n.fasttransferlib.api.Context;
 import dev.technici4n.fasttransferlib.api.content.Content;
 import dev.technici4n.fasttransferlib.api.content.ContentStack;
+import dev.technici4n.fasttransferlib.api.context.Context;
 import dev.technici4n.fasttransferlib.api.lookup.ItemLookupContext;
 import dev.technici4n.fasttransferlib.impl.content.ContentStackImpl;
 import dev.technici4n.fasttransferlib.impl.context.TransactionContext;

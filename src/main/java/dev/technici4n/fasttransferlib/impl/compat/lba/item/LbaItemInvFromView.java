@@ -31,7 +31,7 @@ public class LbaItemTransferableFromView
 
     @Override
     public ItemStack attemptExtraction(ItemFilter itemFilter, int maxAmount, Simulation simulation) {
-        Context context = LbaCompatUtil.asContext(simulation);
+        Context context = LbaCompatUtil.asStatelessContext(simulation);
 
         Content[] contentLock = {null};
         long extracted = ViewUtilities.extract(getDelegate(),
@@ -58,7 +58,7 @@ public class LbaItemTransferableFromView
 
     @Override
     public ItemStack attemptInsertion(ItemStack itemStack, Simulation simulation) {
-        Context context = LbaCompatUtil.asContext(simulation);
+        Context context = LbaCompatUtil.asStatelessContext(simulation);
 
         Content content = ItemContent.of(itemStack);
         long leftover = ViewUtilities.insert(getDelegate(),

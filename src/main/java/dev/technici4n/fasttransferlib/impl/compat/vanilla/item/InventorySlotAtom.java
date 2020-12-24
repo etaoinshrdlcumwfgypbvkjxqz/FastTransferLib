@@ -1,7 +1,7 @@
 package dev.technici4n.fasttransferlib.impl.compat.vanilla.item;
 
-import dev.technici4n.fasttransferlib.api.Context;
 import dev.technici4n.fasttransferlib.api.content.Content;
+import dev.technici4n.fasttransferlib.api.context.Context;
 import dev.technici4n.fasttransferlib.impl.base.AbstractMonoCategoryAtom;
 import dev.technici4n.fasttransferlib.impl.content.ItemContent;
 import net.minecraft.inventory.Inventory;

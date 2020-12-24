@@ -1,4 +1,4 @@
-package dev.technici4n.fasttransferlib.api;
+package dev.technici4n.fasttransferlib.api.context;
 
 public interface Context
         extends AutoCloseable {

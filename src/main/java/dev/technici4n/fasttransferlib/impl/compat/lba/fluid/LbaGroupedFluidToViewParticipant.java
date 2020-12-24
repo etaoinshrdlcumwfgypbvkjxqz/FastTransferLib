@@ -1,11 +1,10 @@
 package dev.technici4n.fasttransferlib.impl.compat.lba.item;
 
-import alexiil.mc.lib.attributes.item.FixedItemInv;
-import com.google.common.base.Suppliers;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Streams;
-import dev.technici4n.fasttransferlib.api.Context;
+import alexiil.mc.lib.attributes.fluid.GroupedFluidInvView;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Maps;
 import dev.technici4n.fasttransferlib.api.content.Content;
+import dev.technici4n.fasttransferlib.api.context.Context;
 import dev.technici4n.fasttransferlib.api.view.Atom;
 import dev.technici4n.fasttransferlib.api.view.View;
 import dev.technici4n.fasttransferlib.api.view.model.ListModel;

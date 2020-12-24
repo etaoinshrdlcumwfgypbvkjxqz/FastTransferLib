@@ -1,7 +1,7 @@
 package dev.technici4n.fasttransferlib.impl.context;
 
 import com.google.common.primitives.Ints;
-import dev.technici4n.fasttransferlib.api.Context;
+import dev.technici4n.fasttransferlib.api.context.Context;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;

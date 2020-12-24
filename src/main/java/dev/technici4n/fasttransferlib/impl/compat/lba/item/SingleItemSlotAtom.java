@@ -1,12 +1,8 @@
 package dev.technici4n.fasttransferlib.impl.compat.lba.item;
 
-import alexiil.mc.lib.attributes.Simulation;
-import alexiil.mc.lib.attributes.item.ItemTransferable;
-import alexiil.mc.lib.attributes.item.SingleItemSlot;
-import alexiil.mc.lib.attributes.item.filter.ExactItemStackFilter;
-import com.google.common.primitives.Ints;
-import dev.technici4n.fasttransferlib.api.Context;
+import alexiil.mc.lib.attributes.item.SingleItemSlotView;
 import dev.technici4n.fasttransferlib.api.content.Content;
+import dev.technici4n.fasttransferlib.api.context.Context;
 import dev.technici4n.fasttransferlib.impl.base.AbstractMonoCategoryAtom;
 import dev.technici4n.fasttransferlib.impl.content.ItemContent;
 import net.minecraft.item.Item;

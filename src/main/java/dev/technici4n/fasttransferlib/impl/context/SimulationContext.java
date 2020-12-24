@@ -1,9 +1,9 @@
 package dev.technici4n.fasttransferlib.impl.context;
 
-import dev.technici4n.fasttransferlib.api.Context;
+import dev.technici4n.fasttransferlib.api.context.StatelessContext;
 
 public class SimulationContext
-        implements Context {
+        implements StatelessContext {
     private static final SimulationContext INSTANCE = new SimulationContext();
 
     public static SimulationContext getInstance() {
