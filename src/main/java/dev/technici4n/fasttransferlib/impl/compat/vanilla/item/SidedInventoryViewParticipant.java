@@ -2,14 +2,14 @@ package dev.technici4n.fasttransferlib.impl.compat.vanilla.item;
 
 import com.google.common.base.Suppliers;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.primitives.Ints;
-import dev.technici4n.fasttransferlib.api.Context;
 import dev.technici4n.fasttransferlib.api.content.Content;
-import dev.technici4n.fasttransferlib.api.transfer.Participant;
+import dev.technici4n.fasttransferlib.api.context.Context;
 import dev.technici4n.fasttransferlib.api.view.Atom;
-import dev.technici4n.fasttransferlib.api.view.View;
 import dev.technici4n.fasttransferlib.api.view.model.ListModel;
-import dev.technici4n.fasttransferlib.impl.base.AbstractMonoCategoryParticipant;
+import dev.technici4n.fasttransferlib.api.view.model.Model;
+import dev.technici4n.fasttransferlib.impl.base.AbstractMonoCategoryViewParticipant;
 import dev.technici4n.fasttransferlib.impl.content.ItemContent;
 import dev.technici4n.fasttransferlib.impl.util.ViewImplUtilities;
 import it.unimi.dsi.fastutil.objects.*;
@@ -23,11 +23,13 @@ import net.minecraft.util.math.Direction;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Supplier;
+import java.util.stream.IntStream;
 
 public class SidedInventoryViewParticipant
-		extends AbstractMonoCategoryParticipant<Item>
-		implements View, ListModel {
+		extends AbstractMonoCategoryViewParticipant<Item>
+		implements ListModel {
 	private final SidedInventory delegate;
 	private final Direction direction;
 	private final int[] slots;
@@ -53,13 +55,7 @@ public class SidedInventoryViewParticipant
 		return new SidedInventoryViewParticipant(delegate, direction);
 	}
 
-	public static Participant ofParticipant(Inventory delegate, Direction direction) {
-		if (delegate instanceof SidedInventory)
-			return of((SidedInventory) delegate, direction);
-		return InventoryViewParticipant.of(delegate);
-	}
-
-	public static View ofView(Inventory delegate, Direction direction) {
+	public static AbstractMonoCategoryViewParticipant<Item> of(Inventory delegate, Direction direction) {
 		if (delegate instanceof SidedInventory)
 			return of((SidedInventory) delegate, direction);
 		return InventoryViewParticipant.of(delegate);
@@ -160,7 +156,7 @@ public class SidedInventoryViewParticipant
 	}
 
 	@Override
-	public long getAmount(Content content) {
+	protected long getAmount(Content content, Item type) {
 		return Arrays.stream(getSlots())
 				.mapToObj(getDelegate()::getStack)
 				.filter(stack -> ItemContent.of(stack).equals(content))

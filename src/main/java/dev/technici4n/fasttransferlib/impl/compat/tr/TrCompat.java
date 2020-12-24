@@ -4,7 +4,7 @@ import dev.technici4n.fasttransferlib.api.content.ContentApi;
 import dev.technici4n.fasttransferlib.api.lookup.BlockLookupContext;
 import dev.technici4n.fasttransferlib.api.transfer.TransferApi;
 import dev.technici4n.fasttransferlib.api.view.ViewApi;
-import dev.technici4n.fasttransferlib.impl.compat.tr.energy.TrEnergyHandlerToViewParticipant;
+import dev.technici4n.fasttransferlib.impl.compat.tr.energy.TrEnergyHandlerToAtom;
 import dev.technici4n.fasttransferlib.impl.compat.tr.energy.TrEnergyType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -29,9 +29,9 @@ public enum TrCompat {
         @SuppressWarnings("unused")
         public static void initializeClass() {}
 
-        private static TrEnergyHandlerToViewParticipant getBlockViewParticipantFallback(World world, BlockPos pos, BlockState state, @Nullable BlockEntity entity, BlockLookupContext context) {
+        private static TrEnergyHandlerToAtom getBlockViewParticipantFallback(World world, BlockPos pos, BlockState state, @Nullable BlockEntity entity, BlockLookupContext context) {
             if (entity != null && Energy.valid(entity)) {
-                return TrEnergyHandlerToViewParticipant.of(Energy.of(entity).side(context.getDirection()));
+                return TrEnergyHandlerToAtom.of(Energy.of(entity).side(context.getDirection()));
             }
 
             return null;

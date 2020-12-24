@@ -16,18 +16,18 @@ import team.reborn.energy.EnergyStorage;
 import java.math.RoundingMode;
 import java.util.OptionalLong;
 
-public class TrEnergyHandlerToViewParticipant
+public class TrEnergyHandlerToAtom
         extends AbstractMonoCategoryAtom<EnergyType>
         implements View {
     private final EnergyHandler delegate;
 
-    protected TrEnergyHandlerToViewParticipant(EnergyHandler delegate) {
+    protected TrEnergyHandlerToAtom(EnergyHandler delegate) {
         super(EnergyType.class);
         this.delegate = delegate.simulate();
     }
 
-    public static TrEnergyHandlerToViewParticipant of(EnergyHandler delegate) {
-        return new TrEnergyHandlerToViewParticipant(delegate);
+    public static TrEnergyHandlerToAtom of(EnergyHandler delegate) {
+        return new TrEnergyHandlerToAtom(delegate);
     }
 
     protected EnergyHandler getDelegate() {

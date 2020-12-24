@@ -2,10 +2,9 @@ package dev.technici4n.fasttransferlib.impl.compat.vanilla;
 
 import dev.technici4n.fasttransferlib.api.lookup.BlockLookupContext;
 import dev.technici4n.fasttransferlib.api.lookup.ItemLookupContext;
-import dev.technici4n.fasttransferlib.api.transfer.Participant;
 import dev.technici4n.fasttransferlib.api.transfer.TransferApi;
-import dev.technici4n.fasttransferlib.api.view.View;
 import dev.technici4n.fasttransferlib.api.view.ViewApi;
+import dev.technici4n.fasttransferlib.impl.base.AbstractMonoCategoryViewParticipant;
 import dev.technici4n.fasttransferlib.impl.compat.vanilla.fluid.BottleAtomParticipant;
 import dev.technici4n.fasttransferlib.impl.compat.vanilla.fluid.BucketAtomParticipant;
 import dev.technici4n.fasttransferlib.impl.compat.vanilla.fluid.CauldronAtomParticipant;
@@ -35,52 +34,47 @@ public enum VanillaCompat {
 
         static {
             // Vanilla containers, for optimal performance
-            TransferApi.BLOCK.registerForBlockEntities(ItemCompat::getBlockEntityParticipant,
+            TransferApi.BLOCK.registerForBlockEntities(ItemCompat::getBlockEntityViewParticipant,
                     BlockEntityType.DISPENSER, BlockEntityType.DROPPER, BlockEntityType.FURNACE, BlockEntityType.BLAST_FURNACE,
                     BlockEntityType.SMOKER, BlockEntityType.BARREL, BlockEntityType.BREWING_STAND, BlockEntityType.HOPPER,
                     BlockEntityType.SHULKER_BOX);
-            TransferApi.BLOCK.registerForBlocks(ItemCompat::getChestParticipant, Blocks.CHEST, Blocks.TRAPPED_CHEST);
+            TransferApi.BLOCK.registerForBlocks(ItemCompat::getChestViewParticipant, Blocks.CHEST, Blocks.TRAPPED_CHEST);
 
-            ViewApi.BLOCK.registerForBlockEntities(ItemCompat::getBlockEntityView,
+            ViewApi.BLOCK.registerForBlockEntities(ItemCompat::getBlockEntityViewParticipant,
                     BlockEntityType.DISPENSER, BlockEntityType.DROPPER, BlockEntityType.FURNACE, BlockEntityType.BLAST_FURNACE,
                     BlockEntityType.SMOKER, BlockEntityType.BARREL, BlockEntityType.BREWING_STAND, BlockEntityType.HOPPER,
                     BlockEntityType.SHULKER_BOX);
-            ViewApi.BLOCK.registerForBlocks(ItemCompat::getChestView, Blocks.CHEST, Blocks.TRAPPED_CHEST);
+            ViewApi.BLOCK.registerForBlocks(ItemCompat::getChestViewParticipant, Blocks.CHEST, Blocks.TRAPPED_CHEST);
 
             // Fallback for vanilla interfaces
-            TransferApi.BLOCK.registerFallback(ItemCompat::getBlockFallbackParticipant);
-            ViewApi.BLOCK.registerFallback(ItemCompat::getBlockFallbackView);
+            TransferApi.BLOCK.registerFallback(ItemCompat::getBlockFallbackViewParticipant);
+            ViewApi.BLOCK.registerFallback(ItemCompat::getBlockFallbackViewParticipant);
         }
 
         public static void initializeClass() {}
 
-        private static Participant getBlockEntityParticipant(BlockEntity entity, BlockLookupContext context) {
+        private static AbstractMonoCategoryViewParticipant<Item> getBlockEntityViewParticipant(BlockEntity entity, BlockLookupContext context) {
             if (entity instanceof Inventory)
-                return SidedInventoryViewParticipant.ofParticipant((Inventory) entity, context.getDirection());
+                return SidedInventoryViewParticipant.of((Inventory) entity, context.getDirection());
             return null;
         }
 
-        private static Participant getBlockFallbackParticipant(World world, BlockPos pos, BlockState state, @Nullable BlockEntity entity, BlockLookupContext context) {
+        private static AbstractMonoCategoryViewParticipant<Item> getBlockFallbackViewParticipant(World world, BlockPos pos, BlockState state, @Nullable BlockEntity entity, BlockLookupContext context) {
             if (entity != null) {
-                Participant result = getBlockEntityParticipant(entity, context);
+                AbstractMonoCategoryViewParticipant<Item> result = getBlockEntityViewParticipant(entity, context);
                 if (result != null)
                     return result;
             }
             if (state.getBlock() instanceof InventoryProvider) {
                 Inventory inv = ((InventoryProvider) state.getBlock()).getInventory(state, world, pos);
-                if (inv != null) return SidedInventoryViewParticipant.ofParticipant(inv, context.getDirection());
+                if (inv != null) return SidedInventoryViewParticipant.of(inv, context.getDirection());
             }
             return null;
         }
 
         private static AbstractMonoCategoryViewParticipant<Item> getChestViewParticipant(World world, BlockPos pos, BlockState state, BlockLookupContext context) {
             Inventory inv = ChestBlock.getInventory((ChestBlock) state.getBlock(), state, world, pos, true);
-            return inv == null ? null : SidedInventoryViewParticipant.ofParticipant(inv, context.getDirection());
-        }
-
-        private static View getChestView(World world, BlockPos pos, BlockState state, BlockLookupContext context) {
-            Inventory inv = ChestBlock.getInventory((ChestBlock) state.getBlock(), state, world, pos, true);
-            return inv == null ? null : SidedInventoryViewParticipant.ofView(inv, context.getDirection());
+            return inv == null ? null : SidedInventoryViewParticipant.of(inv, context.getDirection());
         }
     }
 
