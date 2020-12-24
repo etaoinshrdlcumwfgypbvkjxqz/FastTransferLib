@@ -1,17 +1,19 @@
 package dev.technic4n.fasttransferlib.example.fluid;
 
-import dev.technici4n.fasttransferlib.api.Simulation;
-import dev.technici4n.fasttransferlib.api.fluid.FluidApi;
-import dev.technici4n.fasttransferlib.api.fluid.FluidConstants;
-import dev.technici4n.fasttransferlib.api.fluid.FluidTextHelper;
-import dev.technici4n.fasttransferlib.api.fluid.FluidIo;
-
-import net.minecraft.fluid.Fluid;
+import com.google.common.collect.Iterators;
+import dev.technici4n.fasttransferlib.api.content.Content;
+import dev.technici4n.fasttransferlib.api.content.FluidConstants;
+import dev.technici4n.fasttransferlib.api.view.Atom;
+import dev.technici4n.fasttransferlib.api.view.View;
+import dev.technici4n.fasttransferlib.api.view.ViewApi;
+import dev.technici4n.fasttransferlib.impl.context.ExecutionContext;
+import dev.technici4n.fasttransferlib.impl.lookup.BlockLookupContextImpl;
+import dev.technici4n.fasttransferlib.impl.util.FluidTextUtilities;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.registry.Registry;
 
 public class YeetStick extends Item {
 	public YeetStick(Settings settings) {
@@ -20,19 +22,28 @@ public class YeetStick extends Item {
 
 	@Override
 	public ActionResult useOnBlock(ItemUsageContext context) {
-		FluidIo fluidIo = FluidApi.SIDED.get(context.getWorld(), context.getBlockPos(), context.getSide());
-
-		if (fluidIo != null && !context.getWorld().isClient) {
-			if (fluidIo.getFluidSlotCount() > 0) {
-				Fluid fluid = fluidIo.getFluid(0);
-				long extractedAmount = fluidIo.extract(fluid, 2 * FluidConstants.BOTTLE, Simulation.ACT);
-
-				if (extractedAmount > 0) {
-					context.getPlayer().sendMessage(new LiteralText(String.format("Extracted %s millibuckets of %s", FluidTextHelper.getUnicodeMillibuckets(extractedAmount, true), Registry.FLUID.getId(fluid).toString())), false);
-					context.getPlayer().sendMessage(new LiteralText(String.format("Extracted %s millibuckets of %s", FluidTextHelper.getUnicodeMillibuckets(extractedAmount, false), Registry.FLUID.getId(fluid).toString())), false);
+		if (!context.getWorld().isClient()) {
+			View view = ViewApi.BLOCK.get(context.getWorld(), context.getBlockPos(), BlockLookupContextImpl.of(context.getSide()));
+			if (view != null && view.estimateAtomSize() >= 1L) {
+				Atom atom = Iterators.getNext(view.getAtomIterator(), null);
+				if (atom != null) {
+					Content content = atom.getContent();
+					long extracted = atom.extract(ExecutionContext.getInstance(), content, 2 * FluidConstants.BOTTLE);
+					if (extracted > 0L) {
+						PlayerEntity player = context.getPlayer();
+						if (player != null) {
+							player.sendMessage(
+									new LiteralText(String.format("Extracted %s millibuckets of %s",
+											FluidTextUtilities.getUnicodeMillibuckets(extracted, true), content)),
+									false);
+							player.sendMessage(
+									new LiteralText(String.format("Extracted %s millibuckets of %s",
+											FluidTextUtilities.getUnicodeMillibuckets(extracted, false), content)),
+									false);
+						}
+						return ActionResult.SUCCESS;
+					}
 				}
-
-				return ActionResult.SUCCESS;
 			}
 		}
 
