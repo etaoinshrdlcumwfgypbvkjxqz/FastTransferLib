@@ -65,7 +65,7 @@ public class TrEnergyHandlerToViewParticipant
         double inserted = delegate.insert(maxAmount); // sim
 
         EnergyStorage delegateStorage = getDelegateAccess().getHolder();
-        context.execute(() -> delegateStorage.setStored(current + inserted), () -> delegateStorage.setStored(current));
+        context.configure(() -> delegateStorage.setStored(current + inserted), () -> delegateStorage.setStored(current));
 
         return maxAmount - DoubleMath.roundToLong(inserted, RoundingMode.UP);
     }
@@ -87,7 +87,7 @@ public class TrEnergyHandlerToViewParticipant
         double extracted = delegate.extract(maxAmount); // sim
 
         EnergyStorage delegateStorage = getDelegateAccess().getHolder();
-        context.execute(() -> delegateStorage.setStored(current - extracted), () -> delegateStorage.setStored(current));
+        context.configure(() -> delegateStorage.setStored(current - extracted), () -> delegateStorage.setStored(current));
 
         return DoubleMath.roundToLong(extracted, RoundingMode.DOWN);
     }

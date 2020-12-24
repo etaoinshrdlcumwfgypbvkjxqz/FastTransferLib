@@ -4,29 +4,49 @@ import com.google.common.primitives.Ints;
 import dev.technici4n.fasttransferlib.experimental.api.Context;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Deque;
+import java.util.List;
 
 public class TransactionContext
-        extends ExecutionContext {
+        implements Context {
     private final Deque<Runnable> rollbackActions;
-    private boolean rollback = true;
+    private final List<Runnable> commitActions;
+    private boolean committed = false;
 
     public TransactionContext(long estimatedActions) {
-        this.rollbackActions = new ArrayDeque<>(Ints.saturatedCast(estimatedActions));
+        // estimating number of actions is fruitless because implementations may add multiple actions
+        // todo array deque or linked list
+        int estimatedActions1 = Ints.saturatedCast(estimatedActions);
+        this.rollbackActions = new ArrayDeque<>(estimatedActions1);
+        this.commitActions = new ArrayList<>(estimatedActions1);
     }
 
     @Override
-    public void execute(Runnable action, Runnable rollback) {
-        super.execute(action, rollback); // execute now
+    public void configure(Runnable action, Runnable rollback) {
+        action.run();
         getRollbackActions().push(rollback);
     }
 
+    @Override
+    public void execute(Runnable action) {
+        getCommitActions().add(action);
+    }
+
     public void commitWith(Context context) {
-        context.execute(this::commit, this::rollback);
+        context.configure(this::commitReversibly, this::rollback);
+        context.execute(this::execute);
+    }
+
+    @Override
+    public void close() {
+        if (!isCommitted())
+            rollback();
     }
 
     public void commit() {
-        setRollback(false);
+        commitReversibly();
+        execute();
     }
 
     public void rollback() {
@@ -34,21 +54,27 @@ public class TransactionContext
         getRollbackActions().forEach(Runnable::run);
     }
 
-    @Override
-    public void close() {
-        if (isRollback())
-            rollback();
+    protected void execute() {
+        getCommitActions().forEach(Runnable::run);
     }
 
-    protected boolean isRollback() {
-        return rollback;
+    protected void commitReversibly() {
+        setCommitted(true);
     }
 
-    protected void setRollback(@SuppressWarnings("SameParameterValue") boolean rollback) {
-        this.rollback = rollback;
+    protected boolean isCommitted() {
+        return committed;
+    }
+
+    protected void setCommitted(@SuppressWarnings("SameParameterValue") boolean committed) {
+        this.committed = committed;
     }
 
     protected Deque<Runnable> getRollbackActions() {
         return rollbackActions;
+    }
+
+    protected List<Runnable> getCommitActions() {
+        return commitActions;
     }
 }

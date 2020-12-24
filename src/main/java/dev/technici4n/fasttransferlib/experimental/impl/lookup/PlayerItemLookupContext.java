@@ -24,7 +24,7 @@ public enum PlayerItemLookupContext {
                     if (targetStack.getCount() < amount)
                         return false;
                     int amount1 = Math.toIntExact(amount); // should be within int range
-                    context.execute(() -> targetStack.decrement(amount1), () -> targetStack.increment(amount1));
+                    context.configure(() -> targetStack.decrement(amount1), () -> targetStack.increment(amount1));
                     return true;
                 },
                 (context, stack) -> {
@@ -47,7 +47,7 @@ public enum PlayerItemLookupContext {
                         // offer to player inventory or drop
                         Int2IntMap insertionMap = new Int2IntOpenHashMap(4);
                         ItemEntity[] droppedEntityReference = {null};
-                        context.execute(() -> offerOrDropWithRollbackInformation(player, stack1,
+                        context.configure(() -> offerOrDropWithRollbackInformation(player, stack1,
                                 insertionMap, droppedEntityReference),
                                 () -> rollbackOfferOrDrop(player, insertionMap, droppedEntityReference));
                         return true;
@@ -83,7 +83,7 @@ public enum PlayerItemLookupContext {
         while (!stack.isEmpty()) {
             int slot = getIdealSlot(inventory, stack);
             if (slot == -1) {
-                if (!player.getEntityWorld().isClient()) // do it on server only
+                if (!player.getEntityWorld().isClient()) // do it on server only, random involved
                     droppedEntityReference[0] = player.dropItem(stack, false);
                 break;
             } else {

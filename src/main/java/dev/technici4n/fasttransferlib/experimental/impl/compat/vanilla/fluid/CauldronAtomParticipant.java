@@ -7,21 +7,22 @@ import dev.technici4n.fasttransferlib.experimental.api.view.Atom;
 import dev.technici4n.fasttransferlib.experimental.impl.base.AbstractMonoCategoryAtom;
 import dev.technici4n.fasttransferlib.experimental.impl.content.EmptyContent;
 import dev.technici4n.fasttransferlib.experimental.impl.content.FluidContent;
+import dev.technici4n.fasttransferlib.experimental.impl.util.WorldUtilities;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.CauldronBlock;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 
 public class CauldronAtomParticipant
         extends AbstractMonoCategoryAtom<Fluid>
         implements Atom {
-    private final World world;
+    private final WorldAccess world;
     private final BlockPos position;
 
-    public CauldronAtomParticipant(World world, BlockPos position) {
+    public CauldronAtomParticipant(WorldAccess world, BlockPos position) {
         super(Fluid.class);
         this.world = world;
         this.position = position.toImmutable();
@@ -32,7 +33,7 @@ public class CauldronAtomParticipant
         if (type != Fluids.WATER)
             return maxAmount;
 
-        World world = getWorld();
+        WorldAccess world = getWorld();
         BlockPos position = getPosition();
         BlockState blockState = world.getBlockState(position);
 
@@ -54,7 +55,7 @@ public class CauldronAtomParticipant
         if (type != Fluids.WATER)
             return 0L;
 
-        World world = getWorld();
+        WorldAccess world = getWorld();
         BlockPos position = getPosition();
         BlockState blockState = world.getBlockState(position);
 
@@ -71,14 +72,19 @@ public class CauldronAtomParticipant
         return 0L;
     }
 
-    protected static void setLevel(Context context, World world, BlockPos position, BlockState blockState, int level) {
-        context.execute(
-                () -> world.setBlockState(position, blockState.with(CauldronBlock.LEVEL, level)),
-                () -> world.setBlockState(position, blockState)
+    protected static void setLevel(Context context, WorldAccess world, BlockPos position, BlockState state, int level) {
+        BlockState resultState = state.with(CauldronBlock.LEVEL, level);
+        context.configure(
+                () -> world.setBlockState(position, resultState, WorldUtilities.NO_REDRAW | WorldUtilities.SKIP_DROPS),
+                () -> world.setBlockState(position, state, WorldUtilities.NO_REDRAW | WorldUtilities.SKIP_DROPS)
         );
+        context.execute(() -> {
+            world.setBlockState(position, state, WorldUtilities.NO_REDRAW | WorldUtilities.SKIP_DROPS);
+            world.setBlockState(position, resultState, WorldUtilities.DEFAULT_FLAGS);
+        });
     }
 
-    protected World getWorld() {
+    protected WorldAccess getWorld() {
         return world;
     }
 

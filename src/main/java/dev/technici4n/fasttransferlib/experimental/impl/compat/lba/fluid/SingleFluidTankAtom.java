@@ -65,7 +65,7 @@ public class SingleFluidTankAtom
 
         if (!tryAmount.equals(leftoverAmount)) {
             FluidAmount insert = tryAmount.sub(leftoverAmount);
-            context.execute(() -> transferable.insert(key.withAmount(insert)),
+            context.configure(() -> transferable.insert(key.withAmount(insert)),
                     () -> transferable.extract(key, insert));
             return LbaCompatUtil.asAmount(insert);
         }
@@ -86,7 +86,7 @@ public class SingleFluidTankAtom
         FluidAmount extractedAmount = extracted.getAmount_F();
 
         if (extractedAmount.isPositive()) {
-            context.execute(() -> transferable.extract(key, extractedAmount),
+            context.configure(() -> transferable.extract(key, extractedAmount),
                     () -> transferable.insert(key.withAmount(extractedAmount)));
             return LbaCompatUtil.asAmount(extractedAmount);
         }

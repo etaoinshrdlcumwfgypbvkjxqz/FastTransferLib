@@ -63,13 +63,10 @@ public class InventoryViewParticipant
 			int amount;
 			if (stack.isEmpty())  {
 				amount = Math.toIntExact(Math.min(maxAmount, maxCount));
-				context.execute(() -> {
-					delegate.setStack(slot, ItemContent.asStack(content, amount));
-					delegate.markDirty();
-				}, () -> {
-					delegate.setStack(slot, stack);
-					delegate.markDirty();
-				});
+				context.configure(
+						() -> delegate.setStack(slot, ItemContent.asStack(content, amount)),
+						() -> delegate.setStack(slot, stack)
+				);
 			} else if (content.equals(ItemContent.of(stack))) {
 				amount = Math.toIntExact(Math.min(maxAmount, maxCount - stack.getCount()));
 				incrementalActions.put(stack, amount);
@@ -82,15 +79,8 @@ public class InventoryViewParticipant
 				break;
 		}
 
-		context.execute(() -> {
-			incrementalActions.forEach(ItemStack::increment);
-			if (!incrementalActions.isEmpty())
-				delegate.markDirty();
-		}, () -> {
-			incrementalActions.forEach(ItemStack::decrement);
-			if (!incrementalActions.isEmpty())
-				delegate.markDirty();
-		});
+		context.configure(() -> incrementalActions.forEach(ItemStack::increment), () -> incrementalActions.forEach(ItemStack::decrement));
+		context.execute(delegate::markDirty);
 
 		return maxAmount;
 	}
@@ -121,15 +111,8 @@ public class InventoryViewParticipant
 			}
 		}
 
-		context.execute(() -> {
-			incrementalActions.forEach(ItemStack::decrement);
-			if (!incrementalActions.isEmpty())
-				delegate.markDirty();
-		}, () -> {
-			incrementalActions.forEach(ItemStack::increment);
-			if (!incrementalActions.isEmpty())
-				delegate.markDirty();
-		});
+		context.configure(() -> incrementalActions.forEach(ItemStack::decrement), () -> incrementalActions.forEach(ItemStack::increment));
+		context.execute(delegate::markDirty);
 
 		return maxAmount - leftoverAmount;
 	}

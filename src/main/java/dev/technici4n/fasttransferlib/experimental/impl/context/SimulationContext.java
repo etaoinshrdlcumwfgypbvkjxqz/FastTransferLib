@@ -11,7 +11,12 @@ public class SimulationContext
     }
 
     @Override
-    public void execute(Runnable action, Runnable rollback) {
+    public void configure(Runnable action, Runnable rollback) {
+        // NOOP
+    }
+
+    @Override
+    public void execute(Runnable action) {
         // NOOP
     }
 

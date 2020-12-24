@@ -73,7 +73,7 @@ public class GenericItemStackItemLookupContext
                     if (getStackConsumer().test(consumeAndAddTransaction, fromCount)) {
                         if (amount == fromCount) {
                             // is a replace operation
-                            consumeAndAddTransaction.execute(() -> setReplaced(true), () -> setReplaced(false));
+                            consumeAndAddTransaction.configure(() -> setReplaced(true), () -> setReplaced(false));
                         }
                         if (to.isEmpty() || toCount == 0L || getStackAdder().test(consumeAndAddTransaction, ContentStackImpl.of(to, toCount))) {
                             consumeAndAddTransaction.commitWith(context); // commit using context

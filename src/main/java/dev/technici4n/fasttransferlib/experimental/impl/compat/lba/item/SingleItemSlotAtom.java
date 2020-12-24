@@ -62,7 +62,7 @@ public class SingleItemSlotAtom
 
         if (amount1 != leftoverAmount) {
             int insert = amount1 - leftoverAmount;
-            context.execute(() -> transferable.insert(ItemContent.asStack(itemContent, insert)),
+            context.configure(() -> transferable.insert(ItemContent.asStack(itemContent, insert)),
                     () -> transferable.extract(ItemContent.asStack(itemContent, insert), insert));
             return maxAmount - insert;
         }
@@ -81,7 +81,7 @@ public class SingleItemSlotAtom
         int extractedAmount = extracted.getCount();
 
         if (extractedAmount > 0) {
-            context.execute(() -> transferable.extract(new ExactItemStackFilter(ItemContent.asStack(itemContent, amount1)), extractedAmount),
+            context.configure(() -> transferable.extract(new ExactItemStackFilter(ItemContent.asStack(itemContent, amount1)), extractedAmount),
                     () -> transferable.insert(ItemContent.asStack(itemContent, amount1)));
             return extractedAmount;
         }

@@ -47,24 +47,14 @@ public class SidedInventorySlotAtom
             if (inventory.canInsert(slot, nextStack, getDirection())) {
                 amount = amount1;
                 nextStack.setCount(amount);
-                context.execute(() -> {
-                    inventory.setStack(slot, nextStack);
-                    inventory.markDirty();
-                }, () -> {
-                    inventory.setStack(slot, stack);
-                    inventory.markDirty();
-                });
+                context.configure(() -> inventory.setStack(slot, nextStack), () -> inventory.setStack(slot, stack));
+                context.execute(inventory::markDirty);
             } else
                 amount = 0;
         } else if (content.equals(ItemContent.of(stack))) {
             amount = Math.toIntExact(Math.min(maxAmount, maxCount - stack.getCount()));
-            context.execute(() -> {
-                stack.increment(amount);
-                inventory.markDirty();
-            }, () -> {
-                stack.decrement(amount);
-                inventory.markDirty();
-            });
+            context.configure(() -> stack.increment(amount), () -> stack.decrement(amount));
+            context.execute(inventory::markDirty);
         } else
             amount = 0;
 
@@ -80,13 +70,8 @@ public class SidedInventorySlotAtom
         if (!stack.isEmpty() && content.equals(ItemContent.of(stack)) && inventory.canExtract(slot, stack, getDirection())) {
             // stack is not empty, item matches, can extract
             int amount = Math.toIntExact(Math.min(maxAmount, stack.getCount())); // COMMENT should be in int range, negative excluded
-            context.execute(() -> {
-                stack.decrement(amount);
-                inventory.markDirty();
-            }, () -> {
-                stack.increment(amount);
-                inventory.markDirty();
-            });
+            context.configure(() -> stack.decrement(amount), () -> stack.increment(amount));
+            context.execute(inventory::markDirty);
             return amount;
         }
         return 0L;

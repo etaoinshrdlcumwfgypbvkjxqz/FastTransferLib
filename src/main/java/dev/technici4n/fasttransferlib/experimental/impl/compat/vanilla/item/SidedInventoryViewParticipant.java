@@ -89,13 +89,7 @@ public class SidedInventoryViewParticipant
 				if (delegate.canInsert(index, nextStack, direction)) {
 					amount = amount1;
 					nextStack.setCount(amount);
-					context.execute(() -> {
-						delegate.setStack(slot, nextStack);
-						delegate.markDirty();
-					}, () -> {
-						delegate.setStack(slot, stack);
-						delegate.markDirty();
-					});
+					context.configure(() -> delegate.setStack(slot, nextStack), () -> delegate.setStack(slot, stack));
 				} else
 					amount = 0;
 			} else if (content.equals(ItemContent.of(stack))) {
@@ -110,15 +104,8 @@ public class SidedInventoryViewParticipant
 				break;
 		}
 
-		context.execute(() -> {
-			incrementalActions.forEach(ItemStack::increment);
-			if (!incrementalActions.isEmpty())
-				delegate.markDirty();
-		}, () -> {
-			incrementalActions.forEach(ItemStack::decrement);
-			if (!incrementalActions.isEmpty())
-				delegate.markDirty();
-		});
+		context.configure(() -> incrementalActions.forEach(ItemStack::increment), () -> incrementalActions.forEach(ItemStack::decrement));
+		context.execute(delegate::markDirty);
 
 		return maxAmount;
 	}
@@ -151,15 +138,8 @@ public class SidedInventoryViewParticipant
 			}
 		}
 
-		context.execute(() -> {
-			incrementalActions.forEach(ItemStack::decrement);
-			if (!incrementalActions.isEmpty())
-				delegate.markDirty();
-		}, () -> {
-			incrementalActions.forEach(ItemStack::increment);
-			if (!incrementalActions.isEmpty())
-				delegate.markDirty();
-		});
+		context.configure(() -> incrementalActions.forEach(ItemStack::decrement), () -> incrementalActions.forEach(ItemStack::increment));
+		context.execute(delegate::markDirty);
 
 		return maxAmount - leftoverAmount;
 	}

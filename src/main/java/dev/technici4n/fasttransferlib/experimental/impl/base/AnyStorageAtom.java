@@ -35,14 +35,14 @@ public class AnyStorageAtom
         long inserted;
         if (currentContent.isEmpty()) {
             inserted = Math.min(maxAmount, getCapacity());
-            context.execute(() -> {
+            context.configure(() -> {
                 setContent(content);
                 setAmount(inserted);
             }, () -> setAmount(0L));
         } else if (currentContent.equals(content)) {
             long amount = getAmount();
             inserted = Math.min(maxAmount, getCapacity() - amount);
-            context.execute(() -> setAmount(amount + inserted), () -> setAmount(amount));
+            context.configure(() -> setAmount(amount + inserted), () -> setAmount(amount));
         } else inserted = 0L;
 
         return maxAmount - inserted;
@@ -56,7 +56,7 @@ public class AnyStorageAtom
         if (currentContent.equals(content)) {
             long amount = getAmount();
             extracted = Math.min(maxAmount, amount);
-            context.execute(() -> setAmount(amount - extracted), () -> setAmount(amount));
+            context.configure(() -> setAmount(amount - extracted), () -> setAmount(amount));
         } else extracted = 0L;
 
         return extracted;
