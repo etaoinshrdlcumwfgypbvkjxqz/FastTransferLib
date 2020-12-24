@@ -14,6 +14,7 @@ import team.reborn.energy.EnergyHandler;
 import team.reborn.energy.EnergyStorage;
 
 import java.math.RoundingMode;
+import java.util.OptionalLong;
 
 public class TrEnergyHandlerToViewParticipant
         extends AbstractMonoCategoryAtom<EnergyType>
@@ -46,6 +47,11 @@ public class TrEnergyHandlerToViewParticipant
     @Override
     public long getAmount() {
         return NumberUtilities.toSaturatedInteger(getDelegate().getEnergy());
+    }
+
+    @Override
+    public OptionalLong getCapacity() {
+        return OptionalLong.of(NumberUtilities.toSaturatedInteger(getDelegate().getMaxStored()));
     }
 
     @Override

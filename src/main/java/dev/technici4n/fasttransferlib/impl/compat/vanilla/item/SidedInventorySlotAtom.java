@@ -4,10 +4,13 @@ import dev.technici4n.fasttransferlib.api.content.Content;
 import dev.technici4n.fasttransferlib.api.context.Context;
 import dev.technici4n.fasttransferlib.impl.base.AbstractMonoCategoryAtom;
 import dev.technici4n.fasttransferlib.impl.content.ItemContent;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Direction;
+
+import java.util.OptionalLong;
 
 public class SidedInventorySlotAtom
         extends AbstractMonoCategoryAtom<Item> {
@@ -30,6 +33,15 @@ public class SidedInventorySlotAtom
     @Override
     public long getAmount() {
         return getInventory().getStack(getSlot()).getCount();
+    }
+
+    @Override
+    public OptionalLong getCapacity() {
+        Inventory inventory = getInventory();
+        ItemStack stack = inventory.getStack(getSlot());
+        return OptionalLong.of(stack.isEmpty()
+                ? inventory.getMaxCountPerStack()
+                : Math.min(inventory.getMaxCountPerStack(), stack.getMaxCount()));
     }
 
     @Override

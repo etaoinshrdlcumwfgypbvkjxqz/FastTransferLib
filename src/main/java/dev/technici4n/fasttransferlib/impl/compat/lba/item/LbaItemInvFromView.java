@@ -1,28 +1,41 @@
 package dev.technici4n.fasttransferlib.impl.compat.lba.item;
 
 import alexiil.mc.lib.attributes.Simulation;
-import alexiil.mc.lib.attributes.item.ItemTransferable;
+import alexiil.mc.lib.attributes.item.FixedItemInv;
+import alexiil.mc.lib.attributes.item.GroupedItemInv;
 import alexiil.mc.lib.attributes.item.filter.ItemFilter;
-import dev.technici4n.fasttransferlib.api.Context;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Streams;
+import com.google.common.primitives.Ints;
 import dev.technici4n.fasttransferlib.api.content.Content;
+import dev.technici4n.fasttransferlib.api.context.Context;
+import dev.technici4n.fasttransferlib.api.view.Atom;
 import dev.technici4n.fasttransferlib.api.view.View;
+import dev.technici4n.fasttransferlib.api.view.model.ListModel;
+import dev.technici4n.fasttransferlib.api.view.model.Model;
 import dev.technici4n.fasttransferlib.impl.compat.lba.LbaCompatUtil;
 import dev.technici4n.fasttransferlib.impl.content.ItemContent;
+import dev.technici4n.fasttransferlib.impl.context.DelayedExecutionContext;
+import dev.technici4n.fasttransferlib.impl.context.TransactionContext;
+import dev.technici4n.fasttransferlib.impl.util.TransferUtilities;
 import dev.technici4n.fasttransferlib.impl.util.ViewUtilities;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
-public class LbaItemTransferableFromView
-        implements ItemTransferable {
+import java.util.*;
+
+public class LbaItemInvFromView
+        implements GroupedItemInv, FixedItemInv {
     private final View delegate;
 
-    protected LbaItemTransferableFromView(View delegate) {
+    protected LbaItemInvFromView(View delegate) {
         // the use of 'FluidFilter' means a view is required
         this.delegate = delegate;
     }
 
-    public static LbaItemTransferableFromView of(View delegate) {
-        return new LbaItemTransferableFromView(delegate);
+    public static LbaItemInvFromView of(View delegate) {
+        return new LbaItemInvFromView(delegate);
     }
 
     protected View getDelegate() {
@@ -68,5 +81,147 @@ public class LbaItemTransferableFromView
         int leftover1 = Math.toIntExact(leftover); // within int range
 
         return ItemContent.asStack(content, leftover1);
+    }
+
+    @SuppressWarnings("UnstableApiUsage")
+    @Override
+    public Set<ItemStack> getStoredStacks() {
+        return getDelegate().getContents().stream()
+                .map(content -> ItemContent.asStack(content, 1))
+                .collect(ImmutableSet.toImmutableSet());
+    }
+
+    @SuppressWarnings("UnstableApiUsage")
+    @Override
+    public int getTotalCapacity() {
+        return Ints.saturatedCast(
+                Streams.stream(getDelegate().getAtomIterator())
+                        .map(Atom::getCapacity)
+                        .filter(OptionalLong::isPresent)
+                        .mapToLong(OptionalLong::getAsLong)
+                        .sum()
+        );
+    }
+
+    @Override
+    public ItemInvStatistic getStatistics(ItemFilter filter) {
+        @SuppressWarnings("UnstableApiUsage")
+        List<? extends Atom> filtered = Streams.stream(getDelegate().getAtomIterator())
+                .filter(atom -> filter.matches(ItemContent.asStack(atom.getContent(), 1)))
+                .collect(ImmutableList.toImmutableList());
+        long amount = filtered.stream()
+                .mapToLong(Atom::getAmount)
+                .sum();
+        OptionalLong spaceTotal = filtered.stream()
+                .map(Atom::getCapacity)
+                .filter(OptionalLong::isPresent)
+                .mapToLong(OptionalLong::getAsLong)
+                .reduce(Long::sum);
+        return new ItemInvStatistic(filter,
+                Ints.saturatedCast(amount),
+                Ints.saturatedCast(spaceTotal.orElse(amount) - amount),
+                spaceTotal.isPresent() ? Ints.saturatedCast(spaceTotal.getAsLong()) : -1);
+    }
+
+    @Override
+    public int getSlotCount() {
+        return getDelegateListModel(this)
+                .<Collection<? extends Atom>>map(ListModel::getAtomList)
+                .orElseGet(ImmutableSet::of)
+                .size();
+    }
+
+    @Override
+    public ItemStack getInvStack(int slot) {
+        ensureIndexInBounds(this, slot);
+        Atom atom = getDelegateListModel(this)
+                .orElseThrow(AssertionError::new)
+                .getAtomList()
+                .get(slot);
+        return ItemContent.asStack(atom.getContent(), Ints.saturatedCast(atom.getAmount()));
+    }
+
+    @Override
+    public boolean isItemValidForSlot(int slot, ItemStack stack) {
+        return true; // just return true, permitted by the contract
+    }
+
+    @Override
+    public boolean setInvStack(int slot, ItemStack to, Simulation simulation) {
+        ensureIndexInBounds(this, slot);
+
+        Atom atom = getDelegateListModel(this)
+                .orElseThrow(AssertionError::new)
+                .getAtomList()
+                .get(slot);
+
+        if (to.isEmpty()) {
+            // extract only
+            try (TransactionContext transaction = new TransactionContext(1L)) {
+                TransferUtilities.extractAll(transaction, atom);
+                if (atom.getAmount() == 0L) {
+                    transaction.commitWith(LbaCompatUtil.asStatelessContext(simulation));
+                    return true;
+                }
+                return false;
+            }
+        } else {
+            Content atomContent = atom.getContent();
+            Content toContent = ItemContent.of(to);
+            if (atomContent.isEmpty()) {
+                // insert only
+                try (DelayedExecutionContext execution = DelayedExecutionContext.getInstance()) {
+                    if (atom.insert(execution, toContent, to.getCount()) == 0L) {
+                        execution.executeWith(LbaCompatUtil.asStatelessContext(simulation));
+                        return true;
+                    }
+                    return false;
+                }
+            } else if (atomContent.equals(toContent)) {
+                // extract or insert
+                long atomAmount = atom.getAmount();
+                int toAmount = to.getCount();
+
+                boolean extract;
+                if (atomAmount > toAmount) extract = true;
+                else if (atomAmount < toAmount) extract = false;
+                else return true;
+
+                long diff = Math.abs(atomAmount - toAmount);
+
+                try (DelayedExecutionContext execution = DelayedExecutionContext.getInstance()) {
+                    if (extract
+                            ? atom.extract(execution, atomContent, diff) == diff
+                            : atom.insert(execution, atomContent, diff) == 0L) {
+                        execution.executeWith(LbaCompatUtil.asStatelessContext(simulation));
+                        return true;
+                    }
+                    return false;
+                }
+            } else {
+                // extract and then insert
+                try (TransactionContext transaction = new TransactionContext(2L)) {
+                    TransferUtilities.extractAll(transaction, atom);
+                    if (atom.getAmount() == 0L
+                            && atom.insert(transaction, toContent, to.getCount()) == 0L) {
+                        transaction.commitWith(LbaCompatUtil.asStatelessContext(simulation));
+                        return true;
+                    }
+                    return false;
+                }
+            }
+        }
+    }
+
+    protected static Optional<? extends ListModel> getDelegateListModel(LbaItemInvFromView instance) {
+        Model model = instance.getDelegate().getDirectModel();
+        if (model instanceof ListModel)
+            return Optional.of((ListModel) model);
+        return Optional.empty();
+    }
+
+    protected static void ensureIndexInBounds(LbaItemInvFromView instance, int index) {
+        if (index >= instance.getSlotCount() || index < 0)
+            throw new IndexOutOfBoundsException(String.valueOf(index));
     }
 }

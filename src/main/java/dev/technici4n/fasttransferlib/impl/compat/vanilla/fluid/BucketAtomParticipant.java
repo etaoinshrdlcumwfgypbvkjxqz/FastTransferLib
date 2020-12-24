@@ -15,6 +15,8 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.Items;
 
+import java.util.OptionalLong;
+
 public class BucketAtomParticipant
         extends AbstractMonoCategoryAtom<Fluid> {
     private final ItemConvertible item;
@@ -67,5 +69,10 @@ public class BucketAtomParticipant
     @Override
     public long getAmount() {
         return getContent().isEmpty() ? 0L : FluidConstants.BUCKET;
+    }
+
+    @Override
+    public OptionalLong getCapacity() {
+        return OptionalLong.of(FluidConstants.BUCKET);
     }
 }

@@ -9,7 +9,7 @@ import dev.technici4n.fasttransferlib.impl.context.ExecutionContext;
 import dev.technici4n.fasttransferlib.impl.lookup.BlockLookupContextImpl;
 import dev.technici4n.fasttransferlib.impl.lookup.PlayerItemLookupContext;
 import dev.technici4n.fasttransferlib.impl.util.FluidTextUtilities;
-import dev.technici4n.fasttransferlib.impl.util.MoveUtilities;
+import dev.technici4n.fasttransferlib.impl.util.TransferUtilities;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
@@ -43,7 +43,7 @@ public class SimpleTankBlock extends Block implements BlockEntityProvider {
 		View itemView = ViewApi.ITEM.get(player.getStackInHand(hand).getItem(), PlayerItemLookupContext.ofHand(player, hand));
 		if (participant != null && view != null && itemView != null) {
 			if (!world.isClient()) {
-				MoveUtilities.moveAll(ExecutionContext.getInstance(), itemView, participant, atom -> {
+				TransferUtilities.moveAll(ExecutionContext.getInstance(), itemView, participant, atom -> {
 					Content content = atom.getContent();
 					return content.getCategory() == Fluid.class ? content : null;
 				});

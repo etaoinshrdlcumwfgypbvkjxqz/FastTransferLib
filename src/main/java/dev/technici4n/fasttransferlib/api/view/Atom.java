@@ -1,6 +1,7 @@
 package dev.technici4n.fasttransferlib.api.view;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterators;
 import dev.technici4n.fasttransferlib.api.content.Content;
 import dev.technici4n.fasttransferlib.api.transfer.Participant;
@@ -10,12 +11,16 @@ import it.unimi.dsi.fastutil.objects.Object2LongMaps;
 import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
 
 import java.util.Iterator;
+import java.util.OptionalLong;
+import java.util.Set;
 
 public interface Atom
         extends View, Participant, Model {
     Content getContent();
 
     long getAmount();
+
+    OptionalLong getCapacity();
 
     @Override
     default Iterator<? extends Atom> getAtomIterator() {
@@ -42,6 +47,11 @@ public interface Atom
     @Override
     default Object2LongMap<Content> getAmounts() {
         return Object2LongMaps.unmodifiable(new Object2LongOpenHashMap<>(ImmutableMap.of(getContent(), getAmount())));
+    }
+
+    @Override
+    default Set<? extends Content> getContents() {
+        return ImmutableSet.of(getContent());
     }
 
     @Override

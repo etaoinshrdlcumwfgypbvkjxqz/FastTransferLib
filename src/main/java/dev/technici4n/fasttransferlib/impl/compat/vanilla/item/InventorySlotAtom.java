@@ -8,6 +8,8 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
+import java.util.OptionalLong;
+
 public class InventorySlotAtom
         extends AbstractMonoCategoryAtom<Item> {
     private final Inventory inventory;
@@ -27,6 +29,15 @@ public class InventorySlotAtom
     @Override
     public long getAmount() {
         return getInventory().getStack(getSlot()).getCount();
+    }
+
+    @Override
+    public OptionalLong getCapacity() {
+        Inventory inventory = getInventory();
+        ItemStack stack = inventory.getStack(getSlot());
+        return OptionalLong.of(stack.isEmpty()
+                ? inventory.getMaxCountPerStack()
+                : Math.min(inventory.getMaxCountPerStack(), stack.getMaxCount()));
     }
 
     protected Inventory getInventory() {

@@ -16,6 +16,8 @@ import net.minecraft.fluid.Fluids;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.WorldAccess;
 
+import java.util.OptionalLong;
+
 public class CauldronAtomParticipant
         extends AbstractMonoCategoryAtom<Fluid>
         implements Atom {
@@ -103,5 +105,10 @@ public class CauldronAtomParticipant
         if (blockState.isOf(Blocks.CAULDRON))
             return FluidConstants.BOTTLE * blockState.get(CauldronBlock.LEVEL);
         return 0L;
+    }
+
+    @Override
+    public OptionalLong getCapacity() {
+        return OptionalLong.of(FluidConstants.BUCKET);
     }
 }

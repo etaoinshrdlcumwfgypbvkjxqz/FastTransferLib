@@ -4,6 +4,8 @@ import dev.technici4n.fasttransferlib.api.content.Content;
 import dev.technici4n.fasttransferlib.api.context.Context;
 import net.minecraft.nbt.CompoundTag;
 
+import java.util.OptionalLong;
+
 public class MonoStorageAtom<T>
         extends AbstractMonoCategoryAtom<T> {
     private final AnyStorageAtom delegate;
@@ -33,6 +35,11 @@ public class MonoStorageAtom<T>
     @Override
     public long getAmount() {
         return getDelegate().getAmount();
+    }
+
+    @Override
+    public OptionalLong getCapacity() {
+        return getDelegate().getCapacity();
     }
 
     @Override

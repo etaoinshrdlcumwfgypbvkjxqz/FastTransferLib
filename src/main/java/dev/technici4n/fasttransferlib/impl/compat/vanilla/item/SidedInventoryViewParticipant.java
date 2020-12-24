@@ -180,8 +180,19 @@ public class SidedInventoryViewParticipant
 		);
 	}
 
+	@SuppressWarnings("UnstableApiUsage")
 	@Override
-	public ListModel getDirectModel() {
+	public Set<? extends Content> getContents() {
+		Inventory delegate = getDelegate();
+		int size = delegate.size();
+		return IntStream.range(0, size)
+				.mapToObj(delegate::getStack)
+				.map(ItemContent::of)
+				.collect(ImmutableSet.toImmutableSet());
+	}
+
+	@Override
+	public Model getDirectModel() {
 		return this;
 	}
 

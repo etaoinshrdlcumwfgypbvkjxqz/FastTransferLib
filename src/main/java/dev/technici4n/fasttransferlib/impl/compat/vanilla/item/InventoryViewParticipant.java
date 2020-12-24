@@ -2,6 +2,7 @@ package dev.technici4n.fasttransferlib.impl.compat.vanilla.item;
 
 import com.google.common.base.Suppliers;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.primitives.Ints;
 import dev.technici4n.fasttransferlib.api.Context;
 import dev.technici4n.fasttransferlib.api.content.Content;
@@ -19,6 +20,7 @@ import net.minecraft.util.Util;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
 
@@ -155,8 +157,19 @@ public class InventoryViewParticipant
 		);
 	}
 
+	@SuppressWarnings("UnstableApiUsage")
 	@Override
-	public ListModel getDirectModel() {
+	public Set<? extends Content> getContents() {
+		Inventory delegate = getDelegate();
+		int size = delegate.size();
+		return IntStream.range(0, size)
+				.mapToObj(delegate::getStack)
+				.map(ItemContent::of)
+				.collect(ImmutableSet.toImmutableSet());
+	}
+
+	@Override
+	public Model getDirectModel() {
 		return this;
 	}
 

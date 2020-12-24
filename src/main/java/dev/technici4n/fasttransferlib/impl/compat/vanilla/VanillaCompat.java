@@ -73,26 +73,7 @@ public enum VanillaCompat {
             return null;
         }
 
-        private static View getBlockEntityView(BlockEntity entity, BlockLookupContext context) {
-            if (entity instanceof Inventory)
-                return SidedInventoryViewParticipant.ofView((Inventory) entity, context.getDirection());
-            return null;
-        }
-
-        private static View getBlockFallbackView(World world, BlockPos pos, BlockState state, @Nullable BlockEntity entity, BlockLookupContext context) {
-            if (entity != null) {
-                View result = getBlockEntityView(entity, context);
-                if (result != null)
-                    return result;
-            }
-            if (state.getBlock() instanceof InventoryProvider) {
-                Inventory inv = ((InventoryProvider) state.getBlock()).getInventory(state, world, pos);
-                if (inv != null) return SidedInventoryViewParticipant.ofView(inv, context.getDirection());
-            }
-            return null;
-        }
-
-        private static Participant getChestParticipant(World world, BlockPos pos, BlockState state, BlockLookupContext context) {
+        private static AbstractMonoCategoryViewParticipant<Item> getChestViewParticipant(World world, BlockPos pos, BlockState state, BlockLookupContext context) {
             Inventory inv = ChestBlock.getInventory((ChestBlock) state.getBlock(), state, world, pos, true);
             return inv == null ? null : SidedInventoryViewParticipant.ofParticipant(inv, context.getDirection());
         }

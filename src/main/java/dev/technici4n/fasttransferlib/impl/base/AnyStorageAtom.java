@@ -7,15 +7,17 @@ import dev.technici4n.fasttransferlib.api.view.Atom;
 import dev.technici4n.fasttransferlib.impl.content.EmptyContent;
 import net.minecraft.nbt.CompoundTag;
 
+import java.util.OptionalLong;
+
 public class AnyStorageAtom
         implements Atom {
     private Content content = EmptyContent.INSTANCE;
-    private final long capacity;
+    private final long internalCapacity;
     private long amount;
 
     public AnyStorageAtom(long capacity) {
         assert capacity >= 0L;
-        this.capacity = capacity;
+        this.internalCapacity = capacity;
     }
 
     @Override
@@ -34,14 +36,14 @@ public class AnyStorageAtom
 
         long inserted;
         if (currentContent.isEmpty()) {
-            inserted = Math.min(maxAmount, getCapacity());
+            inserted = Math.min(maxAmount, getInternalCapacity());
             context.configure(() -> {
                 setContent(content);
                 setAmount(inserted);
             }, () -> setAmount(0L));
         } else if (currentContent.equals(content)) {
             long amount = getAmount();
-            inserted = Math.min(maxAmount, getCapacity() - amount);
+            inserted = Math.min(maxAmount, getInternalCapacity() - amount);
             context.configure(() -> setAmount(amount + inserted), () -> setAmount(amount));
         } else inserted = 0L;
 
@@ -62,8 +64,13 @@ public class AnyStorageAtom
         return extracted;
     }
 
-    protected long getCapacity() {
-        return capacity;
+    protected long getInternalCapacity() {
+        return internalCapacity;
+    }
+
+    @Override
+    public OptionalLong getCapacity() {
+        return OptionalLong.of(getInternalCapacity());
     }
 
     protected void setContent(Content content) {
@@ -72,7 +79,7 @@ public class AnyStorageAtom
 
     protected void setAmount(long amount) {
         assert amount >= 0L;
-        assert amount <= getCapacity();
+        assert amount <= getInternalCapacity();
         if ((this.amount = amount) == 0L)
             setContent(EmptyContent.INSTANCE);
         else assert !getContent().isEmpty();

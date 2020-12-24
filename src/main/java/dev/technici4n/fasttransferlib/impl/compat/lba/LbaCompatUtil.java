@@ -19,6 +19,53 @@ import java.math.RoundingMode;
 public enum LbaCompatUtil {
     ;
 
+    public static FluidAmount abs(FluidAmount fluidAmount) {
+        if (fluidAmount.isNegative())
+            return fluidAmount.negate();
+        return fluidAmount;
+    }
+
+    public static class FluidAmountAsAmountsIterator
+            implements LongIterator {
+        private FluidAmount fluidAmount;
+
+        protected FluidAmountAsAmountsIterator(FluidAmount fluidAmount) {
+            this.fluidAmount = fluidAmount;
+        }
+
+        public static FluidAmountAsAmountsIterator of(FluidAmount fluidAmount) {
+            return new FluidAmountAsAmountsIterator(fluidAmount);
+        }
+
+        public static FluidAmountAsAmountsIterator of(FluidVolume fluidVolume) {
+            return new FluidAmountAsAmountsIterator(fluidVolume.getAmount_F());
+        }
+
+        @Override
+        public long nextLong() {
+            if (hasNext()) {
+                FluidAmount fluidAmount = getFluidAmount();
+                long next = asAmount(fluidAmount);
+                setFluidAmount(fluidAmount.sub(asFluidAmount(next)));
+                return next;
+            }
+            return 0L;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return !getFluidAmount().isZero();
+        }
+
+        protected FluidAmount getFluidAmount() {
+            return fluidAmount;
+        }
+
+        protected void setFluidAmount(FluidAmount fluidAmount) {
+            this.fluidAmount = fluidAmount;
+        }
+    }
+
     public static Content asFluidContent(FluidVolume fluidVolume) {
         return asFluidContent(fluidVolume.getFluidKey());
     }
@@ -28,6 +75,8 @@ public enum LbaCompatUtil {
     }
 
     public static FluidKey asFluidKey(Content fluidContent) {
+        if (fluidContent.isEmpty())
+            return FluidKeys.EMPTY;
         assert fluidContent.getCategory() == Fluid.class;
         return FluidKeys.get((Fluid) fluidContent.getType());
     }

@@ -10,7 +10,7 @@ import dev.technici4n.fasttransferlib.impl.context.TransactionContext;
 import java.util.Iterator;
 import java.util.function.Function;
 
-public enum MoveUtilities {
+public enum TransferUtilities {
     ;
 
     public static long moveAll(Context context, View from, Participant to, Function<? super Atom, ? extends Content> filter) {
@@ -53,6 +53,23 @@ public enum MoveUtilities {
             }
 
             transaction.commitWith(context); // commit using context
+        }
+        return result;
+    }
+
+    public static long extractAll(Context context, Atom atom) {
+        if (atom.getAmount() == 0L)
+            return 0L;
+        long result = 0L;
+        try (TransactionContext transaction = new TransactionContext(2L)) {
+            for (long amount = atom.getAmount(); amount != 0L; amount = atom.getAmount()) {
+                assert amount > 0L;
+                long extracted = atom.extract(transaction, atom.getContent(), amount);
+                if (extracted == 0L)
+                    break;
+                result += extracted;
+            }
+            transaction.commitWith(context);
         }
         return result;
     }

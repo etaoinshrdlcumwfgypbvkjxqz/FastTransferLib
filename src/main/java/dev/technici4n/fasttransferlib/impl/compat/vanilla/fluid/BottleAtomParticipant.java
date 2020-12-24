@@ -14,6 +14,7 @@ import net.minecraft.potion.PotionUtil;
 import net.minecraft.potion.Potions;
 
 import java.util.Optional;
+import java.util.OptionalLong;
 
 public class BottleAtomParticipant
         extends AbstractMonoCategoryAtom<Fluid> {
@@ -63,6 +64,11 @@ public class BottleAtomParticipant
     @Override
     public long getAmount() {
         return getContent().isEmpty() ? 0L : FluidConstants.BOTTLE;
+    }
+
+    @Override
+    public OptionalLong getCapacity() {
+        return OptionalLong.of(FluidConstants.BOTTLE);
     }
 
     protected static Optional<? extends Content> getFluidContentAsItemContent(Content fluidContent) {
