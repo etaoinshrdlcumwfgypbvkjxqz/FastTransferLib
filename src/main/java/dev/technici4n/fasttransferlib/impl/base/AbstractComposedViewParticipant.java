@@ -5,12 +5,12 @@ import dev.technici4n.fasttransferlib.api.context.Context;
 import dev.technici4n.fasttransferlib.api.transfer.Participant;
 import dev.technici4n.fasttransferlib.api.view.Atom;
 import dev.technici4n.fasttransferlib.api.view.View;
-import dev.technici4n.fasttransferlib.api.view.flow.Subscriber;
-import dev.technici4n.fasttransferlib.api.view.flow.TransferData;
+import dev.technici4n.fasttransferlib.api.view.flow.Publisher;
 import dev.technici4n.fasttransferlib.api.view.model.Model;
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
 
 import java.util.Iterator;
+import java.util.Optional;
 import java.util.Set;
 
 public abstract class AbstractComposedViewParticipant
@@ -70,7 +70,7 @@ public abstract class AbstractComposedViewParticipant
     }
 
     @Override
-    public boolean subscribe(Subscriber<? super TransferData> subscriber) {
-        return getView().subscribe(subscriber);
+    public <T> Optional<? extends Publisher<T>> getPublisher(Class<T> discriminator) {
+        return getView().getPublisher(discriminator);
     }
 }

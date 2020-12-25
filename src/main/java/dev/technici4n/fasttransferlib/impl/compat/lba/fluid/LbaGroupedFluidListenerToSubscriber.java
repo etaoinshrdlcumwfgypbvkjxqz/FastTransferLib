@@ -6,6 +6,7 @@ import alexiil.mc.lib.attributes.fluid.FluidInvAmountChangeListener_F;
 import alexiil.mc.lib.attributes.fluid.GroupedFluidInvView;
 import alexiil.mc.lib.attributes.fluid.amount.FluidAmount;
 import alexiil.mc.lib.attributes.fluid.volume.FluidKey;
+import dev.technici4n.fasttransferlib.api.view.flow.Subscription;
 import dev.technici4n.fasttransferlib.api.view.flow.TransferData;
 import dev.technici4n.fasttransferlib.impl.compat.lba.LbaCompatUtil;
 import dev.technici4n.fasttransferlib.impl.view.flow.DisposableSubscriber;
@@ -33,7 +34,7 @@ public class LbaGroupedFluidListenerToSubscriber
 
     @Override
     protected void onSubscribe() {
-        // NOOP
+        getSubscription().request(Subscription.UNBOUNDED_REQUEST);
     }
 
     @Override

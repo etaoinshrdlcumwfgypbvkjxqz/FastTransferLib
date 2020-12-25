@@ -24,10 +24,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.Direction;
 
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
 
@@ -155,8 +152,8 @@ public class SidedInventoryViewParticipant
 		}
 
 		@Override
-		protected boolean supportsPushNotification() {
-			return false; // inventory sucks
+		protected Collection<? extends Class<?>> getSupportedPushNotifications() {
+			return ImmutableSet.of(); // inventory sucks
 		}
 
 		@Override

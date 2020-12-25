@@ -2,19 +2,25 @@ package dev.technici4n.fasttransferlib.impl.compat.lba.fluid;
 
 import alexiil.mc.lib.attributes.ListenerToken;
 import alexiil.mc.lib.attributes.fluid.SingleFluidTankView;
+import com.google.common.collect.ImmutableSet;
 import dev.technici4n.fasttransferlib.api.content.Content;
 import dev.technici4n.fasttransferlib.api.context.Context;
+import dev.technici4n.fasttransferlib.api.view.flow.TransferData;
 import dev.technici4n.fasttransferlib.impl.base.AbstractMonoCategoryAtom;
 import dev.technici4n.fasttransferlib.impl.compat.lba.LbaCompatUtil;
 import dev.technici4n.fasttransferlib.impl.util.OptionalWeakReference;
 import dev.technici4n.fasttransferlib.impl.util.TransferUtilities;
+import dev.technici4n.fasttransferlib.impl.view.flow.EmittingPublisher;
 import net.minecraft.fluid.Fluid;
 import sun.misc.Cleaner;
 
+import java.util.Collection;
 import java.util.OptionalLong;
+import java.util.Set;
 
 public class SingleFluidTankAtom
         extends AbstractMonoCategoryAtom<Fluid> {
+    private static final Set<Class<?>> SUPPORTED_PUSH_NOTIFICATIONS = ImmutableSet.of(TransferData.class);
     private final SingleFluidTankView delegate;
     private boolean hasListener;
 
@@ -23,12 +29,11 @@ public class SingleFluidTankAtom
         this.delegate = delegate;
 
         OptionalWeakReference<SingleFluidTankAtom> weakThis = OptionalWeakReference.of(this);
-        @SuppressWarnings("Convert2MethodRef")
         ListenerToken listenerToken = this.delegate.addListener((inv, tank, previous, current) -> weakThis.getOptional()
                         .ifPresent(this1 -> TransferUtilities.compileToTransferData(
                                 LbaCompatUtil.asFluidContent(previous), LbaCompatUtil.asBigAmount(previous),
                                 LbaCompatUtil.asFluidContent(current), LbaCompatUtil.asBigAmount(current)
-                        ).forEachRemaining(data -> this1.reviseAndNotify(data) /* todo javac bug */)),
+                        ).forEachRemaining(data -> this1.reviseAndNotify(TransferData.class, data))),
                 () -> weakThis.getOptional().ifPresent(SingleFluidTankAtom::onListenerRemoved));
 
         if (listenerToken == null) {
@@ -41,7 +46,7 @@ public class SingleFluidTankAtom
 
     protected void onListenerRemoved() {
         setHasListener(false);
-        clearSubscribers();
+        getPublisherIfPresent(TransferData.class).ifPresent(EmittingPublisher::clearSubscribers);
     }
 
     public static SingleFluidTankAtom of(SingleFluidTankView delegate) {
@@ -83,8 +88,8 @@ public class SingleFluidTankAtom
     }
 
     @Override
-    protected boolean supportsPushNotification() {
-        return isHasListener();
+    protected Collection<? extends Class<?>> getSupportedPushNotifications() {
+        return isHasListener() ? SUPPORTED_PUSH_NOTIFICATIONS : ImmutableSet.of();
     }
 
     @Override

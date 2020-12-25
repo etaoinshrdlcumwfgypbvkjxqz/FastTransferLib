@@ -18,6 +18,7 @@ import dev.technici4n.fasttransferlib.impl.base.view.AbstractMonoCategoryView;
 import dev.technici4n.fasttransferlib.impl.compat.lba.LbaCompatUtil;
 import dev.technici4n.fasttransferlib.impl.content.ItemContent;
 import dev.technici4n.fasttransferlib.impl.util.OptionalWeakReference;
+import dev.technici4n.fasttransferlib.impl.view.flow.EmittingPublisher;
 import dev.technici4n.fasttransferlib.impl.view.flow.TransferDataImpl;
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
 import it.unimi.dsi.fastutil.objects.Object2LongMaps;
@@ -25,6 +26,7 @@ import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
 import net.minecraft.item.Item;
 import sun.misc.Cleaner;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -32,6 +34,7 @@ import java.util.Set;
 public class LbaGroupedItemToViewParticipant
         extends AbstractComposedViewParticipant
         implements MapModel {
+    private static final Set<Class<?>> SUPPORTED_PUSH_NOTIFICATIONS = ImmutableSet.of(TransferData.class);
     private final GroupedItemInvView delegate;
     private final View view;
     private final Participant participant;
@@ -87,7 +90,8 @@ public class LbaGroupedItemToViewParticipant
                                 if (diff == 0)
                                     return;
 
-                                this1.reviseAndNotify(TransferDataImpl.of(TransferData.Type.fromDifference(diff > 0), content1, Math.abs(diff)));
+                                this1.reviseAndNotify(TransferData.class,
+                                        TransferDataImpl.of(TransferData.Type.fromDifference(diff > 0), content1, Math.abs(diff)));
                             }),
                     () -> weakThis.getOptional().ifPresent(ViewImpl::onListenerRemoved));
 
@@ -140,8 +144,8 @@ public class LbaGroupedItemToViewParticipant
         }
 
         @Override
-        protected boolean supportsPushNotification() {
-            return isHasListener();
+        protected Collection<? extends Class<?>> getSupportedPushNotifications() {
+            return isHasListener() ? SUPPORTED_PUSH_NOTIFICATIONS : ImmutableSet.of();
         }
 
         @Override
@@ -159,7 +163,7 @@ public class LbaGroupedItemToViewParticipant
 
         protected void onListenerRemoved() {
             setHasListener(false);
-            clearSubscribers();
+            getPublisherIfPresent(TransferData.class).ifPresent(EmittingPublisher::clearSubscribers);
         }
     }
 

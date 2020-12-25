@@ -1,5 +1,6 @@
 package dev.technici4n.fasttransferlib.impl.compat.tr.energy;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.math.DoubleMath;
 import dev.technici4n.fasttransferlib.api.content.Content;
 import dev.technici4n.fasttransferlib.api.content.EnergyType;
@@ -14,6 +15,7 @@ import team.reborn.energy.EnergyHandler;
 import team.reborn.energy.EnergyStorage;
 
 import java.math.RoundingMode;
+import java.util.Collection;
 import java.util.OptionalLong;
 
 public class TrEnergyHandlerToAtom
@@ -110,8 +112,8 @@ public class TrEnergyHandlerToAtom
     }
 
     @Override
-    protected boolean supportsPushNotification() {
-        return false; // energy storage
+    protected Collection<? extends Class<?>> getSupportedPushNotifications() {
+        return ImmutableSet.of(); // energy storage
     }
 
     @Override

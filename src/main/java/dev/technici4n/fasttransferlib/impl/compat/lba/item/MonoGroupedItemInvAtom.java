@@ -2,6 +2,7 @@ package dev.technici4n.fasttransferlib.impl.compat.lba.item;
 
 import alexiil.mc.lib.attributes.ListenerToken;
 import alexiil.mc.lib.attributes.item.GroupedItemInvView;
+import com.google.common.collect.ImmutableSet;
 import dev.technici4n.fasttransferlib.api.content.Content;
 import dev.technici4n.fasttransferlib.api.context.Context;
 import dev.technici4n.fasttransferlib.api.view.flow.TransferData;
@@ -9,15 +10,19 @@ import dev.technici4n.fasttransferlib.impl.base.AbstractMonoCategoryAtom;
 import dev.technici4n.fasttransferlib.impl.compat.lba.LbaCompatUtil;
 import dev.technici4n.fasttransferlib.impl.content.ItemContent;
 import dev.technici4n.fasttransferlib.impl.util.OptionalWeakReference;
+import dev.technici4n.fasttransferlib.impl.view.flow.EmittingPublisher;
 import dev.technici4n.fasttransferlib.impl.view.flow.TransferDataImpl;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import sun.misc.Cleaner;
 
+import java.util.Collection;
 import java.util.OptionalLong;
+import java.util.Set;
 
 public class MonoGroupedItemInvAtom
         extends AbstractMonoCategoryAtom<Item> {
+    private static final Set<Class<?>> SUPPORTED_PUSH_NOTIFICATIONS = ImmutableSet.of(TransferData.class);
     private final GroupedItemInvView delegate;
     private final Content content;
     private final ItemStack key;
@@ -42,7 +47,8 @@ public class MonoGroupedItemInvAtom
                             if (diff == 0)
                                 return;
 
-                            this1.reviseAndNotify(TransferDataImpl.of(TransferData.Type.fromDifference(diff > 0), content1, Math.abs(diff)));
+                            this1.reviseAndNotify(TransferData.class,
+                                    TransferDataImpl.of(TransferData.Type.fromDifference(diff > 0), content1, Math.abs(diff)));
                         }),
                 () -> weakThis.getOptional().ifPresent(MonoGroupedItemInvAtom::onListenerRemoved));
 
@@ -56,7 +62,7 @@ public class MonoGroupedItemInvAtom
 
     protected void onListenerRemoved() {
         setHasListener(false);
-        clearSubscribers();
+        getPublisherIfPresent(TransferData.class).ifPresent(EmittingPublisher::clearSubscribers);
     }
 
     public static MonoGroupedItemInvAtom of(GroupedItemInvView delegate, Content content) {
@@ -102,8 +108,8 @@ public class MonoGroupedItemInvAtom
     }
 
     @Override
-    protected boolean supportsPushNotification() {
-        return isHasListener();
+    protected Collection<? extends Class<?>> getSupportedPushNotifications() {
+        return isHasListener() ? SUPPORTED_PUSH_NOTIFICATIONS : ImmutableSet.of();
     }
 
     @Override

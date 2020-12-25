@@ -1,5 +1,6 @@
 package dev.technici4n.fasttransferlib.impl.compat.vanilla.fluid;
 
+import com.google.common.collect.ImmutableSet;
 import dev.technici4n.fasttransferlib.api.content.Content;
 import dev.technici4n.fasttransferlib.api.content.FluidConstants;
 import dev.technici4n.fasttransferlib.api.context.Context;
@@ -16,6 +17,7 @@ import net.minecraft.fluid.Fluids;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.WorldAccess;
 
+import java.util.Collection;
 import java.util.OptionalLong;
 
 public class CauldronAtomParticipant
@@ -114,8 +116,8 @@ public class CauldronAtomParticipant
     }
 
     @Override
-    protected boolean supportsPushNotification() {
-        return false; // world set block state
+    protected Collection<? extends Class<?>> getSupportedPushNotifications() {
+        return ImmutableSet.of(); // world set block state
     }
 
     @Override

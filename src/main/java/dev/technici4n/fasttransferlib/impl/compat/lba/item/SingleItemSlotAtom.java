@@ -2,15 +2,19 @@ package dev.technici4n.fasttransferlib.impl.compat.lba.item;
 
 import alexiil.mc.lib.attributes.ListenerToken;
 import alexiil.mc.lib.attributes.item.SingleItemSlotView;
+import com.google.common.collect.ImmutableSet;
 import dev.technici4n.fasttransferlib.api.content.Content;
 import dev.technici4n.fasttransferlib.api.context.Context;
+import dev.technici4n.fasttransferlib.api.view.flow.TransferData;
 import dev.technici4n.fasttransferlib.impl.base.AbstractMonoCategoryAtom;
 import dev.technici4n.fasttransferlib.impl.compat.lba.LbaCompatUtil;
 import dev.technici4n.fasttransferlib.impl.content.ItemContent;
 import dev.technici4n.fasttransferlib.impl.util.OptionalWeakReference;
+import dev.technici4n.fasttransferlib.impl.view.flow.EmittingPublisher;
 import net.minecraft.item.Item;
 import sun.misc.Cleaner;
 
+import java.util.Collection;
 import java.util.OptionalLong;
 
 public class SingleItemSlotAtom
@@ -37,7 +41,7 @@ public class SingleItemSlotAtom
 
     protected void onListenerRemoved() {
         setHasListener(false);
-        clearSubscribers();
+        getPublisherIfPresent(TransferData.class).ifPresent(EmittingPublisher::clearSubscribers);
     }
 
     public static SingleItemSlotAtom of(SingleItemSlotView delegate) {
@@ -79,8 +83,8 @@ public class SingleItemSlotAtom
     }
 
     @Override
-    protected boolean supportsPushNotification() {
-        return false; // mark dirty listener only
+    protected Collection<? extends Class<?>> getSupportedPushNotifications() {
+        return ImmutableSet.of(); // mark dirty listener only
     }
 
     @Override

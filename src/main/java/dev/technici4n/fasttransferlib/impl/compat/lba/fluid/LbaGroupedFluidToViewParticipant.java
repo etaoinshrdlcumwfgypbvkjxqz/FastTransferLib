@@ -19,6 +19,7 @@ import dev.technici4n.fasttransferlib.impl.base.view.AbstractMonoCategoryView;
 import dev.technici4n.fasttransferlib.impl.compat.lba.LbaCompatUtil;
 import dev.technici4n.fasttransferlib.impl.util.OptionalWeakReference;
 import dev.technici4n.fasttransferlib.impl.util.TransferUtilities;
+import dev.technici4n.fasttransferlib.impl.view.flow.EmittingPublisher;
 import dev.technici4n.fasttransferlib.impl.view.flow.TransferDataImpl;
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
 import it.unimi.dsi.fastutil.objects.Object2LongMaps;
@@ -26,6 +27,7 @@ import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
 import net.minecraft.fluid.Fluid;
 import sun.misc.Cleaner;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -36,6 +38,7 @@ public class LbaGroupedFluidToViewParticipant
     private final GroupedFluidInvView delegate;
     private final View view;
     private final Participant participant;
+    private static final Set<Class<?>> SUPPORTED_PUSH_NOTIFICATIONS = ImmutableSet.of(TransferData.class);
 
     protected LbaGroupedFluidToViewParticipant(GroupedFluidInvView delegate) {
         this.delegate = delegate;
@@ -75,7 +78,6 @@ public class LbaGroupedFluidToViewParticipant
             extends AbstractMonoCategoryView<Fluid> {
         private boolean hasListener;
 
-        @SuppressWarnings("Convert2MethodRef")
         protected ViewImpl(GroupedFluidInvView delegate) {
             super(Fluid.class);
 
@@ -91,7 +93,7 @@ public class LbaGroupedFluidToViewParticipant
                                 TransferData.Type type = TransferData.Type.fromDifference(diff.isPositive());
                                 TransferUtilities.BigIntegerAsLongIterator.ofStream(LbaCompatUtil.asBigAmount(LbaCompatUtil.abs(diff)))
                                         .mapToObj(diff1 -> TransferDataImpl.of(type, content1, diff1))
-                                        .forEach(data -> this1.reviseAndNotify(data)); // todo javac bug
+                                        .forEach(data -> this1.reviseAndNotify(TransferData.class, data));
                             }),
                     () -> weakThis.getOptional().ifPresent(ViewImpl::onListenerRemoved));
 
@@ -145,8 +147,8 @@ public class LbaGroupedFluidToViewParticipant
         }
 
         @Override
-        protected boolean supportsPushNotification() {
-            return isHasListener();
+        protected Collection<? extends Class<?>> getSupportedPushNotifications() {
+            return isHasListener() ? SUPPORTED_PUSH_NOTIFICATIONS : ImmutableSet.of();
         }
 
         @Override
@@ -164,7 +166,7 @@ public class LbaGroupedFluidToViewParticipant
 
         protected void onListenerRemoved() {
             setHasListener(false);
-            clearSubscribers();
+            getPublisherIfPresent(TransferData.class).ifPresent(EmittingPublisher::clearSubscribers);
         }
     }
 

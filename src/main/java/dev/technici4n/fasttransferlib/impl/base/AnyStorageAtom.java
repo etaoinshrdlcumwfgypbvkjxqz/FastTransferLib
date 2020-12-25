@@ -1,16 +1,21 @@
 package dev.technici4n.fasttransferlib.impl.base;
 
+import com.google.common.collect.ImmutableSet;
 import dev.technici4n.fasttransferlib.api.content.Content;
 import dev.technici4n.fasttransferlib.api.content.ContentApi;
 import dev.technici4n.fasttransferlib.api.context.Context;
+import dev.technici4n.fasttransferlib.api.view.flow.TransferData;
 import dev.technici4n.fasttransferlib.impl.content.EmptyContent;
 import dev.technici4n.fasttransferlib.impl.view.flow.TransferDataImpl;
 import net.minecraft.nbt.CompoundTag;
 
+import java.util.Collection;
 import java.util.OptionalLong;
+import java.util.Set;
 
 public class AnyStorageAtom
         extends AbstractAtom {
+    private static final Set<Class<?>> SUPPORTED_PUSH_NOTIFICATIONS = ImmutableSet.of(TransferData.class);
     private Content content = EmptyContent.INSTANCE;
     private final long internalCapacity;
     private long amount;
@@ -39,7 +44,7 @@ public class AnyStorageAtom
 
         Content content = getContent();
         context.configure(() -> setAmount(amount - extracted), () -> setAmount(amount));
-        context.execute(() -> reviseAndNotify(TransferDataImpl.ofExtraction(content, extracted)));
+        context.execute(() -> reviseAndNotify(TransferData.class, TransferDataImpl.ofExtraction(content, extracted)));
         return extracted;
     }
 
@@ -52,7 +57,7 @@ public class AnyStorageAtom
 
         Content content = getContent();
         context.configure(() -> setAmount(amount + inserted), () -> setAmount(amount));
-        context.execute(() -> reviseAndNotify(TransferDataImpl.ofInsertion(content, inserted)));
+        context.execute(() -> reviseAndNotify(TransferData.class, TransferDataImpl.ofInsertion(content, inserted)));
         return maxAmount - inserted;
     }
 
@@ -66,7 +71,7 @@ public class AnyStorageAtom
             setContent(content);
             setAmount(inserted);
         }, () -> setAmount(0L));
-        context.execute(() -> reviseAndNotify(TransferDataImpl.ofInsertion(content, inserted)));
+        context.execute(() -> reviseAndNotify(TransferData.class, TransferDataImpl.ofInsertion(content, inserted)));
         return maxAmount - inserted;
     }
 
@@ -104,8 +109,8 @@ public class AnyStorageAtom
     }
 
     @Override
-    protected boolean supportsPushNotification() {
-        return true;
+    protected Collection<? extends Class<?>> getSupportedPushNotifications() {
+        return SUPPORTED_PUSH_NOTIFICATIONS;
     }
 
     @Override

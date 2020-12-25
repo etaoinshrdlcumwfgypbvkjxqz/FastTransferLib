@@ -4,6 +4,7 @@ import dev.technici4n.fasttransferlib.api.content.Content;
 import dev.technici4n.fasttransferlib.api.context.Context;
 import net.minecraft.nbt.CompoundTag;
 
+import java.util.Collection;
 import java.util.OptionalLong;
 
 public class MonoStorageAtom<T>
@@ -61,8 +62,8 @@ public class MonoStorageAtom<T>
     }
 
     @Override
-    protected boolean supportsPushNotification() {
-        return getDelegate().supportsPushNotification();
+    protected Collection<? extends Class<?>> getSupportedPushNotifications() {
+        return getDelegate().getSupportedPushNotifications();
     }
 
     @Override

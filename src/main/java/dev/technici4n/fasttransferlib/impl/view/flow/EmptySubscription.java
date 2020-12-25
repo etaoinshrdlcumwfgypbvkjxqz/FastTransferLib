@@ -9,6 +9,11 @@ public enum EmptySubscription
     ;
 
     @Override
+    public void request(long n) {
+        // NOOP
+    }
+
+    @Override
     public void cancel() {
         // NOOP
     }

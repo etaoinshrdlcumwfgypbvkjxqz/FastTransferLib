@@ -24,6 +24,11 @@ public abstract class DisposableSubscriber<T>
         subscription.cancel();
     }
 
+    @Override
+    public void request(long n) {
+        getSubscription().request(n);
+    }
+
     protected Subscription getSubscription() {
         return subscription;
     }

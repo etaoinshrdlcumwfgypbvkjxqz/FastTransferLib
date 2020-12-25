@@ -5,6 +5,7 @@ import alexiil.mc.lib.attributes.ListenerToken;
 import alexiil.mc.lib.attributes.item.GroupedItemInvView;
 import alexiil.mc.lib.attributes.item.ItemInvAmountChangeListener;
 import com.google.common.primitives.Ints;
+import dev.technici4n.fasttransferlib.api.view.flow.Subscription;
 import dev.technici4n.fasttransferlib.api.view.flow.TransferData;
 import dev.technici4n.fasttransferlib.impl.content.ItemContent;
 import dev.technici4n.fasttransferlib.impl.view.flow.DisposableSubscriber;
@@ -33,7 +34,7 @@ public class LbaGroupedItemListenerToSubscriber
 
     @Override
     protected void onSubscribe() {
-        // NOOP
+        getSubscription().request(Subscription.UNBOUNDED_REQUEST);
     }
 
     @Override

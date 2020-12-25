@@ -1,5 +1,6 @@
 package dev.technici4n.fasttransferlib.impl.compat.vanilla.fluid;
 
+import com.google.common.collect.ImmutableSet;
 import dev.technici4n.fasttransferlib.api.content.Content;
 import dev.technici4n.fasttransferlib.api.content.FluidConstants;
 import dev.technici4n.fasttransferlib.api.context.Context;
@@ -13,6 +14,7 @@ import net.minecraft.item.Items;
 import net.minecraft.potion.PotionUtil;
 import net.minecraft.potion.Potions;
 
+import java.util.Collection;
 import java.util.Optional;
 import java.util.OptionalLong;
 
@@ -82,8 +84,8 @@ public class BottleAtomParticipant
     }
 
     @Override
-    protected boolean supportsPushNotification() {
-        return false; // item context
+    protected Collection<? extends Class<?>> getSupportedPushNotifications() {
+        return ImmutableSet.of(); // item context
     }
 
     @Override

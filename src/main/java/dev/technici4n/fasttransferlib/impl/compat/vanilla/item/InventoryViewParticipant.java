@@ -22,6 +22,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Util;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -134,8 +135,8 @@ public class InventoryViewParticipant
 		}
 
 		@Override
-		protected boolean supportsPushNotification() {
-			return false; // inventory sucks
+		protected Collection<? extends Class<?>> getSupportedPushNotifications() {
+			return ImmutableSet.of(); // inventory sucks
 		}
 
 		@Override

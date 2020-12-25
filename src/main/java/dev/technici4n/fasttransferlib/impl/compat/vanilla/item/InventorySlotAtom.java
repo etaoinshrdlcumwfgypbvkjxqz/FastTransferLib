@@ -1,5 +1,6 @@
 package dev.technici4n.fasttransferlib.impl.compat.vanilla.item;
 
+import com.google.common.collect.ImmutableSet;
 import dev.technici4n.fasttransferlib.api.content.Content;
 import dev.technici4n.fasttransferlib.api.context.Context;
 import dev.technici4n.fasttransferlib.impl.base.AbstractMonoCategoryAtom;
@@ -8,6 +9,7 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
+import java.util.Collection;
 import java.util.OptionalLong;
 
 public class InventorySlotAtom
@@ -96,8 +98,8 @@ public class InventorySlotAtom
     }
 
     @Override
-    protected boolean supportsPushNotification() {
-        return false; // inventory sucks
+    protected Collection<? extends Class<?>> getSupportedPushNotifications() {
+        return ImmutableSet.of(); // inventory sucks
     }
 
     @Override

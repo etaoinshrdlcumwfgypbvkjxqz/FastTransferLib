@@ -1,12 +1,12 @@
 package dev.technici4n.fasttransferlib.api.view;
 
 import dev.technici4n.fasttransferlib.api.content.Content;
-import dev.technici4n.fasttransferlib.api.view.flow.Subscriber;
-import dev.technici4n.fasttransferlib.api.view.flow.TransferData;
+import dev.technici4n.fasttransferlib.api.view.flow.Publisher;
 import dev.technici4n.fasttransferlib.api.view.model.Model;
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
 
 import java.util.Iterator;
+import java.util.Optional;
 import java.util.Set;
 
 public interface View {
@@ -26,5 +26,5 @@ public interface View {
 
     Object getRevision();
 
-    boolean subscribe(Subscriber<? super TransferData> subscriber);
+    <T> Optional<? extends Publisher<T>> getPublisher(Class<T> discriminator);
 }
