@@ -4,7 +4,7 @@ import dev.technici4n.fasttransferlib.api.content.Content;
 import dev.technici4n.fasttransferlib.api.content.ContentApi;
 import dev.technici4n.fasttransferlib.api.context.Context;
 import dev.technici4n.fasttransferlib.impl.content.EmptyContent;
-import dev.technici4n.fasttransferlib.impl.view.observer.TransferDataImpl;
+import dev.technici4n.fasttransferlib.impl.view.flow.TransferDataImpl;
 import net.minecraft.nbt.CompoundTag;
 
 import java.util.OptionalLong;

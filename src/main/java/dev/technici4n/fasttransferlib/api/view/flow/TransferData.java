@@ -10,12 +10,24 @@ public interface TransferData {
     long getAmount();
 
     enum Type {
-        INSERT,
-        EXTRACT,
+        INSERT {
+            @Override
+            public long applyToView(long value) {
+                return value;
+            }
+        },
+        EXTRACT {
+            @Override
+            public long applyToView(long value) {
+                return -value;
+            }
+        },
         ;
 
         public static Type fromDifference(boolean positive) {
             return positive ? INSERT : EXTRACT;
         }
+
+        public abstract long applyToView(long value);
     }
 }

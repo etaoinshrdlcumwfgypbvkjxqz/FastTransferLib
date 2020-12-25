@@ -3,7 +3,7 @@ package dev.technici4n.fasttransferlib.impl.base.view;
 import dev.technici4n.fasttransferlib.api.view.View;
 import dev.technici4n.fasttransferlib.api.view.flow.Subscriber;
 import dev.technici4n.fasttransferlib.api.view.flow.TransferData;
-import dev.technici4n.fasttransferlib.impl.view.observer.FunctionalSubscription;
+import dev.technici4n.fasttransferlib.impl.view.flow.FunctionalSubscription;
 
 import java.util.Iterator;
 import java.util.LinkedHashSet;

@@ -1,8 +1,11 @@
 package dev.technici4n.fasttransferlib.impl.compat.lba.item;
 
+import alexiil.mc.lib.attributes.ListenerRemovalToken;
+import alexiil.mc.lib.attributes.ListenerToken;
 import alexiil.mc.lib.attributes.Simulation;
 import alexiil.mc.lib.attributes.item.FixedItemInv;
 import alexiil.mc.lib.attributes.item.GroupedItemInv;
+import alexiil.mc.lib.attributes.item.ItemInvAmountChangeListener;
 import alexiil.mc.lib.attributes.item.filter.ItemFilter;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -168,5 +171,13 @@ public class LbaItemInvFromView
     protected static void ensureIndexInBounds(LbaItemInvFromView instance, int index) {
         if (index >= instance.getSlotCount() || index < 0)
             throw new IndexOutOfBoundsException(String.valueOf(index));
+    }
+
+    @Override
+    public ListenerToken addListener(ItemInvAmountChangeListener listener, ListenerRemovalToken removalToken) {
+        LbaGroupedItemListenerToSubscriber subscriber = LbaGroupedItemListenerToSubscriber.of(this, listener, removalToken);
+        if (getDelegate().subscribe(subscriber))
+            return subscriber;
+        return null;
     }
 }

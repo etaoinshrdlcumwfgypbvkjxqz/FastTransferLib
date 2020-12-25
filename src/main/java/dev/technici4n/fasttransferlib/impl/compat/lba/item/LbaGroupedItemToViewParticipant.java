@@ -18,7 +18,7 @@ import dev.technici4n.fasttransferlib.impl.base.view.AbstractMonoCategoryView;
 import dev.technici4n.fasttransferlib.impl.compat.lba.LbaCompatUtil;
 import dev.technici4n.fasttransferlib.impl.content.ItemContent;
 import dev.technici4n.fasttransferlib.impl.util.OptionalWeakReference;
-import dev.technici4n.fasttransferlib.impl.view.observer.TransferDataImpl;
+import dev.technici4n.fasttransferlib.impl.view.flow.TransferDataImpl;
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
 import it.unimi.dsi.fastutil.objects.Object2LongMaps;
 import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;

@@ -8,7 +8,7 @@ import dev.technici4n.fasttransferlib.api.view.Atom;
 import dev.technici4n.fasttransferlib.api.view.View;
 import dev.technici4n.fasttransferlib.api.view.flow.TransferData;
 import dev.technici4n.fasttransferlib.impl.context.TransactionContext;
-import dev.technici4n.fasttransferlib.impl.view.observer.TransferDataImpl;
+import dev.technici4n.fasttransferlib.impl.view.flow.TransferDataImpl;
 import it.unimi.dsi.fastutil.longs.LongIterator;
 
 import java.math.BigInteger;

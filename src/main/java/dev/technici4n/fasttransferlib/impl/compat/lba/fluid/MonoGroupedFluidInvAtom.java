@@ -12,7 +12,7 @@ import dev.technici4n.fasttransferlib.impl.base.AbstractMonoCategoryAtom;
 import dev.technici4n.fasttransferlib.impl.compat.lba.LbaCompatUtil;
 import dev.technici4n.fasttransferlib.impl.util.OptionalWeakReference;
 import dev.technici4n.fasttransferlib.impl.util.TransferUtilities;
-import dev.technici4n.fasttransferlib.impl.view.observer.TransferDataImpl;
+import dev.technici4n.fasttransferlib.impl.view.flow.TransferDataImpl;
 import net.minecraft.fluid.Fluid;
 import sun.misc.Cleaner;
 

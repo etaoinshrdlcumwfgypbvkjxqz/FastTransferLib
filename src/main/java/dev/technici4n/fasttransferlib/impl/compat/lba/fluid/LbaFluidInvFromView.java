@@ -1,7 +1,10 @@
 package dev.technici4n.fasttransferlib.impl.compat.lba.fluid;
 
+import alexiil.mc.lib.attributes.ListenerRemovalToken;
+import alexiil.mc.lib.attributes.ListenerToken;
 import alexiil.mc.lib.attributes.Simulation;
 import alexiil.mc.lib.attributes.fluid.FixedFluidInv;
+import alexiil.mc.lib.attributes.fluid.FluidInvAmountChangeListener_F;
 import alexiil.mc.lib.attributes.fluid.GroupedFluidInv;
 import alexiil.mc.lib.attributes.fluid.amount.FluidAmount;
 import alexiil.mc.lib.attributes.fluid.filter.FluidFilter;
@@ -158,5 +161,13 @@ public class LbaFluidInvFromView
     protected static void ensureIndexInBounds(LbaFluidInvFromView instance, int index) {
         if (index >= instance.getTankCount() || index < 0)
             throw new IndexOutOfBoundsException(String.valueOf(index));
+    }
+
+    @Override
+    public ListenerToken addListener_F(FluidInvAmountChangeListener_F listener, ListenerRemovalToken removalToken) {
+        LbaGroupedFluidListenerToSubscriber subscriber = LbaGroupedFluidListenerToSubscriber.of(this, listener, removalToken);
+        if (getDelegate().subscribe(subscriber))
+            return subscriber;
+        return null;
     }
 }
