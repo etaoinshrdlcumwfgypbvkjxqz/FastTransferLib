@@ -1,6 +1,6 @@
 package dev.technici4n.fasttransferlib.api.view.flow;
 
-// stripped-down Reactive Streams/java.util.concurrent.Flow in JDJ9
+// stripped-down Reactive Streams/java.util.concurrent.Flow in JDK9
 public interface Subscriber<T> {
     void onSubscribe(Subscription subscription);
 
