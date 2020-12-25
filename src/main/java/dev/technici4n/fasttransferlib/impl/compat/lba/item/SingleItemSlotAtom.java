@@ -25,8 +25,7 @@ public class SingleItemSlotAtom
         OptionalWeakReference<SingleItemSlotAtom> weakThis = OptionalWeakReference.of(this);
         ListenerToken listenerToken = this.delegate.getBackingInv().addListener(
                 inv -> weakThis.getOptional().ifPresent(SingleItemSlotAtom::revise),
-                () -> weakThis.getOptional()
-                        .ifPresent(this1 -> this1.setHasListener(false)));
+                () -> weakThis.getOptional().ifPresent(SingleItemSlotAtom::onListenerRemoved));
 
         if (listenerToken == null) {
             this.hasListener = false;
@@ -34,6 +33,11 @@ public class SingleItemSlotAtom
             this.hasListener = true;
             Cleaner.create(this, listenerToken::removeListener);
         }
+    }
+
+    protected void onListenerRemoved() {
+        setHasListener(false);
+        clearSubscribers();
     }
 
     public static SingleItemSlotAtom of(SingleItemSlotView delegate) {

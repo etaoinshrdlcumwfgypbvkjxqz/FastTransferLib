@@ -1,22 +1,21 @@
 package dev.technici4n.fasttransferlib.impl.base.view;
 
 import dev.technici4n.fasttransferlib.api.view.View;
-import dev.technici4n.fasttransferlib.api.view.observer.Subscription;
-import dev.technici4n.fasttransferlib.api.view.observer.TransferData;
+import dev.technici4n.fasttransferlib.api.view.flow.Subscriber;
+import dev.technici4n.fasttransferlib.api.view.flow.TransferData;
 import dev.technici4n.fasttransferlib.impl.view.observer.FunctionalSubscription;
 
+import java.util.Iterator;
 import java.util.LinkedHashSet;
-import java.util.Optional;
 import java.util.Set;
-import java.util.function.Consumer;
 
 public abstract class AbstractView
         implements View {
-    private final Set<Consumer<? super TransferData>> observers;
+    private final Set<Subscriber<? super TransferData>> subscribers;
     private Object revision = new Object();
 
     protected AbstractView() {
-        this.observers = new LinkedHashSet<>(2); // todo determine initial capacity
+        this.subscribers = new LinkedHashSet<>(2); // todo determine initial capacity
     }
 
     protected abstract boolean supportsPushNotification();
@@ -24,14 +23,19 @@ public abstract class AbstractView
     protected abstract boolean supportsPullNotification();
 
     @Override
-    public Optional<? extends Subscription> addObserver(Consumer<? super TransferData> observer) {
-        if (supportsPushNotification() && getObservers().add(observer))
-            return Optional.of(FunctionalSubscription.of(() -> getObservers().remove(observer)));
-        return Optional.empty();
+    public boolean subscribe(Subscriber<? super TransferData> subscriber) {
+        if (supportsPushNotification() && getSubscribers().add(subscriber)) {
+            subscriber.onSubscribe(FunctionalSubscription.of(() -> {
+                getSubscribers().remove(subscriber);
+                subscriber.onComplete();
+            }));
+            return true;
+        }
+        return false;
     }
 
-    protected Set<Consumer<? super TransferData>> getObservers() {
-        return observers;
+    protected Set<Subscriber<? super TransferData>> getSubscribers() {
+        return subscribers;
     }
 
     @Override
@@ -48,7 +52,7 @@ public abstract class AbstractView
 
     protected void notify(TransferData data) {
         assert supportsPushNotification();
-        getObservers().forEach(observer -> observer.accept(data));
+        getSubscribers().forEach(observer -> observer.onNext(data));
     }
 
     @SuppressWarnings("unused")
@@ -57,7 +61,15 @@ public abstract class AbstractView
         notify(data);
     }
 
-    private void setRevision(Object revision) {
+    protected void clearSubscribers() {
+        for (Iterator<Subscriber<? super TransferData>> iterator = getSubscribers().iterator(); iterator.hasNext(); ) {
+            Subscriber<?> subscriber = iterator.next();
+            iterator.remove();
+            subscriber.onComplete();
+        }
+    }
+
+    protected void setRevision(Object revision) {
         this.revision = revision;
     }
 }

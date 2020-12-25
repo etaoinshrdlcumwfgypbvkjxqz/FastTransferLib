@@ -1,7 +1,7 @@
 package dev.technici4n.fasttransferlib.impl.view.observer;
 
 import dev.technici4n.fasttransferlib.api.content.Content;
-import dev.technici4n.fasttransferlib.api.view.observer.TransferData;
+import dev.technici4n.fasttransferlib.api.view.flow.TransferData;
 
 public final class TransferDataImpl
         implements TransferData {

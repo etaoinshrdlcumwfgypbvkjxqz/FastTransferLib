@@ -10,9 +10,9 @@ import dev.technici4n.fasttransferlib.api.context.Context;
 import dev.technici4n.fasttransferlib.api.transfer.Participant;
 import dev.technici4n.fasttransferlib.api.view.Atom;
 import dev.technici4n.fasttransferlib.api.view.View;
+import dev.technici4n.fasttransferlib.api.view.flow.TransferData;
 import dev.technici4n.fasttransferlib.api.view.model.MapModel;
 import dev.technici4n.fasttransferlib.api.view.model.Model;
-import dev.technici4n.fasttransferlib.api.view.observer.TransferData;
 import dev.technici4n.fasttransferlib.impl.base.AbstractComposedViewParticipant;
 import dev.technici4n.fasttransferlib.impl.base.transfer.AbstractMonoCategoryParticipant;
 import dev.technici4n.fasttransferlib.impl.base.view.AbstractMonoCategoryView;
@@ -93,8 +93,7 @@ public class LbaGroupedFluidToViewParticipant
                                         .mapToObj(diff1 -> TransferDataImpl.of(type, content1, diff1))
                                         .forEach(data -> this1.reviseAndNotify(data)); // todo javac bug
                             }),
-                    () -> weakThis.getOptional()
-                            .ifPresent(this1 -> this1.setHasListener(false)));
+                    () -> weakThis.getOptional().ifPresent(ViewImpl::onListenerRemoved));
 
             if (listenerToken == null) {
                 this.hasListener = false;
@@ -161,6 +160,11 @@ public class LbaGroupedFluidToViewParticipant
 
         protected void setHasListener(@SuppressWarnings("SameParameterValue") boolean hasListener) {
             this.hasListener = hasListener;
+        }
+
+        protected void onListenerRemoved() {
+            setHasListener(false);
+            clearSubscribers();
         }
     }
 

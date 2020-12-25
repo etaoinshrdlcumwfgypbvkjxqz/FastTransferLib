@@ -1,4 +1,4 @@
-package dev.technici4n.fasttransferlib.api.view.observer;
+package dev.technici4n.fasttransferlib.api.view.flow;
 
 import dev.technici4n.fasttransferlib.api.content.Content;
 

@@ -4,7 +4,7 @@ import alexiil.mc.lib.attributes.ListenerToken;
 import alexiil.mc.lib.attributes.item.GroupedItemInvView;
 import dev.technici4n.fasttransferlib.api.content.Content;
 import dev.technici4n.fasttransferlib.api.context.Context;
-import dev.technici4n.fasttransferlib.api.view.observer.TransferData;
+import dev.technici4n.fasttransferlib.api.view.flow.TransferData;
 import dev.technici4n.fasttransferlib.impl.base.AbstractMonoCategoryAtom;
 import dev.technici4n.fasttransferlib.impl.compat.lba.LbaCompatUtil;
 import dev.technici4n.fasttransferlib.impl.content.ItemContent;
@@ -44,8 +44,7 @@ public class MonoGroupedItemInvAtom
 
                             this1.reviseAndNotify(TransferDataImpl.of(TransferData.Type.fromDifference(diff > 0), content1, Math.abs(diff)));
                         }),
-                () -> weakThis.getOptional()
-                        .ifPresent(this1 -> this1.setHasListener(false)));
+                () -> weakThis.getOptional().ifPresent(MonoGroupedItemInvAtom::onListenerRemoved));
 
         if (listenerToken == null) {
             this.hasListener = false;
@@ -53,6 +52,11 @@ public class MonoGroupedItemInvAtom
             this.hasListener = true;
             Cleaner.create(this, listenerToken::removeListener);
         }
+    }
+
+    protected void onListenerRemoved() {
+        setHasListener(false);
+        clearSubscribers();
     }
 
     public static MonoGroupedItemInvAtom of(GroupedItemInvView delegate, Content content) {

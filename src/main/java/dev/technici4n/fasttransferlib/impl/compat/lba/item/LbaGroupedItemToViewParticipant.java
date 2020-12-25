@@ -9,9 +9,9 @@ import dev.technici4n.fasttransferlib.api.context.Context;
 import dev.technici4n.fasttransferlib.api.transfer.Participant;
 import dev.technici4n.fasttransferlib.api.view.Atom;
 import dev.technici4n.fasttransferlib.api.view.View;
+import dev.technici4n.fasttransferlib.api.view.flow.TransferData;
 import dev.technici4n.fasttransferlib.api.view.model.MapModel;
 import dev.technici4n.fasttransferlib.api.view.model.Model;
-import dev.technici4n.fasttransferlib.api.view.observer.TransferData;
 import dev.technici4n.fasttransferlib.impl.base.AbstractComposedViewParticipant;
 import dev.technici4n.fasttransferlib.impl.base.transfer.AbstractMonoCategoryParticipant;
 import dev.technici4n.fasttransferlib.impl.base.view.AbstractMonoCategoryView;
@@ -89,8 +89,7 @@ public class LbaGroupedItemToViewParticipant
 
                                 this1.reviseAndNotify(TransferDataImpl.of(TransferData.Type.fromDifference(diff > 0), content1, Math.abs(diff)));
                             }),
-                    () -> weakThis.getOptional()
-                            .ifPresent(this1 -> this1.setHasListener(false)));
+                    () -> weakThis.getOptional().ifPresent(ViewImpl::onListenerRemoved));
 
             if (listenerToken == null) {
                 this.hasListener = false;
@@ -156,6 +155,11 @@ public class LbaGroupedItemToViewParticipant
 
         protected void setHasListener(@SuppressWarnings("SameParameterValue") boolean hasListener) {
             this.hasListener = hasListener;
+        }
+
+        protected void onListenerRemoved() {
+            setHasListener(false);
+            clearSubscribers();
         }
     }
 

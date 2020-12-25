@@ -5,15 +5,13 @@ import dev.technici4n.fasttransferlib.api.context.Context;
 import dev.technici4n.fasttransferlib.api.transfer.Participant;
 import dev.technici4n.fasttransferlib.api.view.Atom;
 import dev.technici4n.fasttransferlib.api.view.View;
+import dev.technici4n.fasttransferlib.api.view.flow.Subscriber;
+import dev.technici4n.fasttransferlib.api.view.flow.TransferData;
 import dev.technici4n.fasttransferlib.api.view.model.Model;
-import dev.technici4n.fasttransferlib.api.view.observer.Subscription;
-import dev.technici4n.fasttransferlib.api.view.observer.TransferData;
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
 
 import java.util.Iterator;
-import java.util.Optional;
 import java.util.Set;
-import java.util.function.Consumer;
 
 public abstract class AbstractComposedViewParticipant
         implements View, Participant {
@@ -72,7 +70,7 @@ public abstract class AbstractComposedViewParticipant
     }
 
     @Override
-    public Optional<? extends Subscription> addObserver(Consumer<? super TransferData> observer) {
-        return getView().addObserver(observer);
+    public boolean subscribe(Subscriber<? super TransferData> subscriber) {
+        return getView().subscribe(subscriber);
     }
 }

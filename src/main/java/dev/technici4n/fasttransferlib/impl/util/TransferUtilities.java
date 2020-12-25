@@ -6,7 +6,7 @@ import dev.technici4n.fasttransferlib.api.context.Context;
 import dev.technici4n.fasttransferlib.api.transfer.Participant;
 import dev.technici4n.fasttransferlib.api.view.Atom;
 import dev.technici4n.fasttransferlib.api.view.View;
-import dev.technici4n.fasttransferlib.api.view.observer.TransferData;
+import dev.technici4n.fasttransferlib.api.view.flow.TransferData;
 import dev.technici4n.fasttransferlib.impl.context.TransactionContext;
 import dev.technici4n.fasttransferlib.impl.view.observer.TransferDataImpl;
 import it.unimi.dsi.fastutil.longs.LongIterator;

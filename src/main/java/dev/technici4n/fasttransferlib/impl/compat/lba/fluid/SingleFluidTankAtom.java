@@ -29,8 +29,7 @@ public class SingleFluidTankAtom
                                 LbaCompatUtil.asFluidContent(previous), LbaCompatUtil.asBigAmount(previous),
                                 LbaCompatUtil.asFluidContent(current), LbaCompatUtil.asBigAmount(current)
                         ).forEachRemaining(data -> this1.reviseAndNotify(data) /* todo javac bug */)),
-                () -> weakThis.getOptional()
-                        .ifPresent(this1 -> this1.setHasListener(false)));
+                () -> weakThis.getOptional().ifPresent(SingleFluidTankAtom::onListenerRemoved));
 
         if (listenerToken == null) {
             this.hasListener = false;
@@ -38,6 +37,11 @@ public class SingleFluidTankAtom
             this.hasListener = true;
             Cleaner.create(this, listenerToken::removeListener);
         }
+    }
+
+    protected void onListenerRemoved() {
+        setHasListener(false);
+        clearSubscribers();
     }
 
     public static SingleFluidTankAtom of(SingleFluidTankView delegate) {

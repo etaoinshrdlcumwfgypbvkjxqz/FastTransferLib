@@ -7,7 +7,7 @@ import alexiil.mc.lib.attributes.fluid.volume.FluidKey;
 import alexiil.mc.lib.attributes.fluid.volume.FluidKeys;
 import dev.technici4n.fasttransferlib.api.content.Content;
 import dev.technici4n.fasttransferlib.api.context.Context;
-import dev.technici4n.fasttransferlib.api.view.observer.TransferData;
+import dev.technici4n.fasttransferlib.api.view.flow.TransferData;
 import dev.technici4n.fasttransferlib.impl.base.AbstractMonoCategoryAtom;
 import dev.technici4n.fasttransferlib.impl.compat.lba.LbaCompatUtil;
 import dev.technici4n.fasttransferlib.impl.util.OptionalWeakReference;
@@ -50,8 +50,7 @@ public class MonoGroupedFluidInvAtom
                                     .mapToObj(diff1 -> TransferDataImpl.of(type, content1, diff1))
                                     .forEach(data -> this1.reviseAndNotify(data)); // todo javac bug
                         }),
-                () -> weakThis.getOptional()
-                        .ifPresent(this1 -> this1.setHasListener(false)));
+                () -> weakThis.getOptional().ifPresent(MonoGroupedFluidInvAtom::onListenerRemoved));
 
         if (listenerToken == null) {
             this.hasListener = false;
@@ -59,6 +58,11 @@ public class MonoGroupedFluidInvAtom
             this.hasListener = true;
             Cleaner.create(this, listenerToken::removeListener);
         }
+    }
+
+    protected void onListenerRemoved() {
+        setHasListener(false);
+        clearSubscribers();
     }
 
     public static MonoGroupedFluidInvAtom of(GroupedFluidInvView delegate, Content content) {

@@ -1,6 +1,6 @@
 package dev.technici4n.fasttransferlib.impl.view.observer;
 
-import dev.technici4n.fasttransferlib.api.view.observer.Subscription;
+import dev.technici4n.fasttransferlib.api.view.flow.Subscription;
 
 public class FunctionalSubscription
         implements Subscription {
