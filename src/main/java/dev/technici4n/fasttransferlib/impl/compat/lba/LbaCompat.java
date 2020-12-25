@@ -8,7 +8,7 @@ import dev.technici4n.fasttransferlib.api.lookup.BlockLookupContext;
 import dev.technici4n.fasttransferlib.api.transfer.TransferApi;
 import dev.technici4n.fasttransferlib.api.view.View;
 import dev.technici4n.fasttransferlib.api.view.ViewApi;
-import dev.technici4n.fasttransferlib.impl.base.AbstractMonoCategoryViewParticipant;
+import dev.technici4n.fasttransferlib.impl.base.AbstractComposedViewParticipant;
 import dev.technici4n.fasttransferlib.impl.compat.lba.fluid.LbaFixedFluidToViewParticipant;
 import dev.technici4n.fasttransferlib.impl.compat.lba.fluid.LbaFluidInvFromView;
 import dev.technici4n.fasttransferlib.impl.compat.lba.fluid.LbaGroupedFluidToViewParticipant;
@@ -19,8 +19,6 @@ import dev.technici4n.fasttransferlib.impl.lookup.BlockLookupContextImpl;
 import dev.technici4n.fasttransferlib.impl.util.UncheckedAutoCloseable;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.item.Item;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
@@ -71,7 +69,7 @@ public enum LbaCompat {
             }
         }
 
-        private static AbstractMonoCategoryViewParticipant<Item> getBlockFallbackViewParticipant(World world, BlockPos pos, BlockState state, @Nullable BlockEntity entity, BlockLookupContext context) {
+        private static AbstractComposedViewParticipant getBlockFallbackViewParticipant(World world, BlockPos pos, BlockState state, @Nullable BlockEntity entity, BlockLookupContext context) {
             if (inCompat) return null;
 
             Direction direction = context.getDirection();
@@ -148,7 +146,7 @@ public enum LbaCompat {
             }
         }
 
-        private static AbstractMonoCategoryViewParticipant<Fluid> getBlockFallbackViewParticipant(World world, BlockPos pos, BlockState state, @Nullable BlockEntity entity, BlockLookupContext context) {
+        private static AbstractComposedViewParticipant getBlockFallbackViewParticipant(World world, BlockPos pos, BlockState state, @Nullable BlockEntity entity, BlockLookupContext context) {
             if (inCompat) return null;
 
             Direction direction = context.getDirection();

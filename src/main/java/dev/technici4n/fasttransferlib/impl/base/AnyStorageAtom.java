@@ -3,14 +3,14 @@ package dev.technici4n.fasttransferlib.impl.base;
 import dev.technici4n.fasttransferlib.api.content.Content;
 import dev.technici4n.fasttransferlib.api.content.ContentApi;
 import dev.technici4n.fasttransferlib.api.context.Context;
-import dev.technici4n.fasttransferlib.api.view.Atom;
 import dev.technici4n.fasttransferlib.impl.content.EmptyContent;
+import dev.technici4n.fasttransferlib.impl.view.observer.TransferDataImpl;
 import net.minecraft.nbt.CompoundTag;
 
 import java.util.OptionalLong;
 
 public class AnyStorageAtom
-        implements Atom {
+        extends AbstractAtom {
     private Content content = EmptyContent.INSTANCE;
     private final long internalCapacity;
     private long amount;
@@ -31,37 +31,43 @@ public class AnyStorageAtom
     }
 
     @Override
-    public long insert(Context context, Content content, long maxAmount) {
-        Content currentContent = getContent();
+    protected long extractCurrent(Context context, long maxAmount) {
+        long amount = getAmount();
+        long extracted = Math.min(maxAmount, amount);
+        if (extracted == 0L)
+            return 0L;
 
-        long inserted;
-        if (currentContent.isEmpty()) {
-            inserted = Math.min(maxAmount, getInternalCapacity());
-            context.configure(() -> {
-                setContent(content);
-                setAmount(inserted);
-            }, () -> setAmount(0L));
-        } else if (currentContent.equals(content)) {
-            long amount = getAmount();
-            inserted = Math.min(maxAmount, getInternalCapacity() - amount);
-            context.configure(() -> setAmount(amount + inserted), () -> setAmount(amount));
-        } else inserted = 0L;
+        Content content = getContent();
+        context.configure(() -> setAmount(amount - extracted), () -> setAmount(amount));
+        context.execute(() -> reviseAndNotify(TransferDataImpl.ofExtraction(content, extracted)));
+        return extracted;
+    }
 
+    @Override
+    protected long insertCurrent(Context context, long maxAmount) {
+        long amount = getAmount();
+        long inserted = Math.min(maxAmount, getInternalCapacity() - amount);
+        if (inserted == 0L)
+            return maxAmount;
+
+        Content content = getContent();
+        context.configure(() -> setAmount(amount + inserted), () -> setAmount(amount));
+        context.execute(() -> reviseAndNotify(TransferDataImpl.ofInsertion(content, inserted)));
         return maxAmount - inserted;
     }
 
     @Override
-    public long extract(Context context, Content content, long maxAmount) {
-        Content currentContent = getContent();
+    protected long insertNew(Context context, Content content, long maxAmount) {
+        long inserted = Math.min(maxAmount, getInternalCapacity());
+        if (inserted == 0L)
+            return maxAmount;
 
-        long extracted;
-        if (currentContent.equals(content)) {
-            long amount = getAmount();
-            extracted = Math.min(maxAmount, amount);
-            context.configure(() -> setAmount(amount - extracted), () -> setAmount(amount));
-        } else extracted = 0L;
-
-        return extracted;
+        context.configure(() -> {
+            setContent(content);
+            setAmount(inserted);
+        }, () -> setAmount(0L));
+        context.execute(() -> reviseAndNotify(TransferDataImpl.ofInsertion(content, inserted)));
+        return maxAmount - inserted;
     }
 
     protected long getInternalCapacity() {
@@ -95,5 +101,15 @@ public class AnyStorageAtom
     public void fromTag(CompoundTag tag) {
         setContent(ContentApi.deserialize(tag.getCompound("content")));
         setAmount(tag.getLong("amount"));
+    }
+
+    @Override
+    protected boolean supportsPushNotification() {
+        return true;
+    }
+
+    @Override
+    protected boolean supportsPullNotification() {
+        return true;
     }
 }

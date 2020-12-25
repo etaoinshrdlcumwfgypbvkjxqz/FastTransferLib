@@ -55,15 +55,14 @@ public class TrEnergyHandlerToAtom
     }
 
     @Override
-    protected long insert(Context context, Content content, EnergyType type, long maxAmount) {
-        if (!content.equals(EnergyContent.of(TrEnergyType.INSTANCE)))
-            return maxAmount;
-
+    protected long insertCurrent(Context context, long maxAmount) {
         /* note
         This assumes that insertion can be reverted by a following extraction.
         This seems to be the case for 'EnergyHandler'.
 
         Nevermind, just hack around it.
+
+        Why is 'Nevermind' a typo?
          */
 
         EnergyHandler delegate = getDelegate();
@@ -77,15 +76,21 @@ public class TrEnergyHandlerToAtom
     }
 
     @Override
-    protected long extract(Context context, Content content, EnergyType type, long maxAmount) {
+    protected long insertNew(Context context, Content content, EnergyType type, long maxAmount) {
         if (!content.equals(EnergyContent.of(TrEnergyType.INSTANCE)))
-            return 0L;
+            return maxAmount;
+        return insertCurrent(context, maxAmount);
+    }
 
+    @Override
+    protected long extractCurrent(Context context, long maxAmount) {
         /* note
         This assumes that extraction can be reverted by a following insertion.
         This seems to be the case for 'EnergyHandler'.
 
         Nevermind, just hack around it.
+
+        Why is 'Nevermind' a typo?
          */
 
         EnergyHandler delegate = getDelegate();
@@ -96,5 +101,21 @@ public class TrEnergyHandlerToAtom
         context.configure(() -> delegateStorage.setStored(current - extracted), () -> delegateStorage.setStored(current));
 
         return DoubleMath.roundToLong(extracted, RoundingMode.DOWN);
+    }
+
+    @Override
+    public Object getRevision() {
+        assert supportsPullNotification();
+        return getDelegate().getEnergy();
+    }
+
+    @Override
+    protected boolean supportsPushNotification() {
+        return false; // energy storage
+    }
+
+    @Override
+    protected boolean supportsPullNotification() {
+        return true;
     }
 }

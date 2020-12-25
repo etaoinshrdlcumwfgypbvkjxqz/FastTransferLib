@@ -16,13 +16,12 @@ import dev.technici4n.fasttransferlib.api.view.model.ListModel;
 import dev.technici4n.fasttransferlib.api.view.model.Model;
 import dev.technici4n.fasttransferlib.impl.compat.lba.LbaCompatUtil;
 import dev.technici4n.fasttransferlib.impl.content.ItemContent;
-import dev.technici4n.fasttransferlib.impl.context.DelayedExecutionContext;
-import dev.technici4n.fasttransferlib.impl.context.TransactionContext;
 import dev.technici4n.fasttransferlib.impl.util.TransferUtilities;
 import dev.technici4n.fasttransferlib.impl.util.ViewUtilities;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
+import java.math.BigInteger;
 import java.util.*;
 
 public class LbaItemInvFromView
@@ -143,74 +142,20 @@ public class LbaItemInvFromView
 
     @Override
     public boolean isItemValidForSlot(int slot, ItemStack stack) {
+        ensureIndexInBounds(this, slot);
         return true; // just return true, permitted by the contract
     }
 
     @Override
     public boolean setInvStack(int slot, ItemStack to, Simulation simulation) {
         ensureIndexInBounds(this, slot);
-
-        Atom atom = getDelegateListModel(this)
-                .orElseThrow(AssertionError::new)
-                .getAtomList()
-                .get(slot);
-
-        if (to.isEmpty()) {
-            // extract only
-            try (TransactionContext transaction = new TransactionContext(1L)) {
-                TransferUtilities.extractAll(transaction, atom);
-                if (atom.getAmount() == 0L) {
-                    transaction.commitWith(LbaCompatUtil.asStatelessContext(simulation));
-                    return true;
-                }
-                return false;
-            }
-        } else {
-            Content atomContent = atom.getContent();
-            Content toContent = ItemContent.of(to);
-            if (atomContent.isEmpty()) {
-                // insert only
-                try (DelayedExecutionContext execution = DelayedExecutionContext.getInstance()) {
-                    if (atom.insert(execution, toContent, to.getCount()) == 0L) {
-                        execution.executeWith(LbaCompatUtil.asStatelessContext(simulation));
-                        return true;
-                    }
-                    return false;
-                }
-            } else if (atomContent.equals(toContent)) {
-                // extract or insert
-                long atomAmount = atom.getAmount();
-                int toAmount = to.getCount();
-
-                boolean extract;
-                if (atomAmount > toAmount) extract = true;
-                else if (atomAmount < toAmount) extract = false;
-                else return true;
-
-                long diff = Math.abs(atomAmount - toAmount);
-
-                try (DelayedExecutionContext execution = DelayedExecutionContext.getInstance()) {
-                    if (extract
-                            ? atom.extract(execution, atomContent, diff) == diff
-                            : atom.insert(execution, atomContent, diff) == 0L) {
-                        execution.executeWith(LbaCompatUtil.asStatelessContext(simulation));
-                        return true;
-                    }
-                    return false;
-                }
-            } else {
-                // extract and then insert
-                try (TransactionContext transaction = new TransactionContext(2L)) {
-                    TransferUtilities.extractAll(transaction, atom);
-                    if (atom.getAmount() == 0L
-                            && atom.insert(transaction, toContent, to.getCount()) == 0L) {
-                        transaction.commitWith(LbaCompatUtil.asStatelessContext(simulation));
-                        return true;
-                    }
-                    return false;
-                }
-            }
-        }
+        return TransferUtilities.setAtomContent(LbaCompatUtil.asStatelessContext(simulation),
+                getDelegateListModel(this)
+                        .orElseThrow(AssertionError::new)
+                        .getAtomList()
+                        .get(slot),
+                ItemContent.of(to),
+                BigInteger.valueOf(to.getCount()));
     }
 
     protected static Optional<? extends ListModel> getDelegateListModel(LbaItemInvFromView instance) {

@@ -1,4 +1,4 @@
-package dev.technici4n.fasttransferlib.impl.base;
+package dev.technici4n.fasttransferlib.impl.base.view;
 
 import dev.technici4n.fasttransferlib.api.view.model.Model;
 

@@ -1,13 +1,17 @@
-package dev.technici4n.fasttransferlib.impl.base;
+package dev.technici4n.fasttransferlib.impl.base.view;
 
 import dev.technici4n.fasttransferlib.api.content.Content;
-import dev.technici4n.fasttransferlib.api.view.View;
 
-public abstract class AbstractMonoCategoryViewParticipant<T>
-        extends AbstractMonoCategoryParticipant<T>
-        implements View {
-    protected AbstractMonoCategoryViewParticipant(Class<T> category) {
-        super(category);
+public abstract class AbstractMonoCategoryView<T>
+        extends AbstractView {
+    private final Class<T> category;
+
+    protected AbstractMonoCategoryView(Class<T> category) {
+        this.category = category;
+    }
+
+    protected Class<T> getCategory() {
+        return category;
     }
 
     @Override

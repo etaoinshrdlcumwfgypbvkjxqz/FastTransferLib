@@ -29,29 +29,6 @@ public class BottleAtomParticipant
         return PotionUtil.getPotion(getLookupContext().getData()) == Potions.WATER ? Fluids.WATER : Fluids.EMPTY;
     }
 
-    @Override
-    protected long insert(Context context, Content content, Fluid type, long maxAmount) {
-        ItemLookupContext lookupContext = getLookupContext();
-        if (maxAmount < FluidConstants.BOTTLE
-                || !getContent().isEmpty()
-                || !getFluidContentAsItemContent(content)
-                .filter(itemContent -> lookupContext.transform(context, 1L, itemContent, 1L))
-                .isPresent())
-            return maxAmount;
-        return maxAmount - FluidConstants.BOTTLE;
-    }
-
-    @Override
-    protected long extract(Context context, Content content, Fluid type, long maxAmount) {
-        ItemLookupContext lookupContext = getLookupContext();
-        if (maxAmount < FluidConstants.BOTTLE
-                || getContent().isEmpty()
-                || !content.equals(getContent())
-                || !lookupContext.transform(context, 1L, ItemContent.of(Items.GLASS_BOTTLE), 1L))
-            return 0L;
-        return FluidConstants.BOTTLE;
-    }
-
     protected ItemLookupContext getLookupContext() {
         return lookupContext;
     }
@@ -78,5 +55,39 @@ public class BottleAtomParticipant
         // for mixins, should be a better way to do this
 
         return Optional.empty();
+    }
+
+    @Override
+    protected long extractCurrent(Context context, long maxAmount) {
+        if (maxAmount < FluidConstants.BOTTLE
+                || !getLookupContext().transform(context, 1L, ItemContent.of(Items.GLASS_BOTTLE), 1L))
+            return 0L;
+        return FluidConstants.BOTTLE;
+    }
+
+    @Override
+    protected long insertCurrent(Context context, long maxAmount) {
+        // already filled
+        return maxAmount;
+    }
+
+    @Override
+    protected long insertNew(Context context, Content content, Fluid type, long maxAmount) {
+        if (maxAmount < FluidConstants.BOTTLE
+                || !getFluidContentAsItemContent(content)
+                .filter(itemContent -> getLookupContext().transform(context, 1L, itemContent, 1L))
+                .isPresent())
+            return maxAmount;
+        return maxAmount - FluidConstants.BOTTLE;
+    }
+
+    @Override
+    protected boolean supportsPushNotification() {
+        return false; // item context
+    }
+
+    @Override
+    protected boolean supportsPullNotification() {
+        return false; // item context
     }
 }

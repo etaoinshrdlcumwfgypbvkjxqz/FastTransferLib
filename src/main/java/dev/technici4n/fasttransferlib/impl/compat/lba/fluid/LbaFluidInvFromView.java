@@ -18,7 +18,6 @@ import dev.technici4n.fasttransferlib.api.view.View;
 import dev.technici4n.fasttransferlib.api.view.model.ListModel;
 import dev.technici4n.fasttransferlib.api.view.model.Model;
 import dev.technici4n.fasttransferlib.impl.compat.lba.LbaCompatUtil;
-import dev.technici4n.fasttransferlib.impl.context.TransactionContext;
 import dev.technici4n.fasttransferlib.impl.util.TransferUtilities;
 import dev.technici4n.fasttransferlib.impl.util.ViewUtilities;
 import net.minecraft.fluid.Fluid;
@@ -133,85 +132,20 @@ public class LbaFluidInvFromView
 
     @Override
     public boolean isFluidValidForTank(int tank, FluidKey fluid) {
+        ensureIndexInBounds(this, tank);
         return true; // just return true, permitted by the contract
     }
 
-    @SuppressWarnings("UnstableApiUsage")
     @Override
     public boolean setInvFluid(int tank, FluidVolume to, Simulation simulation) {
         ensureIndexInBounds(this, tank);
-
-        Atom atom = getDelegateListModel(this)
-                .orElseThrow(AssertionError::new)
-                .getAtomList()
-                .get(tank);
-
-        if (to.isEmpty()) {
-            // extract only
-            try (TransactionContext transaction = new TransactionContext(2L)) {
-                TransferUtilities.extractAll(transaction, atom);
-                if (atom.getAmount() == 0L) {
-                    transaction.commitWith(LbaCompatUtil.asStatelessContext(simulation));
-                    return true;
-                }
-                return false;
-            }
-        } else {
-            Content atomContent = atom.getContent();
-            Content toContent = LbaCompatUtil.asFluidContent(to);
-            if (atomContent.isEmpty()) {
-                // insert only
-                try (TransactionContext transaction = new TransactionContext(1L)) {
-                    if (Streams.stream(LbaCompatUtil.FluidAmountAsAmountsIterator.of(to))
-                            .mapToLong(insert -> atom.insert(transaction, toContent, insert))
-                            .allMatch(leftover -> leftover == 0L)) {
-                        transaction.commitWith(LbaCompatUtil.asStatelessContext(simulation));
-                        return true;
-                    }
-                    return false;
-                }
-            } else if (atomContent.equals(toContent)) {
-                    // extract or insert
-                    FluidAmount atomAmount = LbaCompatUtil.asFluidAmount(atom.getAmount());
-                    FluidAmount toAmount = to.getAmount_F();
-
-                    boolean extract;
-                    if (atomAmount.isGreaterThan(toAmount)) extract = true;
-                    else if (atomAmount.isLessThan(toAmount)) extract = false;
-                    else return true;
-
-                    FluidAmount diff = LbaCompatUtil.abs(atomAmount.sub(toAmount));
-                    assert !diff.isZero();
-
-                    try (TransactionContext transaction = new TransactionContext(1L)) {
-                        boolean result;
-                        if (extract) {
-                            result = Streams.stream(LbaCompatUtil.FluidAmountAsAmountsIterator.of(diff))
-                                    .allMatch(diff1 -> atom.extract(transaction, atomContent, diff1) == diff1);
-                        } else {
-                            result = Streams.stream(LbaCompatUtil.FluidAmountAsAmountsIterator.of(diff))
-                                    .mapToLong(diff1 -> atom.insert(transaction, atomContent, diff1))
-                                    .allMatch(leftover -> leftover == 0L);
-                        }
-                        if (result)
-                            transaction.commitWith(LbaCompatUtil.asStatelessContext(simulation));
-                        return result;
-                    }
-            } else {
-                // extract and then insert
-                try (TransactionContext transaction = new TransactionContext(2L)) {
-                    TransferUtilities.extractAll(transaction, atom);
-                    if (atom.getAmount() == 0L
-                            && Streams.stream(LbaCompatUtil.FluidAmountAsAmountsIterator.of(to))
-                            .mapToLong(insert -> atom.insert(transaction, toContent, insert))
-                            .allMatch(leftover -> leftover == 0L)) {
-                        transaction.commitWith(LbaCompatUtil.asStatelessContext(simulation));
-                        return true;
-                    }
-                    return false;
-                }
-            }
-        }
+        return TransferUtilities.setAtomContent(LbaCompatUtil.asStatelessContext(simulation),
+                getDelegateListModel(this)
+                        .orElseThrow(AssertionError::new)
+                        .getAtomList()
+                        .get(tank),
+                LbaCompatUtil.asFluidContent(to),
+                LbaCompatUtil.asBigAmount(to));
     }
 
     protected static Optional<? extends ListModel> getDelegateListModel(LbaFluidInvFromView instance) {

@@ -31,10 +31,26 @@ public class CauldronAtomParticipant
     }
 
     @Override
-    protected long insert(Context context, Content content, Fluid type, long maxAmount) {
-        if (type != Fluids.WATER)
-            return maxAmount;
+    protected long extractCurrent(Context context, long maxAmount) {
+        WorldAccess world = getWorld();
+        BlockPos position = getPosition();
+        BlockState blockState = world.getBlockState(position);
 
+        if (blockState.isOf(Blocks.CAULDRON)) {
+            int level = blockState.get(CauldronBlock.LEVEL);
+            int extracted = Math.toIntExact(Math.min(level, maxAmount / FluidConstants.BOTTLE)); // should be within int range
+            int resultLevel = level - extracted;
+
+            setLevel(context, world, position, blockState, resultLevel);
+
+            return extracted * FluidConstants.BOTTLE;
+        }
+
+        return 0L;
+    }
+
+    @Override
+    protected long insertCurrent(Context context, long maxAmount) {
         WorldAccess world = getWorld();
         BlockPos position = getPosition();
         BlockState blockState = world.getBlockState(position);
@@ -53,25 +69,10 @@ public class CauldronAtomParticipant
     }
 
     @Override
-    protected long extract(Context context, Content content, Fluid type, long maxAmount) {
+    protected long insertNew(Context context, Content content, Fluid type, long maxAmount) {
         if (type != Fluids.WATER)
-            return 0L;
-
-        WorldAccess world = getWorld();
-        BlockPos position = getPosition();
-        BlockState blockState = world.getBlockState(position);
-
-        if (blockState.isOf(Blocks.CAULDRON)) {
-            int level = blockState.get(CauldronBlock.LEVEL);
-            int extracted = Math.toIntExact(Math.min(level, maxAmount / FluidConstants.BOTTLE)); // should be within int range
-            int resultLevel = level - extracted;
-
-            setLevel(context, world, position, blockState, resultLevel);
-
-            return extracted * FluidConstants.BOTTLE;
-        }
-
-        return 0L;
+            return maxAmount;
+        return insertCurrent(context, maxAmount);
     }
 
     protected static void setLevel(Context context, WorldAccess world, BlockPos position, BlockState state, int level) {
@@ -110,5 +111,15 @@ public class CauldronAtomParticipant
     @Override
     public OptionalLong getCapacity() {
         return OptionalLong.of(FluidConstants.BUCKET);
+    }
+
+    @Override
+    protected boolean supportsPushNotification() {
+        return false; // world set block state
+    }
+
+    @Override
+    protected boolean supportsPullNotification() {
+        return false; // world set block state
     }
 }

@@ -4,7 +4,7 @@ import dev.technici4n.fasttransferlib.api.lookup.BlockLookupContext;
 import dev.technici4n.fasttransferlib.api.lookup.ItemLookupContext;
 import dev.technici4n.fasttransferlib.api.transfer.TransferApi;
 import dev.technici4n.fasttransferlib.api.view.ViewApi;
-import dev.technici4n.fasttransferlib.impl.base.AbstractMonoCategoryViewParticipant;
+import dev.technici4n.fasttransferlib.impl.base.AbstractComposedViewParticipant;
 import dev.technici4n.fasttransferlib.impl.compat.vanilla.fluid.BottleAtomParticipant;
 import dev.technici4n.fasttransferlib.impl.compat.vanilla.fluid.BucketAtomParticipant;
 import dev.technici4n.fasttransferlib.impl.compat.vanilla.fluid.CauldronAtomParticipant;
@@ -53,15 +53,15 @@ public enum VanillaCompat {
 
         public static void initializeClass() {}
 
-        private static AbstractMonoCategoryViewParticipant<Item> getBlockEntityViewParticipant(BlockEntity entity, BlockLookupContext context) {
+        private static AbstractComposedViewParticipant getBlockEntityViewParticipant(BlockEntity entity, BlockLookupContext context) {
             if (entity instanceof Inventory)
                 return SidedInventoryViewParticipant.of((Inventory) entity, context.getDirection());
             return null;
         }
 
-        private static AbstractMonoCategoryViewParticipant<Item> getBlockFallbackViewParticipant(World world, BlockPos pos, BlockState state, @Nullable BlockEntity entity, BlockLookupContext context) {
+        private static AbstractComposedViewParticipant getBlockFallbackViewParticipant(World world, BlockPos pos, BlockState state, @Nullable BlockEntity entity, BlockLookupContext context) {
             if (entity != null) {
-                AbstractMonoCategoryViewParticipant<Item> result = getBlockEntityViewParticipant(entity, context);
+                AbstractComposedViewParticipant result = getBlockEntityViewParticipant(entity, context);
                 if (result != null)
                     return result;
             }
@@ -72,7 +72,7 @@ public enum VanillaCompat {
             return null;
         }
 
-        private static AbstractMonoCategoryViewParticipant<Item> getChestViewParticipant(World world, BlockPos pos, BlockState state, BlockLookupContext context) {
+        private static AbstractComposedViewParticipant getChestViewParticipant(World world, BlockPos pos, BlockState state, BlockLookupContext context) {
             Inventory inv = ChestBlock.getInventory((ChestBlock) state.getBlock(), state, world, pos, true);
             return inv == null ? null : SidedInventoryViewParticipant.of(inv, context.getDirection());
         }

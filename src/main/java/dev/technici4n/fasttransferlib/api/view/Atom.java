@@ -58,4 +58,10 @@ public interface Atom
     default Model getDirectModel() {
         return this;
     }
+
+    static boolean isEmpty(Atom instance) {
+        boolean contentEmpty = instance.getContent().isEmpty();
+        assert contentEmpty == (instance.getAmount() == 0L);
+        return contentEmpty;
+    }
 }

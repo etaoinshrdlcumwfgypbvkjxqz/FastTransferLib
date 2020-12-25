@@ -43,14 +43,30 @@ public class MonoStorageAtom<T>
     }
 
     @Override
-    protected long insert(Context context, Content content, T type, long maxAmount) {
+    protected long extractCurrent(Context context, long maxAmount) {
         // already filtered
-        return getDelegate().insert(context, content, maxAmount);
+        return getDelegate().extractCurrent(context, maxAmount);
     }
 
     @Override
-    protected long extract(Context context, Content content, T type, long maxAmount) {
+    protected long insertCurrent(Context context, long maxAmount) {
         // already filtered
-        return getDelegate().extract(context, content, maxAmount);
+        return getDelegate().insertCurrent(context, maxAmount);
+    }
+
+    @Override
+    protected long insertNew(Context context, Content content, T type, long maxAmount) {
+        // already filtered
+        return getDelegate().insertNew(context, content, maxAmount);
+    }
+
+    @Override
+    protected boolean supportsPushNotification() {
+        return getDelegate().supportsPushNotification();
+    }
+
+    @Override
+    protected boolean supportsPullNotification() {
+        return getDelegate().supportsPullNotification();
     }
 }

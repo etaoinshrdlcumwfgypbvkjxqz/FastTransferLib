@@ -41,7 +41,7 @@ public class LbaFixedItemToViewParticipant
     }
 
     @Override
-        public long getAtomSize() {
+    public long getAtomSize() {
             return getFixedDelegate().getSlotCount();
     }
 

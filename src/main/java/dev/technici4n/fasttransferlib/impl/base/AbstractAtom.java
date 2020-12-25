@@ -3,33 +3,20 @@ package dev.technici4n.fasttransferlib.impl.base;
 import dev.technici4n.fasttransferlib.api.content.Content;
 import dev.technici4n.fasttransferlib.api.context.Context;
 import dev.technici4n.fasttransferlib.api.view.Atom;
-import dev.technici4n.fasttransferlib.impl.base.view.AbstractMonoCategoryView;
+import dev.technici4n.fasttransferlib.impl.base.view.AbstractView;
 
-public abstract class AbstractMonoCategoryAtom<T>
-        extends AbstractMonoCategoryView<T>
+public abstract class AbstractAtom
+        extends AbstractView
         implements Atom {
-    protected AbstractMonoCategoryAtom(Class<T> category) {
-        super(category);
-    }
-
-    @Override
-    protected long getAmount(Content content, T type) {
-        return Atom.super.getAmount(content);
-    }
-
     @Override
     public final long insert(Context context, Content content, long maxAmount) {
         if (content.isEmpty())
             return maxAmount;
 
-        Class<T> category = getCategory();
-        if (content.getCategory() != category)
-            return maxAmount;
-
         Content atomContent = getContent();
 
         if (atomContent.isEmpty())
-            return insertNew(context, content, category.cast(content.getType()), maxAmount);
+            return insertNew(context, content, maxAmount);
         if (atomContent.equals(content))
             return insertCurrent(context, maxAmount);
 
@@ -39,10 +26,6 @@ public abstract class AbstractMonoCategoryAtom<T>
     @Override
     public final long extract(Context context, Content content, long maxAmount) {
         if (content.isEmpty())
-            return 0L;
-
-        Class<T> category = getCategory();
-        if (content.getCategory() != category)
             return 0L;
 
         Content atomContent = getContent();
@@ -59,5 +42,5 @@ public abstract class AbstractMonoCategoryAtom<T>
 
     protected abstract long insertCurrent(Context context, long maxAmount);
 
-    protected abstract long insertNew(Context context, Content content, T type, long maxAmount);
+    protected abstract long insertNew(Context context, Content content, long maxAmount);
 }
