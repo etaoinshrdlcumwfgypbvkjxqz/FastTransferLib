@@ -2,12 +2,14 @@ package dev.technici4n.fasttransferlib.impl.base;
 
 import dev.technici4n.fasttransferlib.api.content.Content;
 import dev.technici4n.fasttransferlib.api.context.Context;
+import dev.technici4n.fasttransferlib.api.query.Query;
 import dev.technici4n.fasttransferlib.api.transfer.Participant;
 import dev.technici4n.fasttransferlib.api.view.Atom;
 import dev.technici4n.fasttransferlib.api.view.View;
 import dev.technici4n.fasttransferlib.api.view.flow.Publisher;
 import dev.technici4n.fasttransferlib.api.view.model.Model;
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
+import net.fabricmc.fabric.api.util.TriState;
 
 import java.util.Iterator;
 import java.util.Optional;
@@ -72,5 +74,27 @@ public abstract class AbstractComposedViewParticipant
     @Override
     public <T> Optional<? extends Publisher<T>> getPublisher(Class<T> discriminator) {
         return getView().getPublisher(discriminator);
+    }
+
+    @Override
+    public TriState query(Query query) {
+        TriState viewQuery = getView().query(query);
+        TriState participantQuery = getParticipant().query(query);
+        if (viewQuery == participantQuery)
+            return viewQuery;
+        if (viewQuery == TriState.TRUE && participantQuery == TriState.DEFAULT
+                || participantQuery == TriState.TRUE && viewQuery == TriState.DEFAULT)
+            return TriState.TRUE;
+        /* table
+        TRUE TRUE -> TRUE
+        DEFAULT TRUE -> TRUE
+
+        FALSE FALSE -> FALSE
+
+        DEFAULT DEFAULT -> DEFAULT
+        DEFAULT FALSE -> DEFAULT
+        TRUE FALSE -> DEFAULT
+         */
+        return TriState.DEFAULT;
     }
 }

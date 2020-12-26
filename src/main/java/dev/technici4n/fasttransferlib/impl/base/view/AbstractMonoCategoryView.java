@@ -1,6 +1,9 @@
 package dev.technici4n.fasttransferlib.impl.base.view;
 
 import dev.technici4n.fasttransferlib.api.content.Content;
+import dev.technici4n.fasttransferlib.api.query.Query;
+import dev.technici4n.fasttransferlib.api.query.StoreCategoryQuery;
+import net.fabricmc.fabric.api.util.TriState;
 
 public abstract class AbstractMonoCategoryView<T>
         extends AbstractView {
@@ -23,4 +26,11 @@ public abstract class AbstractMonoCategoryView<T>
     }
 
     protected abstract long getAmount(Content content, T type);
+
+    @Override
+    public TriState query(Query query) {
+        if (query instanceof StoreCategoryQuery && ((StoreCategoryQuery) query).getCategory() != getCategory())
+            return TriState.FALSE;
+        return TriState.DEFAULT;
+    }
 }

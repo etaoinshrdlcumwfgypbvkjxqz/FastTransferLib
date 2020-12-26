@@ -5,10 +5,15 @@ import dev.technici4n.fasttransferlib.api.content.Content;
 import dev.technici4n.fasttransferlib.api.content.FluidConstants;
 import dev.technici4n.fasttransferlib.api.context.Context;
 import dev.technici4n.fasttransferlib.api.lookup.ItemLookupContext;
+import dev.technici4n.fasttransferlib.api.query.Query;
+import dev.technici4n.fasttransferlib.api.query.StoreQuery;
+import dev.technici4n.fasttransferlib.api.query.TransferQuery;
 import dev.technici4n.fasttransferlib.impl.base.AbstractMonoCategoryAtom;
 import dev.technici4n.fasttransferlib.impl.content.FluidContent;
 import dev.technici4n.fasttransferlib.impl.content.ItemContent;
 import dev.technici4n.fasttransferlib.impl.mixin.BucketItemAccess;
+import dev.technici4n.fasttransferlib.impl.util.TriStateUtilities;
+import net.fabricmc.fabric.api.util.TriState;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.BucketItem;
@@ -89,5 +94,16 @@ public class BucketAtomParticipant
     @Override
     protected boolean supportsPullNotification() {
         return false; // item context
+    }
+
+    @Override
+    public TriState query(Query query) {
+        return TriStateUtilities.orGet(super.query(query), () -> {
+                    if (query instanceof TransferQuery)
+                        return TriState.TRUE;
+                    if (query instanceof StoreQuery)
+                        return TriState.TRUE;
+                    return TriState.DEFAULT;
+                });
     }
 }

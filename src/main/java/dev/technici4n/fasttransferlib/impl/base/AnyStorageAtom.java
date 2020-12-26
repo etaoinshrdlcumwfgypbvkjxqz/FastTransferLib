@@ -4,9 +4,13 @@ import com.google.common.collect.ImmutableSet;
 import dev.technici4n.fasttransferlib.api.content.Content;
 import dev.technici4n.fasttransferlib.api.content.ContentApi;
 import dev.technici4n.fasttransferlib.api.context.Context;
+import dev.technici4n.fasttransferlib.api.query.Query;
+import dev.technici4n.fasttransferlib.api.query.StoreQuery;
+import dev.technici4n.fasttransferlib.api.query.TransferQuery;
 import dev.technici4n.fasttransferlib.api.view.flow.TransferData;
 import dev.technici4n.fasttransferlib.impl.content.EmptyContent;
 import dev.technici4n.fasttransferlib.impl.view.flow.TransferDataImpl;
+import net.fabricmc.fabric.api.util.TriState;
 import net.minecraft.nbt.CompoundTag;
 
 import java.util.Collection;
@@ -116,5 +120,14 @@ public class AnyStorageAtom
     @Override
     protected boolean supportsPullNotification() {
         return true;
+    }
+
+    @Override
+    public TriState query(Query query) {
+        if (query instanceof TransferQuery)
+            return TriState.TRUE;
+        if (query instanceof StoreQuery)
+            return TriState.TRUE;
+        return TriState.DEFAULT;
     }
 }

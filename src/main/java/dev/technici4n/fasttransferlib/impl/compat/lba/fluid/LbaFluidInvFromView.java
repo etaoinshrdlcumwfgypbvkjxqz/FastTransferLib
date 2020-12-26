@@ -22,6 +22,7 @@ import dev.technici4n.fasttransferlib.api.view.flow.TransferData;
 import dev.technici4n.fasttransferlib.api.view.model.ListModel;
 import dev.technici4n.fasttransferlib.api.view.model.Model;
 import dev.technici4n.fasttransferlib.impl.compat.lba.LbaCompatUtil;
+import dev.technici4n.fasttransferlib.impl.query.StoreContentQueryImpl;
 import dev.technici4n.fasttransferlib.impl.util.TransferUtilities;
 import dev.technici4n.fasttransferlib.impl.util.ViewUtilities;
 import net.minecraft.fluid.Fluid;
@@ -137,7 +138,12 @@ public class LbaFluidInvFromView
     @Override
     public boolean isFluidValidForTank(int tank, FluidKey fluid) {
         ensureIndexInBounds(this, tank);
-        return true; // just return true, permitted by the contract
+        return  getDelegateListModel(this)
+                .orElseThrow(AssertionError::new)
+                .getAtomList()
+                .get(tank)
+                .query(StoreContentQueryImpl.of(LbaCompatUtil.asFluidContent(fluid)))
+                .orElse(true);
     }
 
     @Override

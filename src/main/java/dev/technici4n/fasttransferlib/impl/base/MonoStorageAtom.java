@@ -2,6 +2,9 @@ package dev.technici4n.fasttransferlib.impl.base;
 
 import dev.technici4n.fasttransferlib.api.content.Content;
 import dev.technici4n.fasttransferlib.api.context.Context;
+import dev.technici4n.fasttransferlib.api.query.Query;
+import dev.technici4n.fasttransferlib.impl.util.TriStateUtilities;
+import net.fabricmc.fabric.api.util.TriState;
 import net.minecraft.nbt.CompoundTag;
 
 import java.util.Collection;
@@ -69,5 +72,10 @@ public class MonoStorageAtom<T>
     @Override
     protected boolean supportsPullNotification() {
         return getDelegate().supportsPullNotification();
+    }
+
+    @Override
+    public TriState query(Query query) {
+        return TriStateUtilities.orGet(super.query(query), () -> getDelegate().query(query));
     }
 }

@@ -20,6 +20,7 @@ import dev.technici4n.fasttransferlib.api.view.model.ListModel;
 import dev.technici4n.fasttransferlib.api.view.model.Model;
 import dev.technici4n.fasttransferlib.impl.compat.lba.LbaCompatUtil;
 import dev.technici4n.fasttransferlib.impl.content.ItemContent;
+import dev.technici4n.fasttransferlib.impl.query.StoreContentQueryImpl;
 import dev.technici4n.fasttransferlib.impl.util.TransferUtilities;
 import dev.technici4n.fasttransferlib.impl.util.ViewUtilities;
 import net.minecraft.item.Item;
@@ -147,7 +148,12 @@ public class LbaItemInvFromView
     @Override
     public boolean isItemValidForSlot(int slot, ItemStack stack) {
         ensureIndexInBounds(this, slot);
-        return true; // just return true, permitted by the contract
+        return  getDelegateListModel(this)
+                .orElseThrow(AssertionError::new)
+                .getAtomList()
+                .get(slot)
+                .query(StoreContentQueryImpl.of(ItemContent.of(stack)))
+                .orElse(true);
     }
 
     @Override

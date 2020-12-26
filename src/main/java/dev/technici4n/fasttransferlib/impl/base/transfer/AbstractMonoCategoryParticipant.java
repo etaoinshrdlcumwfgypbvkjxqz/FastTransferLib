@@ -2,6 +2,9 @@ package dev.technici4n.fasttransferlib.impl.base.transfer;
 
 import dev.technici4n.fasttransferlib.api.content.Content;
 import dev.technici4n.fasttransferlib.api.context.Context;
+import dev.technici4n.fasttransferlib.api.query.Query;
+import dev.technici4n.fasttransferlib.api.query.TransferCategoryQuery;
+import net.fabricmc.fabric.api.util.TriState;
 
 public abstract class AbstractMonoCategoryParticipant<T>
         extends AbstractParticipant {
@@ -33,5 +36,12 @@ public abstract class AbstractMonoCategoryParticipant<T>
 
     protected Class<T> getCategory() {
         return category;
+    }
+
+    @Override
+    public TriState query(Query query) {
+        if (query instanceof TransferCategoryQuery && ((TransferCategoryQuery) query).getCategory() != getCategory())
+            return TriState.FALSE;
+        return TriState.DEFAULT;
     }
 }

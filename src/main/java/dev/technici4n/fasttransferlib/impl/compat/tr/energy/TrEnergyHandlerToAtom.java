@@ -125,4 +125,18 @@ public class TrEnergyHandlerToAtom
     protected boolean supportsPullNotification() {
         return true;
     }
+
+    @Override
+    public TriState query(Query query) {
+        return TriStateUtilities.orGet(super.query(query), () -> {
+            if (query instanceof ContentQuery
+                    && !((ContentQuery) query).getContent().equals(EnergyContent.of(TrEnergyType.INSTANCE)))
+                return TriState.FALSE;
+            if (query instanceof TransferQuery)
+                return TriState.TRUE;
+            if (query instanceof StoreQuery)
+                return TriState.TRUE;
+            return TriState.DEFAULT;
+        });
+    }
 }

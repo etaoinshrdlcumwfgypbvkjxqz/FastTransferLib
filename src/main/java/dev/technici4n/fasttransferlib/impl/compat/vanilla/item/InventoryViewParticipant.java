@@ -6,6 +6,9 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.primitives.Ints;
 import dev.technici4n.fasttransferlib.api.content.Content;
 import dev.technici4n.fasttransferlib.api.context.Context;
+import dev.technici4n.fasttransferlib.api.query.Query;
+import dev.technici4n.fasttransferlib.api.query.StoreQuery;
+import dev.technici4n.fasttransferlib.api.query.TransferQuery;
 import dev.technici4n.fasttransferlib.api.transfer.Participant;
 import dev.technici4n.fasttransferlib.api.view.Atom;
 import dev.technici4n.fasttransferlib.api.view.View;
@@ -15,8 +18,10 @@ import dev.technici4n.fasttransferlib.impl.base.AbstractComposedViewParticipant;
 import dev.technici4n.fasttransferlib.impl.base.transfer.AbstractMonoCategoryParticipant;
 import dev.technici4n.fasttransferlib.impl.base.view.AbstractMonoCategoryView;
 import dev.technici4n.fasttransferlib.impl.content.ItemContent;
+import dev.technici4n.fasttransferlib.impl.util.TriStateUtilities;
 import dev.technici4n.fasttransferlib.impl.util.ViewImplUtilities;
 import it.unimi.dsi.fastutil.objects.*;
+import net.fabricmc.fabric.api.util.TriState;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -143,6 +148,15 @@ public class InventoryViewParticipant
 		protected boolean supportsPullNotification() {
 			return false; // inventory sucks
 		}
+
+		@Override
+		public TriState query(Query query) {
+			return TriStateUtilities.orGet(super.query(query), () -> {
+				if (query instanceof StoreQuery)
+					return TriState.TRUE;
+				return TriState.DEFAULT;
+			});
+		}
 	}
 
 	public class ParticipantImpl
@@ -222,6 +236,15 @@ public class InventoryViewParticipant
 			context.execute(delegate::markDirty);
 
 			return maxAmount - leftoverAmount;
+		}
+
+		@Override
+		public TriState query(Query query) {
+			return TriStateUtilities.orGet(super.query(query), () -> {
+				if (query instanceof TransferQuery)
+					return TriState.TRUE;
+				return TriState.DEFAULT;
+			});
 		}
 	}
 }

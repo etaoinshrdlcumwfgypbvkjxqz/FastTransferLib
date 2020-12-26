@@ -4,11 +4,16 @@ import com.google.common.collect.ImmutableSet;
 import dev.technici4n.fasttransferlib.api.content.Content;
 import dev.technici4n.fasttransferlib.api.content.FluidConstants;
 import dev.technici4n.fasttransferlib.api.context.Context;
+import dev.technici4n.fasttransferlib.api.query.ContentQuery;
+import dev.technici4n.fasttransferlib.api.query.Query;
+import dev.technici4n.fasttransferlib.api.query.StoreQuery;
+import dev.technici4n.fasttransferlib.api.query.TransferQuery;
 import dev.technici4n.fasttransferlib.api.view.Atom;
 import dev.technici4n.fasttransferlib.impl.base.AbstractMonoCategoryAtom;
-import dev.technici4n.fasttransferlib.impl.content.EmptyContent;
 import dev.technici4n.fasttransferlib.impl.content.FluidContent;
+import dev.technici4n.fasttransferlib.impl.util.TriStateUtilities;
 import dev.technici4n.fasttransferlib.impl.util.WorldUtilities;
+import net.fabricmc.fabric.api.util.TriState;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.CauldronBlock;
@@ -123,5 +128,19 @@ public class CauldronAtomParticipant
     @Override
     protected boolean supportsPullNotification() {
         return false; // world set block state
+    }
+
+    @Override
+    public TriState query(Query query) {
+        return TriStateUtilities.orGet(super.query(query), () -> {
+            if (query instanceof ContentQuery
+                    && !((ContentQuery) query).getContent().equals(FluidContent.of(Fluids.WATER)))
+                return TriState.FALSE;
+            if (query instanceof TransferQuery)
+                return TriState.TRUE;
+            if (query instanceof StoreQuery)
+                return TriState.TRUE;
+            return TriState.DEFAULT;
+        });
     }
 }

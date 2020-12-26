@@ -6,6 +6,9 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import dev.technici4n.fasttransferlib.api.content.Content;
 import dev.technici4n.fasttransferlib.api.context.Context;
+import dev.technici4n.fasttransferlib.api.query.Query;
+import dev.technici4n.fasttransferlib.api.query.StoreQuery;
+import dev.technici4n.fasttransferlib.api.query.TransferQuery;
 import dev.technici4n.fasttransferlib.api.transfer.Participant;
 import dev.technici4n.fasttransferlib.api.transfer.TransferAction;
 import dev.technici4n.fasttransferlib.api.view.Atom;
@@ -19,11 +22,13 @@ import dev.technici4n.fasttransferlib.impl.base.view.AbstractMonoCategoryView;
 import dev.technici4n.fasttransferlib.impl.compat.lba.LbaCompatUtil;
 import dev.technici4n.fasttransferlib.impl.content.ItemContent;
 import dev.technici4n.fasttransferlib.impl.util.OptionalWeakReference;
+import dev.technici4n.fasttransferlib.impl.util.TriStateUtilities;
 import dev.technici4n.fasttransferlib.impl.view.flow.EmittingPublisher;
 import dev.technici4n.fasttransferlib.impl.view.flow.TransferDataImpl;
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
 import it.unimi.dsi.fastutil.objects.Object2LongMaps;
 import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
+import net.fabricmc.fabric.api.util.TriState;
 import net.minecraft.item.Item;
 import sun.misc.Cleaner;
 
@@ -166,6 +171,15 @@ public class LbaGroupedItemToViewParticipant
             setHasListener(false);
             getPublisherIfPresent(TransferData.class).ifPresent(EmittingPublisher::clearSubscribers);
         }
+
+        @Override
+        public TriState query(Query query) {
+            return TriStateUtilities.orGet(super.query(query), () -> {
+                if (query instanceof StoreQuery)
+                    return TriState.TRUE;
+                return TriState.DEFAULT;
+            });
+        }
     }
 
     public class ParticipantImpl
@@ -182,6 +196,15 @@ public class LbaGroupedItemToViewParticipant
         @Override
         protected long extractMono(Context context, Content content, Item type, long maxAmount) {
             return LbaCompatUtil.genericExtractImpl(getDelegate(), context, content, maxAmount);
+        }
+
+        @Override
+        public TriState query(Query query) {
+            return TriStateUtilities.orGet(super.query(query), () -> {
+                if (query instanceof TransferQuery)
+                    return TriState.TRUE;
+                return TriState.DEFAULT;
+            });
         }
     }
 }

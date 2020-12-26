@@ -3,8 +3,13 @@ package dev.technici4n.fasttransferlib.impl.compat.vanilla.item;
 import com.google.common.collect.ImmutableSet;
 import dev.technici4n.fasttransferlib.api.content.Content;
 import dev.technici4n.fasttransferlib.api.context.Context;
+import dev.technici4n.fasttransferlib.api.query.Query;
+import dev.technici4n.fasttransferlib.api.query.StoreQuery;
+import dev.technici4n.fasttransferlib.api.query.TransferQuery;
 import dev.technici4n.fasttransferlib.impl.base.AbstractMonoCategoryAtom;
 import dev.technici4n.fasttransferlib.impl.content.ItemContent;
+import dev.technici4n.fasttransferlib.impl.util.TriStateUtilities;
+import net.fabricmc.fabric.api.util.TriState;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -105,5 +110,16 @@ public class InventorySlotAtom
     @Override
     protected boolean supportsPullNotification() {
         return false; // inventory sucks
+    }
+
+    @Override
+    public TriState query(Query query) {
+        return TriStateUtilities.orGet(super.query(query), () -> {
+            if (query instanceof TransferQuery)
+                return TriState.TRUE;
+            if (query instanceof StoreQuery)
+                return TriState.TRUE;
+            return TriState.DEFAULT;
+        });
     }
 }

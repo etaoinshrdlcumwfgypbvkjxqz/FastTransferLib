@@ -2,8 +2,11 @@ package dev.technici4n.fasttransferlib.impl.base;
 
 import dev.technici4n.fasttransferlib.api.content.Content;
 import dev.technici4n.fasttransferlib.api.context.Context;
+import dev.technici4n.fasttransferlib.api.query.CategoryQuery;
+import dev.technici4n.fasttransferlib.api.query.Query;
 import dev.technici4n.fasttransferlib.api.view.Atom;
 import dev.technici4n.fasttransferlib.impl.base.view.AbstractMonoCategoryView;
+import net.fabricmc.fabric.api.util.TriState;
 
 public abstract class AbstractMonoCategoryAtom<T>
         extends AbstractMonoCategoryView<T>
@@ -60,4 +63,11 @@ public abstract class AbstractMonoCategoryAtom<T>
     protected abstract long insertCurrent(Context context, long maxAmount);
 
     protected abstract long insertNew(Context context, Content content, T type, long maxAmount);
+
+    @Override
+    public TriState query(Query query) {
+        if (query instanceof CategoryQuery && ((CategoryQuery) query).getCategory() != getCategory())
+            return TriState.FALSE;
+        return TriState.DEFAULT;
+    }
 }

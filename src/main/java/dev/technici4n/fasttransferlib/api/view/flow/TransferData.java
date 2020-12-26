@@ -9,5 +9,4 @@ public interface TransferData {
     Content getContent();
 
     long getAmount();
-
 }

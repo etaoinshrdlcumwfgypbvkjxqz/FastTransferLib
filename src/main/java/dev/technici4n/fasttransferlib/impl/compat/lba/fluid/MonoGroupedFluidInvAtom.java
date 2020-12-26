@@ -8,14 +8,20 @@ import alexiil.mc.lib.attributes.fluid.volume.FluidKeys;
 import com.google.common.collect.ImmutableSet;
 import dev.technici4n.fasttransferlib.api.content.Content;
 import dev.technici4n.fasttransferlib.api.context.Context;
+import dev.technici4n.fasttransferlib.api.query.ContentQuery;
+import dev.technici4n.fasttransferlib.api.query.Query;
+import dev.technici4n.fasttransferlib.api.query.StoreQuery;
+import dev.technici4n.fasttransferlib.api.query.TransferQuery;
 import dev.technici4n.fasttransferlib.api.transfer.TransferAction;
 import dev.technici4n.fasttransferlib.api.view.flow.TransferData;
 import dev.technici4n.fasttransferlib.impl.base.AbstractMonoCategoryAtom;
 import dev.technici4n.fasttransferlib.impl.compat.lba.LbaCompatUtil;
 import dev.technici4n.fasttransferlib.impl.util.OptionalWeakReference;
 import dev.technici4n.fasttransferlib.impl.util.TransferUtilities;
+import dev.technici4n.fasttransferlib.impl.util.TriStateUtilities;
 import dev.technici4n.fasttransferlib.impl.view.flow.EmittingPublisher;
 import dev.technici4n.fasttransferlib.impl.view.flow.TransferDataImpl;
+import net.fabricmc.fabric.api.util.TriState;
 import net.minecraft.fluid.Fluid;
 import sun.misc.Cleaner;
 
@@ -104,7 +110,7 @@ public class MonoGroupedFluidInvAtom
 
     @Override
     protected long insertNew(Context context, Content content, Fluid type, long maxAmount) {
-        return LbaCompatUtil.genericInsertImpl(getDelegate(), context, content, maxAmount);
+        return maxAmount; // reject
     }
 
     @Override
@@ -128,5 +134,18 @@ public class MonoGroupedFluidInvAtom
 
     protected void setHasListener(@SuppressWarnings("SameParameterValue") boolean hasListener) {
         this.hasListener = hasListener;
+    }
+
+    @Override
+    public TriState query(Query query) {
+        return TriStateUtilities.orGet(super.query(query), () -> {
+            if (query instanceof ContentQuery && !((ContentQuery) query).getContent().equals(getContent()))
+                return TriState.FALSE;
+            if (query instanceof TransferQuery)
+                return TriState.TRUE;
+            if (query instanceof StoreQuery)
+                return TriState.TRUE;
+            return TriState.DEFAULT;
+        });
     }
 }
