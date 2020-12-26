@@ -6,14 +6,11 @@ import dev.technici4n.fasttransferlib.api.view.flow.Publisher;
 import dev.technici4n.fasttransferlib.api.view.model.Model;
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
 
-import java.util.Iterator;
 import java.util.Optional;
 import java.util.Set;
 
 public interface View
-        extends Queryable {
-    Iterator<? extends Atom> getAtomIterator();
-
+        extends Iterable<Atom>, Queryable {
     long getAtomSize();
 
     long estimateAtomSize();
@@ -22,7 +19,7 @@ public interface View
 
     Object2LongMap<Content> getAmounts();
 
-    Set<? extends Content> getContents();
+    Set<Content> getContents();
 
     Model getDirectModel();
 

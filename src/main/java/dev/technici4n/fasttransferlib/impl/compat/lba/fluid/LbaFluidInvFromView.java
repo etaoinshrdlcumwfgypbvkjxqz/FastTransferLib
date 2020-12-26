@@ -97,7 +97,7 @@ public class LbaFluidInvFromView
     @Override
     public FluidInvStatistic getStatistics(FluidFilter filter) {
         @SuppressWarnings("UnstableApiUsage")
-        List<? extends Atom> filtered = Streams.stream(getDelegate().getAtomIterator())
+        List<? extends Atom> filtered = Streams.stream(getDelegate())
                 .filter(atom -> filter.matches(LbaCompatUtil.asFluidKey(atom.getContent())))
                 .collect(ImmutableList.toImmutableList());
         long amount = filtered.stream()

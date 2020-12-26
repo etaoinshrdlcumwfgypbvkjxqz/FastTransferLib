@@ -29,10 +29,7 @@ public enum TransferUtilities {
         long result = 0L;
         try (TransactionContext transaction = new TransactionContext(from.estimateAtomSize())) {
             // need transaction, extract and insert may have unknown side effect
-
-            for (Iterator<? extends Atom> fromIterator = from.getAtomIterator();
-                 fromIterator.hasNext();) {
-                Atom fromAtom = fromIterator.next();
+            for (Atom fromAtom : from) {
                 Content content = filter.apply(fromAtom);
                 if (content != null) {
                     while (true) {
@@ -63,7 +60,6 @@ public enum TransferUtilities {
                     }
                 }
             }
-
             transaction.commitWith(context); // commit using context
         }
         return result;

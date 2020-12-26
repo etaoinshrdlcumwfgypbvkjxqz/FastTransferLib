@@ -31,6 +31,7 @@ import it.unimi.dsi.fastutil.objects.Object2LongMaps;
 import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
 import net.fabricmc.fabric.api.util.TriState;
 import net.minecraft.fluid.Fluid;
+import org.jetbrains.annotations.NotNull;
 import sun.misc.Cleaner;
 
 import java.util.Collection;
@@ -70,11 +71,10 @@ public class LbaGroupedFluidToViewParticipant
         return participant;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public Map<Content, ? extends Atom> getAtomMap() {
+    public Map<Content, Atom> getAtomMap() {
         GroupedFluidInvView delegate = getDelegate();
-        return Maps.toMap((Iterable<Content>) getContents(), content -> {
+        return Maps.toMap(getContents(), content -> {
             assert content != null;
             return MonoGroupedFluidInvAtom.of(delegate, content);
         });
@@ -136,7 +136,7 @@ public class LbaGroupedFluidToViewParticipant
 
         @SuppressWarnings("UnstableApiUsage")
         @Override
-        public Set<? extends Content> getContents() {
+        public Set<Content> getContents() {
             return getDelegate().getStoredFluids().stream()
                     .map(LbaCompatUtil::asFluidContent)
                     .collect(ImmutableSet.toImmutableSet());
@@ -148,7 +148,7 @@ public class LbaGroupedFluidToViewParticipant
         }
 
         @Override
-        public Iterator<? extends Atom> getAtomIterator() {
+        public @NotNull Iterator<Atom> iterator() {
             return getAtomMap().values().iterator();
         }
 

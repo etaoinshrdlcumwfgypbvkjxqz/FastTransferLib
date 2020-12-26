@@ -10,6 +10,7 @@ import dev.technici4n.fasttransferlib.api.view.flow.Publisher;
 import dev.technici4n.fasttransferlib.api.view.model.Model;
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
 import net.fabricmc.fabric.api.util.TriState;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
 import java.util.Optional;
@@ -32,8 +33,8 @@ public abstract class AbstractComposedViewParticipant
     }
 
     @Override
-    public Iterator<? extends Atom> getAtomIterator() {
-        return getView().getAtomIterator();
+    public @NotNull Iterator<Atom> iterator() {
+        return getView().iterator();
     }
 
     @Override
@@ -57,7 +58,7 @@ public abstract class AbstractComposedViewParticipant
     }
 
     @Override
-    public Set<? extends Content> getContents() {
+    public Set<Content> getContents() {
         return getView().getContents();
     }
 

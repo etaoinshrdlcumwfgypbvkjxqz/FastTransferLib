@@ -7,5 +7,5 @@ import java.util.Map;
 
 public interface MapModel
         extends Model {
-    Map<Content, ? extends Atom> getAtomMap();
+    Map<Content, Atom> getAtomMap();
 }

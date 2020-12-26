@@ -9,6 +9,7 @@ import dev.technici4n.fasttransferlib.api.view.model.Model;
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
 import it.unimi.dsi.fastutil.objects.Object2LongMaps;
 import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
 import java.util.OptionalLong;
@@ -23,7 +24,7 @@ public interface Atom
     OptionalLong getCapacity();
 
     @Override
-    default Iterator<? extends Atom> getAtomIterator() {
+    default @NotNull Iterator<Atom> iterator() {
         return Iterators.singletonIterator(this);
     }
 
@@ -50,7 +51,7 @@ public interface Atom
     }
 
     @Override
-    default Set<? extends Content> getContents() {
+    default Set<Content> getContents() {
         return ImmutableSet.of(getContent());
     }
 

@@ -99,7 +99,7 @@ public class LbaItemInvFromView
     @Override
     public int getTotalCapacity() {
         return Ints.saturatedCast(
-                Streams.stream(getDelegate().getAtomIterator())
+                Streams.stream(getDelegate())
                         .map(Atom::getCapacity)
                         .filter(OptionalLong::isPresent)
                         .mapToLong(OptionalLong::getAsLong)
@@ -110,7 +110,7 @@ public class LbaItemInvFromView
     @Override
     public ItemInvStatistic getStatistics(ItemFilter filter) {
         @SuppressWarnings("UnstableApiUsage")
-        List<? extends Atom> filtered = Streams.stream(getDelegate().getAtomIterator())
+        List<? extends Atom> filtered = Streams.stream(getDelegate())
                 .filter(atom -> filter.matches(ItemContent.asStack(atom.getContent(), 1)))
                 .collect(ImmutableList.toImmutableList());
         long amount = filtered.stream()

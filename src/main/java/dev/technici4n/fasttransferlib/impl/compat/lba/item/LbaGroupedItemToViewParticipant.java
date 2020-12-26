@@ -30,6 +30,7 @@ import it.unimi.dsi.fastutil.objects.Object2LongMaps;
 import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
 import net.fabricmc.fabric.api.util.TriState;
 import net.minecraft.item.Item;
+import org.jetbrains.annotations.NotNull;
 import sun.misc.Cleaner;
 
 import java.util.Collection;
@@ -56,11 +57,10 @@ public class LbaGroupedItemToViewParticipant
         return new LbaGroupedItemToViewParticipant(delegate);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public Map<Content, ? extends Atom> getAtomMap() {
+    public Map<Content, Atom> getAtomMap() {
         GroupedItemInvView delegate = getDelegate();
-        return Maps.toMap((Iterable<Content>) getContents(), content -> {
+        return Maps.toMap(getContents(), content -> {
             assert content != null;
             return MonoGroupedItemInvAtom.of(delegate, content);
         });
@@ -110,7 +110,7 @@ public class LbaGroupedItemToViewParticipant
         }
 
         @Override
-        public Iterator<? extends Atom> getAtomIterator() {
+        public @NotNull Iterator<Atom> iterator() {
             return getAtomMap().values().iterator();
         }
 
@@ -138,7 +138,7 @@ public class LbaGroupedItemToViewParticipant
 
         @SuppressWarnings("UnstableApiUsage")
         @Override
-        public Set<? extends Content> getContents() {
+        public Set<Content> getContents() {
             return getDelegate().getStoredStacks().stream()
                     .map(ItemContent::of)
                     .collect(ImmutableSet.toImmutableSet());

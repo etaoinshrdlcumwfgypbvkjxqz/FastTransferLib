@@ -6,7 +6,6 @@ import dev.technici4n.fasttransferlib.api.view.Atom;
 import dev.technici4n.fasttransferlib.api.view.View;
 import dev.technici4n.fasttransferlib.impl.context.TransactionContext;
 
-import java.util.Iterator;
 import java.util.function.Function;
 
 public enum ViewUtilities {
@@ -24,12 +23,10 @@ public enum ViewUtilities {
         try (TransactionContext transaction = new TransactionContext(instance.estimateAtomSize())) {
             // need transaction, extract and insert may have unknown side effect
 
-            for (Iterator<? extends Atom> instanceIterator = instance.getAtomIterator();
-                 instanceIterator.hasNext();) {
+            for (Atom instanceAtom : instance) {
                 assert maxAmount >= 0L;
                 if (maxAmount == 0L)
                     break;
-                Atom instanceAtom = instanceIterator.next();
                 Content content = filter.apply(instanceAtom);
                 if (content != null)
                     maxAmount = instanceAtom.insert(transaction, content, maxAmount);
@@ -45,12 +42,10 @@ public enum ViewUtilities {
         try (TransactionContext transaction = new TransactionContext(instance.estimateAtomSize())) {
             // need transaction, extract and insert may have unknown side effect
 
-            for (Iterator<? extends Atom> instanceIterator = instance.getAtomIterator();
-                 instanceIterator.hasNext();) {
+            for (Atom instanceAtom : instance) {
                 assert left >= 0L;
                 if (left == 0L)
                     break;
-                Atom instanceAtom = instanceIterator.next();
                 Content content = filter.apply(instanceAtom);
                 if (content != null)
                     left -= instanceAtom.extract(transaction, content, left);

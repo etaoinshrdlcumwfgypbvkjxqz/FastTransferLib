@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface ListModel
         extends Model {
-    List<? extends Atom> getAtomList();
+    List<Atom> getAtomList();
 }

@@ -25,7 +25,7 @@ public class YeetStick extends Item {
 		if (!context.getWorld().isClient()) {
 			View view = ViewApi.BLOCK.get(context.getWorld(), context.getBlockPos(), BlockLookupContextImpl.of(context.getSide()));
 			if (view != null && view.estimateAtomSize() >= 1L) {
-				Atom atom = Iterators.getNext(view.getAtomIterator(), null);
+				Atom atom = Iterators.getNext(view.iterator(), null);
 				if (atom != null) {
 					Content content = atom.getContent();
 					long extracted = atom.extract(ExecutionContext.getInstance(), content, 2 * FluidConstants.BOTTLE);

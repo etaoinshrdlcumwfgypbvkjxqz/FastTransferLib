@@ -26,6 +26,7 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Util;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -38,7 +39,7 @@ public class InventoryViewParticipant
 		extends AbstractComposedViewParticipant
 		implements ListModel {
 	private final Inventory delegate;
-	private final Supplier<? extends List<? extends Atom>> atomList;
+	private final Supplier<? extends List<Atom>> atomList;
 	private final View view;
 	private final Participant participant;
 
@@ -65,7 +66,7 @@ public class InventoryViewParticipant
 	}
 
 	@Override
-	public List<? extends Atom> getAtomList() {
+	public List<Atom> getAtomList() {
 		return atomList.get();
 	}
 
@@ -86,7 +87,7 @@ public class InventoryViewParticipant
 		}
 
 		@Override
-		public Iterator<? extends Atom> getAtomIterator() {
+		public @NotNull Iterator<Atom> iterator() {
 			return getAtomList().iterator();
 		}
 
@@ -125,7 +126,7 @@ public class InventoryViewParticipant
 
 		@SuppressWarnings("UnstableApiUsage")
 		@Override
-		public Set<? extends Content> getContents() {
+		public Set<Content> getContents() {
 			Inventory delegate = getDelegate();
 			int size = delegate.size();
 			return IntStream.range(0, size)

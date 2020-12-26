@@ -6,6 +6,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Streams;
 import dev.technici4n.fasttransferlib.api.view.Atom;
 import dev.technici4n.fasttransferlib.api.view.model.ListModel;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
 import java.util.List;
@@ -15,7 +16,7 @@ public class LbaFixedItemToViewParticipant
         extends LbaGroupedItemToViewParticipant
         implements ListModel {
     private final FixedItemInvView fixedDelegate;
-    private final Supplier<? extends List<? extends Atom>> atomList;
+    private final Supplier<? extends List<Atom>> atomList;
 
     @SuppressWarnings("UnstableApiUsage")
     protected LbaFixedItemToViewParticipant(FixedItemInvView delegate) {
@@ -36,7 +37,7 @@ public class LbaFixedItemToViewParticipant
     }
 
     @Override
-    public Iterator<? extends Atom> getAtomIterator() {
+    public @NotNull Iterator<Atom> iterator() {
         return getAtomList().iterator();
     }
 
@@ -46,7 +47,7 @@ public class LbaFixedItemToViewParticipant
     }
 
     @Override
-    public List<? extends Atom> getAtomList() {
+    public List<Atom> getAtomList() {
         return atomList.get();
     }
 }
