@@ -5,6 +5,7 @@ import alexiil.mc.lib.attributes.item.GroupedItemInvView;
 import com.google.common.collect.ImmutableSet;
 import dev.technici4n.fasttransferlib.api.content.Content;
 import dev.technici4n.fasttransferlib.api.context.Context;
+import dev.technici4n.fasttransferlib.api.transfer.TransferAction;
 import dev.technici4n.fasttransferlib.api.view.flow.TransferData;
 import dev.technici4n.fasttransferlib.impl.base.AbstractMonoCategoryAtom;
 import dev.technici4n.fasttransferlib.impl.compat.lba.LbaCompatUtil;
@@ -48,7 +49,7 @@ public class MonoGroupedItemInvAtom
                                 return;
 
                             this1.reviseAndNotify(TransferData.class,
-                                    TransferDataImpl.of(TransferData.Type.fromDifference(diff > 0), content1, Math.abs(diff)));
+                                    TransferDataImpl.of(TransferAction.fromDifference(diff > 0), content1, Math.abs(diff)));
                         }),
                 () -> weakThis.getOptional().ifPresent(MonoGroupedItemInvAtom::onListenerRemoved));
 

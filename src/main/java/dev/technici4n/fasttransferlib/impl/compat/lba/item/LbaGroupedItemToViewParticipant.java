@@ -7,6 +7,7 @@ import com.google.common.collect.Maps;
 import dev.technici4n.fasttransferlib.api.content.Content;
 import dev.technici4n.fasttransferlib.api.context.Context;
 import dev.technici4n.fasttransferlib.api.transfer.Participant;
+import dev.technici4n.fasttransferlib.api.transfer.TransferAction;
 import dev.technici4n.fasttransferlib.api.view.Atom;
 import dev.technici4n.fasttransferlib.api.view.View;
 import dev.technici4n.fasttransferlib.api.view.flow.TransferData;
@@ -91,7 +92,7 @@ public class LbaGroupedItemToViewParticipant
                                     return;
 
                                 this1.reviseAndNotify(TransferData.class,
-                                        TransferDataImpl.of(TransferData.Type.fromDifference(diff > 0), content1, Math.abs(diff)));
+                                        TransferDataImpl.of(TransferAction.fromDifference(diff > 0), content1, Math.abs(diff)));
                             }),
                     () -> weakThis.getOptional().ifPresent(ViewImpl::onListenerRemoved));
 

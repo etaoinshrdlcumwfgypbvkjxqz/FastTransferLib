@@ -42,7 +42,7 @@ public class LbaGroupedItemListenerToSubscriber
         ItemStack stack = ItemContent.asStack(data.getContent(), 1);
         GroupedItemInvView inventory = getOwner();
         int current = inventory.getAmount(stack);
-        int previous = Math.max(0, Ints.saturatedCast(current - data.getType().applyToView(data.getAmount())));
+        int previous = Math.max(0, Ints.saturatedCast(current - data.getType().applyAsLong(data.getAmount())));
         getListener().onChange(inventory, stack, previous, current);
     }
 

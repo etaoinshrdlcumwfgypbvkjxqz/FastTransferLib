@@ -42,7 +42,7 @@ public class LbaGroupedFluidListenerToSubscriber
         FluidKey fluid = LbaCompatUtil.asFluidKey(data.getContent());
         GroupedFluidInvView inventory = getOwner();
         FluidAmount current = inventory.getAmount_F(fluid);
-        FluidAmount previous = current.sub(LbaCompatUtil.asFluidAmount(data.getType().applyToView(data.getAmount()))).max(FluidAmount.ZERO);
+        FluidAmount previous = current.sub(LbaCompatUtil.asFluidAmount(data.getType().applyAsLong(data.getAmount()))).max(FluidAmount.ZERO);
         getListener().onChange(inventory, fluid, previous, current);
     }
 

@@ -8,6 +8,7 @@ import com.google.common.collect.Maps;
 import dev.technici4n.fasttransferlib.api.content.Content;
 import dev.technici4n.fasttransferlib.api.context.Context;
 import dev.technici4n.fasttransferlib.api.transfer.Participant;
+import dev.technici4n.fasttransferlib.api.transfer.TransferAction;
 import dev.technici4n.fasttransferlib.api.view.Atom;
 import dev.technici4n.fasttransferlib.api.view.View;
 import dev.technici4n.fasttransferlib.api.view.flow.TransferData;
@@ -90,9 +91,9 @@ public class LbaGroupedFluidToViewParticipant
                                 if (diff.isZero())
                                     return;
 
-                                TransferData.Type type = TransferData.Type.fromDifference(diff.isPositive());
+                                TransferAction action = TransferAction.fromDifference(diff.isPositive());
                                 TransferUtilities.BigIntegerAsLongIterator.ofStream(LbaCompatUtil.asBigAmount(LbaCompatUtil.abs(diff)))
-                                        .mapToObj(diff1 -> TransferDataImpl.of(type, content1, diff1))
+                                        .mapToObj(diff1 -> TransferDataImpl.of(action, content1, diff1))
                                         .forEach(data -> this1.reviseAndNotify(TransferData.class, data));
                             }),
                     () -> weakThis.getOptional().ifPresent(ViewImpl::onListenerRemoved));

@@ -4,6 +4,7 @@ import com.google.common.collect.Streams;
 import dev.technici4n.fasttransferlib.api.content.Content;
 import dev.technici4n.fasttransferlib.api.context.Context;
 import dev.technici4n.fasttransferlib.api.transfer.Participant;
+import dev.technici4n.fasttransferlib.api.transfer.TransferAction;
 import dev.technici4n.fasttransferlib.api.view.Atom;
 import dev.technici4n.fasttransferlib.api.view.View;
 import dev.technici4n.fasttransferlib.api.view.flow.TransferData;
@@ -92,15 +93,15 @@ public enum TransferUtilities {
 
         if (from.equals(to)) {
             // insert/extract
-            TransferData.Type type;
+            TransferAction action;
             int comparison = toAmount.compareTo(fromAmount);
             if (comparison == 0) return Stream.<TransferData>empty().iterator(); // no delta
-            else type = TransferData.Type.fromDifference(comparison > 0);
+            else action = TransferAction.fromDifference(comparison > 0);
 
             BigInteger diff = toAmount.subtract(fromAmount);
 
             return BigIntegerAsLongIterator.ofStream(diff.abs())
-                    .<TransferData>mapToObj(toAmount1 -> TransferDataImpl.of(type, from, toAmount1))
+                    .<TransferData>mapToObj(toAmount1 -> TransferDataImpl.of(action, from, toAmount1))
                     .iterator();
         } else {
             // extract and insert
