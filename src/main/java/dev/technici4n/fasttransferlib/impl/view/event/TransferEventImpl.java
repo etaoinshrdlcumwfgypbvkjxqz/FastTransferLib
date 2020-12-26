@@ -1,30 +1,30 @@
-package dev.technici4n.fasttransferlib.impl.view.flow;
+package dev.technici4n.fasttransferlib.impl.view.event;
 
 import dev.technici4n.fasttransferlib.api.content.Content;
 import dev.technici4n.fasttransferlib.api.transfer.TransferAction;
-import dev.technici4n.fasttransferlib.api.view.flow.TransferData;
+import dev.technici4n.fasttransferlib.api.view.event.TransferEvent;
 
-public final class TransferDataImpl
-        implements TransferData {
+public final class TransferEventImpl
+        implements TransferEvent {
     private final TransferAction action;
     private final Content content;
     private final long amount;
 
-    private TransferDataImpl(TransferAction action, Content content, long amount) {
+    private TransferEventImpl(TransferAction action, Content content, long amount) {
         this.action = action;
         this.content = content;
         this.amount = amount;
     }
 
-    public static TransferDataImpl of(TransferAction action, Content content, long amount) {
-        return new TransferDataImpl(action, content, amount);
+    public static TransferEventImpl of(TransferAction action, Content content, long amount) {
+        return new TransferEventImpl(action, content, amount);
     }
 
-    public static TransferDataImpl ofInsertion(Content content, long amount) {
+    public static TransferEventImpl ofInsertion(Content content, long amount) {
         return of(TransferAction.INSERT, content, amount);
     }
 
-    public static TransferDataImpl ofExtraction(Content content, long amount) {
+    public static TransferEventImpl ofExtraction(Content content, long amount) {
         return of(TransferAction.EXTRACT, content, amount);
     }
 

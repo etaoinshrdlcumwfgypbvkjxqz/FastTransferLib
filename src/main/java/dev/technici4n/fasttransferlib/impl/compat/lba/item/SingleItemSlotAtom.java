@@ -9,7 +9,8 @@ import dev.technici4n.fasttransferlib.api.query.ContentQuery;
 import dev.technici4n.fasttransferlib.api.query.Query;
 import dev.technici4n.fasttransferlib.api.query.StoreQuery;
 import dev.technici4n.fasttransferlib.api.query.TransferQuery;
-import dev.technici4n.fasttransferlib.api.view.flow.TransferData;
+import dev.technici4n.fasttransferlib.api.view.event.NetTransferEvent;
+import dev.technici4n.fasttransferlib.api.view.event.TransferEvent;
 import dev.technici4n.fasttransferlib.impl.base.AbstractMonoCategoryAtom;
 import dev.technici4n.fasttransferlib.impl.compat.lba.LbaCompatUtil;
 import dev.technici4n.fasttransferlib.impl.content.ItemContent;
@@ -22,11 +23,13 @@ import sun.misc.Cleaner;
 
 import java.util.Collection;
 import java.util.OptionalLong;
+import java.util.Set;
 
 public class SingleItemSlotAtom
         extends AbstractMonoCategoryAtom<Item> {
+    private static final Set<Class<?>> SUPPORTED_PULL_EVENTS = ImmutableSet.of(TransferEvent.class, NetTransferEvent.class);
     private final SingleItemSlotView delegate;
-    private boolean hasListener;
+    private boolean hasTransferListener;
 
     protected SingleItemSlotAtom(SingleItemSlotView delegate) {
         super(Item.class);
@@ -34,20 +37,23 @@ public class SingleItemSlotAtom
 
         OptionalWeakReference<SingleItemSlotAtom> weakThis = OptionalWeakReference.of(this);
         ListenerToken listenerToken = this.delegate.getBackingInv().addListener(
-                inv -> weakThis.getOptional().ifPresent(SingleItemSlotAtom::revise),
+                inv -> weakThis.getOptional().ifPresent(this1 -> {
+                    this1.revise(NetTransferEvent.class);
+                    this1.revise(TransferEvent.class);
+                }),
                 () -> weakThis.getOptional().ifPresent(SingleItemSlotAtom::onListenerRemoved));
 
         if (listenerToken == null) {
-            this.hasListener = false;
+            this.hasTransferListener = false;
         } else {
-            this.hasListener = true;
+            this.hasTransferListener = true;
             Cleaner.create(this, listenerToken::removeListener);
         }
     }
 
     protected void onListenerRemoved() {
-        setHasListener(false);
-        getPublisherIfPresent(TransferData.class).ifPresent(EmittingPublisher::clearSubscribers);
+        setHasTransferListener(false);
+        getPublisherIfPresent(TransferEvent.class).ifPresent(EmittingPublisher::clearSubscribers);
     }
 
     public static SingleItemSlotAtom of(SingleItemSlotView delegate) {
@@ -89,21 +95,21 @@ public class SingleItemSlotAtom
     }
 
     @Override
-    protected Collection<? extends Class<?>> getSupportedPushNotifications() {
+    protected Collection<? extends Class<?>> getSupportedPushEvents() {
         return ImmutableSet.of(); // mark dirty listener only
     }
 
     @Override
-    protected boolean supportsPullNotification() {
-        return isHasListener();
+    protected Collection<? extends Class<?>> getSupportedPullEvents() {
+        return isHasTransferListener() ? SUPPORTED_PULL_EVENTS : ImmutableSet.of();
     }
 
-    protected boolean isHasListener() {
-        return hasListener;
+    protected boolean isHasTransferListener() {
+        return hasTransferListener;
     }
 
-    protected void setHasListener(@SuppressWarnings("SameParameterValue") boolean hasListener) {
-        this.hasListener = hasListener;
+    protected void setHasTransferListener(@SuppressWarnings("SameParameterValue") boolean hasTransferListener) {
+        this.hasTransferListener = hasTransferListener;
     }
 
     @Override

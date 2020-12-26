@@ -7,9 +7,9 @@ import dev.technici4n.fasttransferlib.api.transfer.Participant;
 import dev.technici4n.fasttransferlib.api.transfer.TransferAction;
 import dev.technici4n.fasttransferlib.api.view.Atom;
 import dev.technici4n.fasttransferlib.api.view.View;
-import dev.technici4n.fasttransferlib.api.view.flow.TransferData;
+import dev.technici4n.fasttransferlib.api.view.event.TransferEvent;
 import dev.technici4n.fasttransferlib.impl.context.TransactionContext;
-import dev.technici4n.fasttransferlib.impl.view.flow.TransferDataImpl;
+import dev.technici4n.fasttransferlib.impl.view.event.TransferEventImpl;
 import it.unimi.dsi.fastutil.longs.LongIterator;
 
 import java.math.BigInteger;
@@ -83,7 +83,7 @@ public enum TransferUtilities {
     }
 
     @SuppressWarnings("UnstableApiUsage")
-    public static Iterator<TransferData> compileToTransferData(Content from, BigInteger fromAmount, Content to, BigInteger toAmount) {
+    public static Iterator<TransferEvent> compileToTransferData(Content from, BigInteger fromAmount, Content to, BigInteger toAmount) {
         if (from.isEmpty()) fromAmount = BigInteger.ZERO;
         if (to.isEmpty()) toAmount = BigInteger.ZERO;
 
@@ -91,21 +91,21 @@ public enum TransferUtilities {
             // insert/extract
             TransferAction action;
             int comparison = toAmount.compareTo(fromAmount);
-            if (comparison == 0) return Stream.<TransferData>empty().iterator(); // no delta
+            if (comparison == 0) return Stream.<TransferEvent>empty().iterator(); // no delta
             else action = TransferAction.fromDifference(comparison > 0);
 
             BigInteger diff = toAmount.subtract(fromAmount);
 
             return BigIntegerAsLongIterator.ofStream(diff.abs())
-                    .<TransferData>mapToObj(toAmount1 -> TransferDataImpl.of(action, from, toAmount1))
+                    .<TransferEvent>mapToObj(toAmount1 -> TransferEventImpl.of(action, from, toAmount1))
                     .iterator();
         } else {
             // extract and insert
             return Streams.concat(
                     BigIntegerAsLongIterator.ofStream(fromAmount)
-                            .<TransferData>mapToObj(toAmount1 -> TransferDataImpl.ofExtraction(from, toAmount1)),
+                            .<TransferEvent>mapToObj(toAmount1 -> TransferEventImpl.ofExtraction(from, toAmount1)),
                     BigIntegerAsLongIterator.ofStream(toAmount)
-                            .<TransferData>mapToObj(toAmount1 -> TransferDataImpl.ofInsertion(from, toAmount1))
+                            .<TransferEvent>mapToObj(toAmount1 -> TransferEventImpl.ofInsertion(from, toAmount1))
             ).iterator();
         }
     }

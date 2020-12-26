@@ -5,14 +5,14 @@ import alexiil.mc.lib.attributes.ListenerToken;
 import alexiil.mc.lib.attributes.item.GroupedItemInvView;
 import alexiil.mc.lib.attributes.item.ItemInvAmountChangeListener;
 import com.google.common.primitives.Ints;
+import dev.technici4n.fasttransferlib.api.view.event.TransferEvent;
 import dev.technici4n.fasttransferlib.api.view.flow.Subscription;
-import dev.technici4n.fasttransferlib.api.view.flow.TransferData;
 import dev.technici4n.fasttransferlib.impl.content.ItemContent;
 import dev.technici4n.fasttransferlib.impl.view.flow.DisposableSubscriber;
 import net.minecraft.item.ItemStack;
 
 public class LbaGroupedItemListenerToSubscriber
-        extends DisposableSubscriber<TransferData>
+        extends DisposableSubscriber<TransferEvent>
         implements ListenerToken {
     private final GroupedItemInvView owner;
     private final ItemInvAmountChangeListener listener;
@@ -38,7 +38,7 @@ public class LbaGroupedItemListenerToSubscriber
     }
 
     @Override
-    public void onNext(TransferData data) {
+    public void onNext(TransferEvent data) {
         ItemStack stack = ItemContent.asStack(data.getContent(), 1);
         GroupedItemInvView inventory = getOwner();
         int current = inventory.getAmount(stack);

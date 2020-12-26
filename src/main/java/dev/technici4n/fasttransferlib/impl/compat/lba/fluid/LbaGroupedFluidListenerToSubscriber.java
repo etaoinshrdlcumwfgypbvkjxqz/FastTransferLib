@@ -6,13 +6,13 @@ import alexiil.mc.lib.attributes.fluid.FluidInvAmountChangeListener_F;
 import alexiil.mc.lib.attributes.fluid.GroupedFluidInvView;
 import alexiil.mc.lib.attributes.fluid.amount.FluidAmount;
 import alexiil.mc.lib.attributes.fluid.volume.FluidKey;
+import dev.technici4n.fasttransferlib.api.view.event.TransferEvent;
 import dev.technici4n.fasttransferlib.api.view.flow.Subscription;
-import dev.technici4n.fasttransferlib.api.view.flow.TransferData;
 import dev.technici4n.fasttransferlib.impl.compat.lba.LbaCompatUtil;
 import dev.technici4n.fasttransferlib.impl.view.flow.DisposableSubscriber;
 
 public class LbaGroupedFluidListenerToSubscriber
-        extends DisposableSubscriber<TransferData>
+        extends DisposableSubscriber<TransferEvent>
         implements ListenerToken {
     private final GroupedFluidInvView owner;
     private final FluidInvAmountChangeListener_F listener;
@@ -38,7 +38,7 @@ public class LbaGroupedFluidListenerToSubscriber
     }
 
     @Override
-    public void onNext(TransferData data) {
+    public void onNext(TransferEvent data) {
         FluidKey fluid = LbaCompatUtil.asFluidKey(data.getContent());
         GroupedFluidInvView inventory = getOwner();
         FluidAmount current = inventory.getAmount_F(fluid);

@@ -7,9 +7,11 @@ import dev.technici4n.fasttransferlib.api.context.Context;
 import dev.technici4n.fasttransferlib.api.query.Query;
 import dev.technici4n.fasttransferlib.api.query.StoreQuery;
 import dev.technici4n.fasttransferlib.api.query.TransferQuery;
-import dev.technici4n.fasttransferlib.api.view.flow.TransferData;
+import dev.technici4n.fasttransferlib.api.view.event.CapacityChangeEvent;
+import dev.technici4n.fasttransferlib.api.view.event.NetTransferEvent;
+import dev.technici4n.fasttransferlib.api.view.event.TransferEvent;
 import dev.technici4n.fasttransferlib.impl.content.EmptyContent;
-import dev.technici4n.fasttransferlib.impl.view.flow.TransferDataImpl;
+import dev.technici4n.fasttransferlib.impl.view.event.TransferEventImpl;
 import net.fabricmc.fabric.api.util.TriState;
 import net.minecraft.nbt.CompoundTag;
 
@@ -19,7 +21,8 @@ import java.util.Set;
 
 public class AnyStorageAtom
         extends AbstractAtom {
-    private static final Set<Class<?>> SUPPORTED_PUSH_NOTIFICATIONS = ImmutableSet.of(TransferData.class);
+    private static final Set<Class<?>> SUPPORTED_PUSH_EVENTS = ImmutableSet.of(TransferEvent.class, CapacityChangeEvent.class);
+    private static final Set<Class<?>> SUPPORTED_PULL_EVENTS = ImmutableSet.of(TransferEvent.class, NetTransferEvent.class, CapacityChangeEvent.class);
     private Content content = EmptyContent.INSTANCE;
     private final long internalCapacity;
     private long amount;
@@ -48,7 +51,7 @@ public class AnyStorageAtom
 
         Content content = getContent();
         context.configure(() -> setAmount(amount - extracted), () -> setAmount(amount));
-        context.execute(() -> reviseAndNotify(TransferData.class, TransferDataImpl.ofExtraction(content, extracted)));
+        context.execute(() -> reviseAndNotify(TransferEvent.class, TransferEventImpl.ofExtraction(content, extracted)));
         return extracted;
     }
 
@@ -61,7 +64,10 @@ public class AnyStorageAtom
 
         Content content = getContent();
         context.configure(() -> setAmount(amount + inserted), () -> setAmount(amount));
-        context.execute(() -> reviseAndNotify(TransferData.class, TransferDataImpl.ofInsertion(content, inserted)));
+        context.execute(() -> {
+            revise(NetTransferEvent.class);
+            reviseAndNotify(TransferEvent.class, TransferEventImpl.ofInsertion(content, inserted));
+        });
         return maxAmount - inserted;
     }
 
@@ -75,7 +81,7 @@ public class AnyStorageAtom
             setContent(content);
             setAmount(inserted);
         }, () -> setAmount(0L));
-        context.execute(() -> reviseAndNotify(TransferData.class, TransferDataImpl.ofInsertion(content, inserted)));
+        context.execute(() -> reviseAndNotify(TransferEvent.class, TransferEventImpl.ofInsertion(content, inserted)));
         return maxAmount - inserted;
     }
 
@@ -113,13 +119,15 @@ public class AnyStorageAtom
     }
 
     @Override
-    protected Collection<? extends Class<?>> getSupportedPushNotifications() {
-        return SUPPORTED_PUSH_NOTIFICATIONS;
+    protected Collection<? extends Class<?>> getSupportedPushEvents() {
+        // fixed capacity
+        return SUPPORTED_PUSH_EVENTS;
     }
 
     @Override
-    protected boolean supportsPullNotification() {
-        return true;
+    protected Collection<? extends Class<?>> getSupportedPullEvents() {
+        // fixed capacity
+        return SUPPORTED_PULL_EVENTS;
     }
 
     @Override

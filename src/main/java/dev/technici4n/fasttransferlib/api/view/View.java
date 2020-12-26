@@ -23,7 +23,7 @@ public interface View
 
     Model getDirectModel();
 
-    Object getRevision();
+    Object getRevisionFor(Class<?> event);
 
-    <T> Optional<? extends Publisher<T>> getPublisher(Class<T> discriminator);
+    <T> Optional<? extends Publisher<T>> getPublisherFor(Class<T> event);
 }

@@ -141,13 +141,13 @@ public class InventoryViewParticipant
 		}
 
 		@Override
-		protected Collection<? extends Class<?>> getSupportedPushNotifications() {
+		protected Collection<? extends Class<?>> getSupportedPushEvents() {
 			return ImmutableSet.of(); // inventory sucks
 		}
 
 		@Override
-		protected boolean supportsPullNotification() {
-			return false; // inventory sucks
+		protected Collection<? extends Class<?>> getSupportedPullEvents() {
+			return ImmutableSet.of(); // inventory sucks
 		}
 
 		@Override

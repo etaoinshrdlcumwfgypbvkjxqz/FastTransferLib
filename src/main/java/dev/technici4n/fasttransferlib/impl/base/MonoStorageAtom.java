@@ -65,13 +65,13 @@ public class MonoStorageAtom<T>
     }
 
     @Override
-    protected Collection<? extends Class<?>> getSupportedPushNotifications() {
-        return getDelegate().getSupportedPushNotifications();
+    protected Collection<? extends Class<?>> getSupportedPushEvents() {
+        return getDelegate().getSupportedPushEvents();
     }
 
     @Override
-    protected boolean supportsPullNotification() {
-        return getDelegate().supportsPullNotification();
+    protected Collection<? extends Class<?>> getSupportedPullEvents() {
+        return getDelegate().getSupportedPullEvents();
     }
 
     @Override

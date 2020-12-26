@@ -13,7 +13,8 @@ import dev.technici4n.fasttransferlib.api.transfer.Participant;
 import dev.technici4n.fasttransferlib.api.transfer.TransferAction;
 import dev.technici4n.fasttransferlib.api.view.Atom;
 import dev.technici4n.fasttransferlib.api.view.View;
-import dev.technici4n.fasttransferlib.api.view.flow.TransferData;
+import dev.technici4n.fasttransferlib.api.view.event.NetTransferEvent;
+import dev.technici4n.fasttransferlib.api.view.event.TransferEvent;
 import dev.technici4n.fasttransferlib.api.view.model.MapModel;
 import dev.technici4n.fasttransferlib.api.view.model.Model;
 import dev.technici4n.fasttransferlib.impl.base.AbstractComposedViewParticipant;
@@ -23,8 +24,8 @@ import dev.technici4n.fasttransferlib.impl.compat.lba.LbaCompatUtil;
 import dev.technici4n.fasttransferlib.impl.content.ItemContent;
 import dev.technici4n.fasttransferlib.impl.util.OptionalWeakReference;
 import dev.technici4n.fasttransferlib.impl.util.TriStateUtilities;
+import dev.technici4n.fasttransferlib.impl.view.event.TransferEventImpl;
 import dev.technici4n.fasttransferlib.impl.view.flow.EmittingPublisher;
-import dev.technici4n.fasttransferlib.impl.view.flow.TransferDataImpl;
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
 import it.unimi.dsi.fastutil.objects.Object2LongMaps;
 import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
@@ -41,7 +42,8 @@ import java.util.Set;
 public class LbaGroupedItemToViewParticipant
         extends AbstractComposedViewParticipant
         implements MapModel {
-    private static final Set<Class<?>> SUPPORTED_PUSH_NOTIFICATIONS = ImmutableSet.of(TransferData.class);
+    private static final Set<Class<?>> SUPPORTED_PUSH_EVENTS = ImmutableSet.of(TransferEvent.class);
+    private static final Set<Class<?>> SUPPORTED_PULL_EVENTS = ImmutableSet.of(TransferEvent.class, NetTransferEvent.class);
     private final GroupedItemInvView delegate;
     private final View view;
     private final Participant participant;
@@ -82,7 +84,7 @@ public class LbaGroupedItemToViewParticipant
 
     public class ViewImpl
             extends AbstractMonoCategoryView<Item> {
-        private boolean hasListener;
+        private boolean hasTransferListener;
 
         protected ViewImpl(GroupedItemInvView delegate) {
             super(Item.class);
@@ -96,15 +98,16 @@ public class LbaGroupedItemToViewParticipant
                                 if (diff == 0)
                                     return;
 
-                                this1.reviseAndNotify(TransferData.class,
-                                        TransferDataImpl.of(TransferAction.fromDifference(diff > 0), content1, Math.abs(diff)));
+                                this1.revise(NetTransferEvent.class);
+                                this1.reviseAndNotify(TransferEvent.class,
+                                        TransferEventImpl.of(TransferAction.fromDifference(diff > 0), content1, Math.abs(diff)));
                             }),
-                    () -> weakThis.getOptional().ifPresent(ViewImpl::onListenerRemoved));
+                    () -> weakThis.getOptional().ifPresent(ViewImpl::onTransferListenerRemoved));
 
             if (listenerToken == null) {
-                this.hasListener = false;
+                this.hasTransferListener = false;
             } else {
-                this.hasListener = true;
+                this.hasTransferListener = true;
                 Cleaner.create(this, listenerToken::removeListener);
             }
         }
@@ -150,26 +153,26 @@ public class LbaGroupedItemToViewParticipant
         }
 
         @Override
-        protected Collection<? extends Class<?>> getSupportedPushNotifications() {
-            return isHasListener() ? SUPPORTED_PUSH_NOTIFICATIONS : ImmutableSet.of();
+        protected Collection<? extends Class<?>> getSupportedPushEvents() {
+            return isHasTransferListener() ? SUPPORTED_PUSH_EVENTS : ImmutableSet.of();
         }
 
         @Override
-        protected boolean supportsPullNotification() {
-            return isHasListener();
+        protected Collection<? extends Class<?>> getSupportedPullEvents() {
+            return isHasTransferListener() ? SUPPORTED_PULL_EVENTS : ImmutableSet.of();
         }
 
-        protected boolean isHasListener() {
-            return hasListener;
+        protected boolean isHasTransferListener() {
+            return hasTransferListener;
         }
 
-        protected void setHasListener(@SuppressWarnings("SameParameterValue") boolean hasListener) {
-            this.hasListener = hasListener;
+        protected void setHasTransferListener(@SuppressWarnings("SameParameterValue") boolean hasTransferListener) {
+            this.hasTransferListener = hasTransferListener;
         }
 
-        protected void onListenerRemoved() {
-            setHasListener(false);
-            getPublisherIfPresent(TransferData.class).ifPresent(EmittingPublisher::clearSubscribers);
+        protected void onTransferListenerRemoved() {
+            setHasTransferListener(false);
+            getPublisherIfPresent(TransferEvent.class).ifPresent(EmittingPublisher::clearSubscribers);
         }
 
         @Override

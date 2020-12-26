@@ -9,6 +9,8 @@ import dev.technici4n.fasttransferlib.api.query.ContentQuery;
 import dev.technici4n.fasttransferlib.api.query.Query;
 import dev.technici4n.fasttransferlib.api.query.StoreQuery;
 import dev.technici4n.fasttransferlib.api.query.TransferQuery;
+import dev.technici4n.fasttransferlib.api.view.event.CapacityChangeEvent;
+import dev.technici4n.fasttransferlib.api.view.event.NetTransferEvent;
 import dev.technici4n.fasttransferlib.impl.base.AbstractMonoCategoryAtom;
 import dev.technici4n.fasttransferlib.impl.content.FluidContent;
 import dev.technici4n.fasttransferlib.impl.content.ItemContent;
@@ -23,9 +25,12 @@ import net.minecraft.potion.Potions;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.OptionalLong;
+import java.util.Set;
 
 public class BottleAtomParticipant
         extends AbstractMonoCategoryAtom<Fluid> {
+    private static final Set<Class<?>> SUPPORTED_PUSH_EVENTS = ImmutableSet.of(CapacityChangeEvent.class);
+    private static final Set<Class<?>> SUPPORTED_PULL_EVENTS = ImmutableSet.of(NetTransferEvent.class, CapacityChangeEvent.class);
     private final ItemLookupContext lookupContext;
 
     public BottleAtomParticipant(ItemLookupContext lookupContext) {
@@ -90,13 +95,21 @@ public class BottleAtomParticipant
     }
 
     @Override
-    protected Collection<? extends Class<?>> getSupportedPushNotifications() {
-        return ImmutableSet.of(); // item context
+    protected Collection<? extends Class<?>> getSupportedPushEvents() {
+        // capacity is fixed, therefore supports it effectively
+        return SUPPORTED_PUSH_EVENTS; // item context
     }
 
     @Override
-    protected boolean supportsPullNotification() {
-        return false; // item context
+    protected Collection<? extends Class<?>> getSupportedPullEvents() {
+        return SUPPORTED_PULL_EVENTS; // item context
+    }
+
+    @Override
+    public Object getRevisionFor(Class<?> event) {
+        if (event == NetTransferEvent.class)
+            return getContent(); // net change involves net content change
+        return super.getRevisionFor(event);
     }
 
     @Override

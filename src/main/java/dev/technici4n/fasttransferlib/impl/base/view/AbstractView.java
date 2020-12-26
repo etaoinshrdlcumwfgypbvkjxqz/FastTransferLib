@@ -12,51 +12,52 @@ import java.util.Optional;
 
 public abstract class AbstractView
         implements View {
-    private Object revision;
+    private final LoadingCache<Class<?>, Object> revisions;
     private final LoadingCache<Class<?>, EmittingPublisher<?>> publishers;
 
     protected AbstractView() {
-        this.revision = new Object();
+        this.revisions = CacheBuilder.newBuilder().concurrencyLevel(1).initialCapacity(4)
+                .build(CacheLoader.from(Object::new));
         this.publishers = CacheBuilder.newBuilder().concurrencyLevel(1).initialCapacity(4)
                 .build(CacheLoader.from(key -> new EmittingPublisher<>(4)));
     }
 
-    protected abstract Collection<? extends Class<?>> getSupportedPushNotifications();
+    protected abstract Collection<? extends Class<?>> getSupportedPushEvents();
 
-    protected abstract boolean supportsPullNotification();
+    protected abstract Collection<? extends Class<?>> getSupportedPullEvents();
 
     @Override
-    public Object getRevision() {
-        if (supportsPullNotification())
-            return revision;
+    public Object getRevisionFor(Class<?> event) {
+        if (getSupportedPullEvents().contains(event))
+            return getRevisions().getUnchecked(event);
         return new Object();
     }
 
-    protected void revise() {
-        assert supportsPullNotification();
-        setRevision(new Object());
+    protected void revise(Class<?> event) {
+        assert getSupportedPullEvents().contains(event);
+        getRevisions().refresh(event);
     }
 
-    protected <T> void notify(Class<T> discriminator, T data) {
-        assert getSupportedPushNotifications().contains(discriminator);
-        getPublisherIfPresent(discriminator).ifPresent(publisher -> publisher.emit(data));
+    protected <T> void notify(Class<T> event, T data) {
+        assert getSupportedPushEvents().contains(event);
+        getPublisherIfPresent(event).ifPresent(publisher -> publisher.emit(data));
     }
 
     @SuppressWarnings("unused")
-    protected <T> void reviseAndNotify(Class<T> discriminator, T data) {
-        revise();
-        notify(discriminator, data);
-    }
-
-    protected void setRevision(Object revision) {
-        this.revision = revision;
+    protected <T> void reviseAndNotify(@SuppressWarnings("SameParameterValue") Class<T> event, T data) {
+        revise(event);
+        notify(event, data);
     }
 
     @Override
-    public <T> Optional<? extends Publisher<T>> getPublisher(Class<T> discriminator) {
-        if (getSupportedPushNotifications().contains(discriminator))
-            return Optional.of(getPublisherUnchecked(discriminator));
+    public <T> Optional<? extends Publisher<T>> getPublisherFor(Class<T> event) {
+        if (getSupportedPushEvents().contains(event))
+            return Optional.of(getPublisher(event));
         return Optional.empty();
+    }
+
+    protected LoadingCache<Class<?>, Object> getRevisions() {
+        return revisions;
     }
 
     protected LoadingCache<Class<?>, EmittingPublisher<?>> getPublishers() {
@@ -64,12 +65,12 @@ public abstract class AbstractView
     }
 
     @SuppressWarnings("unchecked")
-    protected <T> EmittingPublisher<T> getPublisherUnchecked(Class<T> discriminator) {
-        return (EmittingPublisher<T>) getPublishers().getUnchecked(discriminator);
+    protected <T> EmittingPublisher<T> getPublisher(Class<T> event) {
+        return (EmittingPublisher<T>) getPublishers().getUnchecked(event);
     }
 
     @SuppressWarnings("unchecked")
-    protected <T> Optional<? extends EmittingPublisher<T>> getPublisherIfPresent(Class<T> discriminator) {
-        return Optional.ofNullable((EmittingPublisher<T>) getPublishers().getIfPresent(discriminator));
+    protected <T> Optional<? extends EmittingPublisher<T>> getPublisherIfPresent(Class<T> event) {
+        return Optional.ofNullable((EmittingPublisher<T>) getPublishers().getIfPresent(event));
     }
 }

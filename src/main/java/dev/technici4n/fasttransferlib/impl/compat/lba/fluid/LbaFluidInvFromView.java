@@ -18,7 +18,7 @@ import dev.technici4n.fasttransferlib.api.content.Content;
 import dev.technici4n.fasttransferlib.api.context.Context;
 import dev.technici4n.fasttransferlib.api.view.Atom;
 import dev.technici4n.fasttransferlib.api.view.View;
-import dev.technici4n.fasttransferlib.api.view.flow.TransferData;
+import dev.technici4n.fasttransferlib.api.view.event.TransferEvent;
 import dev.technici4n.fasttransferlib.api.view.model.ListModel;
 import dev.technici4n.fasttransferlib.api.view.model.Model;
 import dev.technici4n.fasttransferlib.impl.compat.lba.LbaCompatUtil;
@@ -173,7 +173,7 @@ public class LbaFluidInvFromView
     @Override
     public ListenerToken addListener_F(FluidInvAmountChangeListener_F listener, ListenerRemovalToken removalToken) {
         LbaGroupedFluidListenerToSubscriber subscriber = LbaGroupedFluidListenerToSubscriber.of(this, listener, removalToken);
-        if (getDelegate().getPublisher(TransferData.class)
+        if (getDelegate().getPublisherFor(TransferEvent.class)
                 .filter(publisher -> {
                     publisher.subscribe(subscriber);
                     return true;

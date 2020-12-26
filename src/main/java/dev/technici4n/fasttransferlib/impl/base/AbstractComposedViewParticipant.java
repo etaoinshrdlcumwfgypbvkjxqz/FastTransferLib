@@ -68,13 +68,13 @@ public abstract class AbstractComposedViewParticipant
     }
 
     @Override
-    public Object getRevision() {
-        return getView().getRevision();
+    public Object getRevisionFor(Class<?> event) {
+        return getView().getRevisionFor(event);
     }
 
     @Override
-    public <T> Optional<? extends Publisher<T>> getPublisher(Class<T> discriminator) {
-        return getView().getPublisher(discriminator);
+    public <T> Optional<? extends Publisher<T>> getPublisherFor(Class<T> event) {
+        return getView().getPublisherFor(event);
     }
 
     @Override

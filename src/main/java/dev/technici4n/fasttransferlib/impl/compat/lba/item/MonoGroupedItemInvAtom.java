@@ -10,14 +10,15 @@ import dev.technici4n.fasttransferlib.api.query.Query;
 import dev.technici4n.fasttransferlib.api.query.StoreQuery;
 import dev.technici4n.fasttransferlib.api.query.TransferQuery;
 import dev.technici4n.fasttransferlib.api.transfer.TransferAction;
-import dev.technici4n.fasttransferlib.api.view.flow.TransferData;
+import dev.technici4n.fasttransferlib.api.view.event.NetTransferEvent;
+import dev.technici4n.fasttransferlib.api.view.event.TransferEvent;
 import dev.technici4n.fasttransferlib.impl.base.AbstractMonoCategoryAtom;
 import dev.technici4n.fasttransferlib.impl.compat.lba.LbaCompatUtil;
 import dev.technici4n.fasttransferlib.impl.content.ItemContent;
 import dev.technici4n.fasttransferlib.impl.util.OptionalWeakReference;
 import dev.technici4n.fasttransferlib.impl.util.TriStateUtilities;
+import dev.technici4n.fasttransferlib.impl.view.event.TransferEventImpl;
 import dev.technici4n.fasttransferlib.impl.view.flow.EmittingPublisher;
-import dev.technici4n.fasttransferlib.impl.view.flow.TransferDataImpl;
 import net.fabricmc.fabric.api.util.TriState;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -29,11 +30,12 @@ import java.util.Set;
 
 public class MonoGroupedItemInvAtom
         extends AbstractMonoCategoryAtom<Item> {
-    private static final Set<Class<?>> SUPPORTED_PUSH_NOTIFICATIONS = ImmutableSet.of(TransferData.class);
+    private static final Set<Class<?>> SUPPORTED_PUSH_EVENTS = ImmutableSet.of(TransferEvent.class);
+    private static final Set<Class<?>> SUPPORTED_PULL_EVENTS = ImmutableSet.of(TransferEvent.class, NetTransferEvent.class);
     private final GroupedItemInvView delegate;
     private final Content content;
     private final ItemStack key;
-    private boolean hasListener;
+    private boolean hasTransferListener;
 
     protected MonoGroupedItemInvAtom(GroupedItemInvView delegate, Content content) {
         super(Item.class);
@@ -54,22 +56,23 @@ public class MonoGroupedItemInvAtom
                             if (diff == 0)
                                 return;
 
-                            this1.reviseAndNotify(TransferData.class,
-                                    TransferDataImpl.of(TransferAction.fromDifference(diff > 0), content1, Math.abs(diff)));
+                            this1.revise(NetTransferEvent.class);
+                            this1.reviseAndNotify(TransferEvent.class,
+                                    TransferEventImpl.of(TransferAction.fromDifference(diff > 0), content1, Math.abs(diff)));
                         }),
                 () -> weakThis.getOptional().ifPresent(MonoGroupedItemInvAtom::onListenerRemoved));
 
         if (listenerToken == null) {
-            this.hasListener = false;
+            this.hasTransferListener = false;
         } else {
-            this.hasListener = true;
+            this.hasTransferListener = true;
             Cleaner.create(this, listenerToken::removeListener);
         }
     }
 
     protected void onListenerRemoved() {
-        setHasListener(false);
-        getPublisherIfPresent(TransferData.class).ifPresent(EmittingPublisher::clearSubscribers);
+        setHasTransferListener(false);
+        getPublisherIfPresent(TransferEvent.class).ifPresent(EmittingPublisher::clearSubscribers);
     }
 
     public static MonoGroupedItemInvAtom of(GroupedItemInvView delegate, Content content) {
@@ -115,21 +118,21 @@ public class MonoGroupedItemInvAtom
     }
 
     @Override
-    protected Collection<? extends Class<?>> getSupportedPushNotifications() {
-        return isHasListener() ? SUPPORTED_PUSH_NOTIFICATIONS : ImmutableSet.of();
+    protected Collection<? extends Class<?>> getSupportedPushEvents() {
+        return isHasTransferListener() ? SUPPORTED_PUSH_EVENTS : ImmutableSet.of();
     }
 
     @Override
-    protected boolean supportsPullNotification() {
-        return isHasListener();
+    protected Collection<? extends Class<?>> getSupportedPullEvents() {
+        return isHasTransferListener() ? SUPPORTED_PULL_EVENTS : ImmutableSet.of();
     }
 
-    protected boolean isHasListener() {
-        return hasListener;
+    protected boolean isHasTransferListener() {
+        return hasTransferListener;
     }
 
-    protected void setHasListener(@SuppressWarnings("SameParameterValue") boolean hasListener) {
-        this.hasListener = hasListener;
+    protected void setHasTransferListener(@SuppressWarnings("SameParameterValue") boolean hasTransferListener) {
+        this.hasTransferListener = hasTransferListener;
     }
 
     @Override
