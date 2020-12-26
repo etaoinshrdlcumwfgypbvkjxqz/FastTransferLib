@@ -36,7 +36,7 @@ public class GenericItemStackItemLookupContext
     }
 
     @Override
-    public long getAmount() {
+    public long getQuantity() {
         return isReplaced() ? 0L : getStackGetter().get().getCount();
     }
 
@@ -63,15 +63,15 @@ public class GenericItemStackItemLookupContext
                 return true; // transform nothing to nothing, always succeed
             return getStackAdder().test(context, ContentStackImpl.of(to, toCount)); // one atomic operation for us
         } else {
-            long amount = getAmount();
-            if (amount >= fromCount) {
+            long quantity = getQuantity();
+            if (quantity >= fromCount) {
                 // has enough and not replaced (0L case handled above)
                 assert !isReplaced();
 
                 try (TransactionContext consumeAndAddTransaction = new TransactionContext(3)) {
                     // subtract
                     if (getStackConsumer().test(consumeAndAddTransaction, fromCount)) {
-                        if (amount == fromCount) {
+                        if (quantity == fromCount) {
                             // is a replace operation
                             consumeAndAddTransaction.configure(() -> setReplaced(true), () -> setReplaced(false));
                         }

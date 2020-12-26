@@ -11,34 +11,34 @@ import java.util.function.Function;
 public enum ViewUtilities {
     ;
 
-    public static long insert(View instance, Context context, Content content, long maxAmount) {
-        return insert(instance, context, maxAmount, atom -> content);
+    public static long insert(View instance, Context context, Content content, long maxQuantity) {
+        return insert(instance, context, maxQuantity, atom -> content);
     }
 
-    public static long extract(View instance, Context context, Content content, long maxAmount) {
-        return extract(instance, context, maxAmount, atom -> content);
+    public static long extract(View instance, Context context, Content content, long maxQuantity) {
+        return extract(instance, context, maxQuantity, atom -> content);
     }
 
-    public static long insert(View instance, Context context, long maxAmount, Function<? super Atom, ? extends Content> filter) {
+    public static long insert(View instance, Context context, long maxQuantity, Function<? super Atom, ? extends Content> filter) {
         try (TransactionContext transaction = new TransactionContext(instance.estimateAtomSize())) {
             // need transaction, extract and insert may have unknown side effect
 
             for (Atom instanceAtom : instance) {
-                assert maxAmount >= 0L;
-                if (maxAmount == 0L)
+                assert maxQuantity >= 0L;
+                if (maxQuantity == 0L)
                     break;
                 Content content = filter.apply(instanceAtom);
                 if (content != null)
-                    maxAmount = instanceAtom.insert(transaction, content, maxAmount);
+                    maxQuantity = instanceAtom.insert(transaction, content, maxQuantity);
             }
 
             transaction.commitWith(context); // commit using context
         }
-        return maxAmount;
+        return maxQuantity;
     }
 
-    public static long extract(View instance, Context context, long maxAmount, Function<? super Atom, ? extends Content> filter) {
-        long left = maxAmount;
+    public static long extract(View instance, Context context, long maxQuantity, Function<? super Atom, ? extends Content> filter) {
+        long left = maxQuantity;
         try (TransactionContext transaction = new TransactionContext(instance.estimateAtomSize())) {
             // need transaction, extract and insert may have unknown side effect
 
@@ -53,6 +53,6 @@ public enum ViewUtilities {
 
             transaction.commitWith(context); // commit using context
         }
-        return maxAmount - left;
+        return maxQuantity - left;
     }
 }

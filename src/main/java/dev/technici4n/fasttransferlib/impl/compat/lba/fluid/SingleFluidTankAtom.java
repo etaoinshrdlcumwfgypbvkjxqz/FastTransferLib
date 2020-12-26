@@ -39,8 +39,8 @@ public class SingleFluidTankAtom
         OptionalWeakReference<SingleFluidTankAtom> weakThis = OptionalWeakReference.of(this);
         ListenerToken listenerToken = this.delegate.addListener((inv, tank, previous, current) -> weakThis.getOptional()
                         .ifPresent(this1 -> TransferUtilities.compileToTransferData(
-                                LbaCompatUtil.asFluidContent(previous), LbaCompatUtil.asBigAmount(previous),
-                                LbaCompatUtil.asFluidContent(current), LbaCompatUtil.asBigAmount(current)
+                                LbaCompatUtil.asFluidContent(previous), LbaCompatUtil.asBigQuantity(previous),
+                                LbaCompatUtil.asFluidContent(current), LbaCompatUtil.asBigQuantity(current)
                         ).forEachRemaining(data -> {
                             this1.revise(NetTransferEvent.class);
                             this1.reviseAndNotify(TransferEvent.class, data);
@@ -70,28 +70,28 @@ public class SingleFluidTankAtom
     }
 
     @Override
-    public long getAmount() {
-        return LbaCompatUtil.asAmount(getDelegate().get());
+    public long getQuantity() {
+        return LbaCompatUtil.asQuantity(getDelegate().get());
     }
 
     @Override
     public OptionalLong getCapacity() {
-        return OptionalLong.of(LbaCompatUtil.asAmount(getDelegate().getMaxAmount_F()));
+        return OptionalLong.of(LbaCompatUtil.asQuantity(getDelegate().getMaxAmount_F()));
     }
 
     @Override
-    protected long insertCurrent(Context context, long maxAmount) {
-        return LbaCompatUtil.genericInsertImpl(getDelegate(), context, getContent(), maxAmount);
+    protected long insertCurrent(Context context, long maxQuantity) {
+        return LbaCompatUtil.genericInsertImpl(getDelegate(), context, getContent(), maxQuantity);
     }
 
     @Override
-    protected long insertNew(Context context, Content content, Fluid type, long maxAmount) {
-        return LbaCompatUtil.genericInsertImpl(getDelegate(), context, content, maxAmount);
+    protected long insertNew(Context context, Content content, Fluid type, long maxQuantity) {
+        return LbaCompatUtil.genericInsertImpl(getDelegate(), context, content, maxQuantity);
     }
 
     @Override
-    protected long extractCurrent(Context context, long maxAmount) {
-        return LbaCompatUtil.genericExtractImpl(getDelegate(), context, getContent(), maxAmount);
+    protected long extractCurrent(Context context, long maxQuantity) {
+        return LbaCompatUtil.genericExtractImpl(getDelegate(), context, getContent(), maxQuantity);
     }
 
     protected SingleFluidTankView getDelegate() {

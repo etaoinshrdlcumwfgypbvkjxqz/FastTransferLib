@@ -55,7 +55,7 @@ public class TrEnergyHandlerToAtom
     }
 
     @Override
-    public long getAmount() {
+    public long getQuantity() {
         return NumberUtilities.toSaturatedInteger(getDelegate().getEnergy());
     }
 
@@ -65,7 +65,7 @@ public class TrEnergyHandlerToAtom
     }
 
     @Override
-    protected long insertCurrent(Context context, long maxAmount) {
+    protected long insertCurrent(Context context, long maxQuantity) {
         /* note
         This assumes that insertion can be reverted by a following extraction.
         This seems to be the case for 'EnergyHandler'.
@@ -77,23 +77,23 @@ public class TrEnergyHandlerToAtom
 
         EnergyHandler delegate = getDelegate();
         double current = delegate.getEnergy();
-        double inserted = delegate.insert(maxAmount); // sim
+        double inserted = delegate.insert(maxQuantity); // sim
 
         EnergyStorage delegateStorage = getDelegateAccess().getHolder();
         context.configure(() -> delegateStorage.setStored(current + inserted), () -> delegateStorage.setStored(current));
 
-        return maxAmount - DoubleMath.roundToLong(inserted, RoundingMode.UP);
+        return maxQuantity - DoubleMath.roundToLong(inserted, RoundingMode.UP);
     }
 
     @Override
-    protected long insertNew(Context context, Content content, EnergyType type, long maxAmount) {
+    protected long insertNew(Context context, Content content, EnergyType type, long maxQuantity) {
         if (!content.equals(EnergyContent.of(TrEnergyType.INSTANCE)))
-            return maxAmount;
-        return insertCurrent(context, maxAmount);
+            return maxQuantity;
+        return insertCurrent(context, maxQuantity);
     }
 
     @Override
-    protected long extractCurrent(Context context, long maxAmount) {
+    protected long extractCurrent(Context context, long maxQuantity) {
         /* note
         This assumes that extraction can be reverted by a following insertion.
         This seems to be the case for 'EnergyHandler'.
@@ -105,7 +105,7 @@ public class TrEnergyHandlerToAtom
 
         EnergyHandler delegate = getDelegate();
         double current = delegate.getEnergy();
-        double extracted = delegate.extract(maxAmount); // sim
+        double extracted = delegate.extract(maxQuantity); // sim
 
         EnergyStorage delegateStorage = getDelegateAccess().getHolder();
         context.configure(() -> delegateStorage.setStored(current - extracted), () -> delegateStorage.setStored(current));

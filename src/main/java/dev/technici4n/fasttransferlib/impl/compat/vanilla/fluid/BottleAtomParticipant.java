@@ -52,7 +52,7 @@ public class BottleAtomParticipant
     }
 
     @Override
-    public long getAmount() {
+    public long getQuantity() {
         return getContent().isEmpty() ? 0L : FluidConstants.BOTTLE;
     }
 
@@ -71,27 +71,27 @@ public class BottleAtomParticipant
     }
 
     @Override
-    protected long extractCurrent(Context context, long maxAmount) {
-        if (maxAmount < FluidConstants.BOTTLE
+    protected long extractCurrent(Context context, long maxQuantity) {
+        if (maxQuantity < FluidConstants.BOTTLE
                 || !getLookupContext().transform(context, 1L, ItemContent.of(Items.GLASS_BOTTLE), 1L))
             return 0L;
         return FluidConstants.BOTTLE;
     }
 
     @Override
-    protected long insertCurrent(Context context, long maxAmount) {
+    protected long insertCurrent(Context context, long maxQuantity) {
         // already filled
-        return maxAmount;
+        return maxQuantity;
     }
 
     @Override
-    protected long insertNew(Context context, Content content, Fluid type, long maxAmount) {
-        if (maxAmount < FluidConstants.BOTTLE
+    protected long insertNew(Context context, Content content, Fluid type, long maxQuantity) {
+        if (maxQuantity < FluidConstants.BOTTLE
                 || !getFluidContentAsItemContent(content)
                 .filter(itemContent -> getLookupContext().transform(context, 1L, itemContent, 1L))
                 .isPresent())
-            return maxAmount;
-        return maxAmount - FluidConstants.BOTTLE;
+            return maxQuantity;
+        return maxQuantity - FluidConstants.BOTTLE;
     }
 
     @Override

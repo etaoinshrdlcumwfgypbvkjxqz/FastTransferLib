@@ -33,62 +33,62 @@ public enum LbaCompatUtil {
         return fluidAmount;
     }
 
-    public static long genericInsertImpl(Object object, Context context, Content itemContent, long maxAmount) {
+    public static long genericInsertImpl(Object object, Context context, Content itemContent, long maxQuantity) {
         if (object instanceof ItemTransferable)
-            return insertImpl((ItemTransferable) object, context, itemContent, maxAmount);
+            return insertImpl((ItemTransferable) object, context, itemContent, maxQuantity);
         else if (object instanceof FluidTransferable)
-            return insertImpl((FluidTransferable) object, context, itemContent, maxAmount);
-        return maxAmount;
+            return insertImpl((FluidTransferable) object, context, itemContent, maxQuantity);
+        return maxQuantity;
     }
 
-    public static long genericExtractImpl(Object object, Context context, Content itemContent, long maxAmount) {
+    public static long genericExtractImpl(Object object, Context context, Content itemContent, long maxQuantity) {
         if (object instanceof ItemTransferable)
-            return extractImpl((ItemTransferable) object, context, itemContent, maxAmount);
+            return extractImpl((ItemTransferable) object, context, itemContent, maxQuantity);
         else if (object instanceof FluidTransferable)
-            return extractImpl((FluidTransferable) object, context, itemContent, maxAmount);
+            return extractImpl((FluidTransferable) object, context, itemContent, maxQuantity);
         return 0L;
     }
 
-    public static long insertImpl(ItemTransferable transferable, Context context, Content itemContent, long maxAmount) {
+    public static long insertImpl(ItemTransferable transferable, Context context, Content itemContent, long maxQuantity) {
         /* note
         This assumes that an insertion can always be reverted by an extraction that follows the insertion,
         which may be reasonable for most cases.
         However, if this is violated, things may go wrong.
          */
-        int amount1 = Ints.saturatedCast(maxAmount);
+        int quantity1 = Ints.saturatedCast(maxQuantity);
 
-        ItemStack leftover = transferable.attemptInsertion(ItemContent.asStack(itemContent, amount1), Simulation.SIMULATE);
-        int leftoverAmount = leftover.getCount();
+        ItemStack leftover = transferable.attemptInsertion(ItemContent.asStack(itemContent, quantity1), Simulation.SIMULATE);
+        int leftoverQuantity = leftover.getCount();
 
-        if (amount1 != leftoverAmount) {
-            int insert = amount1 - leftoverAmount;
+        if (quantity1 != leftoverQuantity) {
+            int insert = quantity1 - leftoverQuantity;
             context.configure(() -> transferable.insert(ItemContent.asStack(itemContent, insert)),
                     () -> transferable.extract(ItemContent.asStack(itemContent, insert), insert));
-            return maxAmount - insert;
+            return maxQuantity - insert;
         }
-        return maxAmount;
+        return maxQuantity;
     }
 
-    public static long extractImpl(ItemTransferable transferable, Context context, Content itemContent, long maxAmount) {
+    public static long extractImpl(ItemTransferable transferable, Context context, Content itemContent, long maxQuantity) {
         /* note
         This assumes that an extraction can always be reverted by an insertion that follows the extraction,
         which is reasonable for a tank.
         However, if this is wrong, things may go wrong.
          */
-        int amount1 = Ints.saturatedCast(maxAmount);
+        int quantity1 = Ints.saturatedCast(maxQuantity);
 
-        ItemStack extracted = transferable.attemptExtraction(new ExactItemStackFilter(ItemContent.asStack(itemContent, amount1)), amount1, Simulation.SIMULATE);
-        int extractedAmount = extracted.getCount();
+        ItemStack extracted = transferable.attemptExtraction(new ExactItemStackFilter(ItemContent.asStack(itemContent, quantity1)), quantity1, Simulation.SIMULATE);
+        int extractedQuantity = extracted.getCount();
 
-        if (extractedAmount > 0) {
-            context.configure(() -> transferable.extract(new ExactItemStackFilter(ItemContent.asStack(itemContent, amount1)), extractedAmount),
-                    () -> transferable.insert(ItemContent.asStack(itemContent, amount1)));
-            return extractedAmount;
+        if (extractedQuantity > 0) {
+            context.configure(() -> transferable.extract(new ExactItemStackFilter(ItemContent.asStack(itemContent, quantity1)), extractedQuantity),
+                    () -> transferable.insert(ItemContent.asStack(itemContent, quantity1)));
+            return extractedQuantity;
         }
         return 0L;
     }
 
-    public static long insertImpl(FluidTransferable transferable, Context context, Content fluidContent, long maxAmount) {
+    public static long insertImpl(FluidTransferable transferable, Context context, Content fluidContent, long maxQuantity) {
         /* note
         This assumes that an insertion can always be reverted by an extraction that follows the insertion,
         which is reasonable for a tank.
@@ -96,21 +96,21 @@ public enum LbaCompatUtil {
          */
         FluidKey key = asFluidKey(fluidContent);
         assert key != null;
-        FluidAmount tryAmount = asFluidAmount(maxAmount);
+        FluidAmount tryQuantity = asFluidAmount(maxQuantity);
 
-        FluidVolume leftover = transferable.attemptInsertion(key.withAmount(tryAmount), Simulation.SIMULATE);
-        FluidAmount leftoverAmount = leftover.getAmount_F();
+        FluidVolume leftover = transferable.attemptInsertion(key.withAmount(tryQuantity), Simulation.SIMULATE);
+        FluidAmount leftoverQuantity = leftover.getAmount_F();
 
-        if (!tryAmount.equals(leftoverAmount)) {
-            FluidAmount insert = tryAmount.sub(leftoverAmount);
+        if (!tryQuantity.equals(leftoverQuantity)) {
+            FluidAmount insert = tryQuantity.sub(leftoverQuantity);
             context.configure(() -> transferable.insert(key.withAmount(insert)),
                     () -> transferable.extract(key, insert));
-            return asAmount(insert);
+            return asQuantity(insert);
         }
-        return maxAmount;
+        return maxQuantity;
     }
 
-    public static long extractImpl(FluidTransferable transferable, Context context, Content fluidContent, long maxAmount) {
+    public static long extractImpl(FluidTransferable transferable, Context context, Content fluidContent, long maxQuantity) {
         /* note
         This assumes that an extraction can always be reverted by an insertion that follows the extraction,
         which is reasonable for a tank.
@@ -118,15 +118,15 @@ public enum LbaCompatUtil {
          */
         FluidKey key = asFluidKey(fluidContent);
         assert key != null;
-        FluidAmount tryAmount = asFluidAmount(maxAmount);
+        FluidAmount tryQuantity = asFluidAmount(maxQuantity);
 
-        FluidVolume extracted = transferable.attemptExtraction(ExactFluidFilter.of(key), tryAmount, Simulation.SIMULATE);
-        FluidAmount extractedAmount = extracted.getAmount_F();
+        FluidVolume extracted = transferable.attemptExtraction(ExactFluidFilter.of(key), tryQuantity, Simulation.SIMULATE);
+        FluidAmount extractedQuantity = extracted.getAmount_F();
 
-        if (extractedAmount.isPositive()) {
-            context.configure(() -> transferable.extract(key, extractedAmount),
-                    () -> transferable.insert(key.withAmount(extractedAmount)));
-            return asAmount(extractedAmount);
+        if (extractedQuantity.isPositive()) {
+            context.configure(() -> transferable.extract(key, extractedQuantity),
+                    () -> transferable.insert(key.withAmount(extractedQuantity)));
+            return asQuantity(extractedQuantity);
         }
         return 0L;
     }
@@ -146,28 +146,28 @@ public enum LbaCompatUtil {
         return FluidKeys.get((Fluid) fluidContent.getType());
     }
 
-    public static long asAmount(FluidVolume fluidVolume) {
-        return asAmount(fluidVolume.getAmount_F());
+    public static long asQuantity(FluidVolume fluidVolume) {
+        return asQuantity(fluidVolume.getAmount_F());
     }
 
-    public static long asAmount(FluidAmount fluidAmount) {
+    public static long asQuantity(FluidAmount fluidAmount) {
         return fluidAmount.asLong(FluidConstants.BUCKET, RoundingMode.DOWN);
     }
 
-    public static BigInteger asBigAmount(FluidVolume fluidVolume) {
-        return asBigAmount(fluidVolume.getAmount_F());
+    public static BigInteger asBigQuantity(FluidVolume fluidVolume) {
+        return asBigQuantity(fluidVolume.getAmount_F());
     }
 
-    public static BigInteger asBigAmount(FluidAmount fluidAmount) {
+    public static BigInteger asBigQuantity(FluidAmount fluidAmount) {
         return fluidAmount.bigMul(BUCKET).whole;
     }
 
-    public static FluidAmount asFluidAmount(long amount) {
-        return FluidAmount.of(amount, FluidConstants.BUCKET);
+    public static FluidAmount asFluidAmount(long quantity) {
+        return FluidAmount.of(quantity, FluidConstants.BUCKET);
     }
 
-    public static FluidVolume asFluidVolume(Content fluidContent, long amount) {
-        return asFluidKey(fluidContent).withAmount(asFluidAmount(amount));
+    public static FluidVolume asFluidVolume(Content fluidContent, long quantity) {
+        return asFluidKey(fluidContent).withAmount(asFluidAmount(quantity));
     }
 
     public static StatelessContext asStatelessContext(Simulation simulation) {

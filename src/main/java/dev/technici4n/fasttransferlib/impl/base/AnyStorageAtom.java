@@ -25,7 +25,7 @@ public class AnyStorageAtom
     private static final Set<Class<?>> SUPPORTED_PULL_EVENTS = ImmutableSet.of(TransferEvent.class, NetTransferEvent.class, CapacityChangeEvent.class);
     private Content content = EmptyContent.INSTANCE;
     private final long internalCapacity;
-    private long amount;
+    private long quantity;
 
     public AnyStorageAtom(long capacity) {
         assert capacity >= 0L;
@@ -38,51 +38,51 @@ public class AnyStorageAtom
     }
 
     @Override
-    public long getAmount() {
-        return amount;
+    public long getQuantity() {
+        return quantity;
     }
 
     @Override
-    protected long extractCurrent(Context context, long maxAmount) {
-        long amount = getAmount();
-        long extracted = Math.min(maxAmount, amount);
+    protected long extractCurrent(Context context, long maxQuantity) {
+        long quantity = getQuantity();
+        long extracted = Math.min(maxQuantity, quantity);
         if (extracted == 0L)
             return 0L;
 
         Content content = getContent();
-        context.configure(() -> setAmount(amount - extracted), () -> setAmount(amount));
+        context.configure(() -> setQuantity(quantity - extracted), () -> setQuantity(quantity));
         context.execute(() -> reviseAndNotify(TransferEvent.class, TransferEventImpl.ofExtraction(content, extracted)));
         return extracted;
     }
 
     @Override
-    protected long insertCurrent(Context context, long maxAmount) {
-        long amount = getAmount();
-        long inserted = Math.min(maxAmount, getInternalCapacity() - amount);
+    protected long insertCurrent(Context context, long maxQuantity) {
+        long quantity = getQuantity();
+        long inserted = Math.min(maxQuantity, getInternalCapacity() - quantity);
         if (inserted == 0L)
-            return maxAmount;
+            return maxQuantity;
 
         Content content = getContent();
-        context.configure(() -> setAmount(amount + inserted), () -> setAmount(amount));
+        context.configure(() -> setQuantity(quantity + inserted), () -> setQuantity(quantity));
         context.execute(() -> {
             revise(NetTransferEvent.class);
             reviseAndNotify(TransferEvent.class, TransferEventImpl.ofInsertion(content, inserted));
         });
-        return maxAmount - inserted;
+        return maxQuantity - inserted;
     }
 
     @Override
-    protected long insertNew(Context context, Content content, long maxAmount) {
-        long inserted = Math.min(maxAmount, getInternalCapacity());
+    protected long insertNew(Context context, Content content, long maxQuantity) {
+        long inserted = Math.min(maxQuantity, getInternalCapacity());
         if (inserted == 0L)
-            return maxAmount;
+            return maxQuantity;
 
         context.configure(() -> {
             setContent(content);
-            setAmount(inserted);
-        }, () -> setAmount(0L));
+            setQuantity(inserted);
+        }, () -> setQuantity(0L));
         context.execute(() -> reviseAndNotify(TransferEvent.class, TransferEventImpl.ofInsertion(content, inserted)));
-        return maxAmount - inserted;
+        return maxQuantity - inserted;
     }
 
     protected long getInternalCapacity() {
@@ -98,10 +98,10 @@ public class AnyStorageAtom
         this.content = content;
     }
 
-    protected void setAmount(long amount) {
-        assert amount >= 0L;
-        assert amount <= getInternalCapacity();
-        if ((this.amount = amount) == 0L)
+    protected void setQuantity(long quantity) {
+        assert quantity >= 0L;
+        assert quantity <= getInternalCapacity();
+        if ((this.quantity = quantity) == 0L)
             setContent(EmptyContent.INSTANCE);
         else assert !getContent().isEmpty();
     }
@@ -109,13 +109,13 @@ public class AnyStorageAtom
     public CompoundTag toTag() {
         CompoundTag result = new CompoundTag();
         result.put("content", ContentApi.serialize(getContent()));
-        result.putLong("amount", getAmount());
+        result.putLong("quantity", getQuantity());
         return result;
     }
 
     public void fromTag(CompoundTag tag) {
         setContent(ContentApi.deserialize(tag.getCompound("content")));
-        setAmount(tag.getLong("amount"));
+        setQuantity(tag.getLong("quantity"));
     }
 
     @Override

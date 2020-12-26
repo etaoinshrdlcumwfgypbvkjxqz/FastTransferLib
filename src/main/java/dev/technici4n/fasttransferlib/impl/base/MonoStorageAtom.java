@@ -37,8 +37,8 @@ public class MonoStorageAtom<T>
     }
 
     @Override
-    public long getAmount() {
-        return getDelegate().getAmount();
+    public long getQuantity() {
+        return getDelegate().getQuantity();
     }
 
     @Override
@@ -47,21 +47,21 @@ public class MonoStorageAtom<T>
     }
 
     @Override
-    protected long extractCurrent(Context context, long maxAmount) {
+    protected long extractCurrent(Context context, long maxQuantity) {
         // already filtered
-        return getDelegate().extractCurrent(context, maxAmount);
+        return getDelegate().extractCurrent(context, maxQuantity);
     }
 
     @Override
-    protected long insertCurrent(Context context, long maxAmount) {
+    protected long insertCurrent(Context context, long maxQuantity) {
         // already filtered
-        return getDelegate().insertCurrent(context, maxAmount);
+        return getDelegate().insertCurrent(context, maxQuantity);
     }
 
     @Override
-    protected long insertNew(Context context, Content content, T type, long maxAmount) {
+    protected long insertNew(Context context, Content content, T type, long maxQuantity) {
         // already filtered
-        return getDelegate().insertNew(context, content, maxAmount);
+        return getDelegate().insertNew(context, content, maxQuantity);
     }
 
     @Override

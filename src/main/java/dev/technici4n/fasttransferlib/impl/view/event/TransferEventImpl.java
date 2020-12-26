@@ -8,24 +8,24 @@ public final class TransferEventImpl
         implements TransferEvent {
     private final TransferAction action;
     private final Content content;
-    private final long amount;
+    private final long quantity;
 
-    private TransferEventImpl(TransferAction action, Content content, long amount) {
+    private TransferEventImpl(TransferAction action, Content content, long quantity) {
         this.action = action;
         this.content = content;
-        this.amount = amount;
+        this.quantity = quantity;
     }
 
-    public static TransferEventImpl of(TransferAction action, Content content, long amount) {
-        return new TransferEventImpl(action, content, amount);
+    public static TransferEventImpl of(TransferAction action, Content content, long quantity) {
+        return new TransferEventImpl(action, content, quantity);
     }
 
-    public static TransferEventImpl ofInsertion(Content content, long amount) {
-        return of(TransferAction.INSERT, content, amount);
+    public static TransferEventImpl ofInsertion(Content content, long quantity) {
+        return of(TransferAction.INSERT, content, quantity);
     }
 
-    public static TransferEventImpl ofExtraction(Content content, long amount) {
-        return of(TransferAction.EXTRACT, content, amount);
+    public static TransferEventImpl ofExtraction(Content content, long quantity) {
+        return of(TransferAction.EXTRACT, content, quantity);
     }
 
     @Override
@@ -39,7 +39,7 @@ public final class TransferEventImpl
     }
 
     @Override
-    public long getAmount() {
-        return amount;
+    public long getQuantity() {
+        return quantity;
     }
 }

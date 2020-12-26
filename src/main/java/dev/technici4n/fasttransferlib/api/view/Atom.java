@@ -19,7 +19,7 @@ public interface Atom
         extends View, Participant, Model {
     Content getContent();
 
-    long getAmount();
+    long getQuantity();
 
     OptionalLong getCapacity();
 
@@ -39,15 +39,15 @@ public interface Atom
     }
 
     @Override
-    default long getAmount(Content content) {
+    default long getQuantity(Content content) {
         if (getContent().equals(content))
-            return getAmount();
+            return getQuantity();
         return 0L;
     }
 
     @Override
-    default Object2LongMap<Content> getAmounts() {
-        return Object2LongMaps.unmodifiable(new Object2LongOpenHashMap<>(ImmutableMap.of(getContent(), getAmount())));
+    default Object2LongMap<Content> getQuantitys() {
+        return Object2LongMaps.unmodifiable(new Object2LongOpenHashMap<>(ImmutableMap.of(getContent(), getQuantity())));
     }
 
     @Override
@@ -62,6 +62,6 @@ public interface Atom
 
     static boolean isEmpty(Atom instance) {
         // do NOT use #getContent to test emptiness
-        return instance.getAmount() == 0L;
+        return instance.getQuantity() == 0L;
     }
 }

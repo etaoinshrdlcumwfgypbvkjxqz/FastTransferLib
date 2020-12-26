@@ -6,7 +6,7 @@ import dev.technici4n.fasttransferlib.api.query.Queryable;
 
 public interface Participant
         extends Queryable {
-    long insert(Context context, Content content, long maxAmount);
+    long insert(Context context, Content content, long maxQuantity);
 
-    long extract(Context context, Content content, long maxAmount);
+    long extract(Context context, Content content, long maxQuantity);
 }

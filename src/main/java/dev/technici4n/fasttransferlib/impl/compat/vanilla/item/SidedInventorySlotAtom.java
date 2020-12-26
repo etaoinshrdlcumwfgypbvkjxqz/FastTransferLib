@@ -41,7 +41,7 @@ public class SidedInventorySlotAtom
     }
 
     @Override
-    public long getAmount() {
+    public long getQuantity() {
         return getInventory().getStack(getSlot()).getCount();
     }
 
@@ -84,7 +84,7 @@ public class SidedInventorySlotAtom
     }
 
     @Override
-    protected long extractCurrent(Context context, long maxAmount) {
+    protected long extractCurrent(Context context, long maxQuantity) {
         SidedInventory inventory = getInventory();
         int slot = getSlot();
         ItemStack stack = inventory.getStack(slot);
@@ -92,48 +92,48 @@ public class SidedInventorySlotAtom
 
         if (inventory.canExtract(slot, stack, getDirection())) {
             // stack is not empty, item matches, can extract
-            int amount = Math.toIntExact(Math.min(maxAmount, stack.getCount())); // COMMENT should be in int range, negative excluded
-            context.configure(() -> stack.decrement(amount), () -> stack.increment(amount));
+            int quantity = Math.toIntExact(Math.min(maxQuantity, stack.getCount())); // COMMENT should be in int range, negative excluded
+            context.configure(() -> stack.decrement(quantity), () -> stack.increment(quantity));
             context.execute(inventory::markDirty);
-            return amount;
+            return quantity;
         }
 
         return 0L;
     }
 
     @Override
-    protected long insertCurrent(Context context, long maxAmount) {
+    protected long insertCurrent(Context context, long maxQuantity) {
         SidedInventory inventory = getInventory();
         int slot = getSlot();
         ItemStack stack = inventory.getStack(slot);
 
         int maxCount = Math.min(stack.getMaxCount(), inventory.getMaxCountPerStack());
 
-        int amount = Math.toIntExact(Math.min(maxAmount, maxCount - stack.getCount()));
-        context.configure(() -> stack.increment(amount), () -> stack.decrement(amount));
+        int quantity = Math.toIntExact(Math.min(maxQuantity, maxCount - stack.getCount()));
+        context.configure(() -> stack.increment(quantity), () -> stack.decrement(quantity));
         context.execute(inventory::markDirty);
 
-        return maxAmount - amount;
+        return maxQuantity - quantity;
     }
 
     @Override
-    protected long insertNew(Context context, Content content, Item type, long maxAmount) {
+    protected long insertNew(Context context, Content content, Item type, long maxQuantity) {
         SidedInventory inventory = getInventory();
         int slot = getSlot();
         ItemStack stack = inventory.getStack(slot);
 
         int maxCount = Math.min(type.getMaxCount(), inventory.getMaxCountPerStack());
 
-        int amount = Math.toIntExact(Math.min(maxAmount, maxCount));
-        ItemStack nextStack = ItemContent.asStack(content, amount);
+        int quantity = Math.toIntExact(Math.min(maxQuantity, maxCount));
+        ItemStack nextStack = ItemContent.asStack(content, quantity);
         if (inventory.canInsert(slot, nextStack, getDirection())) {
-            nextStack.setCount(amount);
+            nextStack.setCount(quantity);
             context.configure(() -> inventory.setStack(slot, nextStack), () -> inventory.setStack(slot, stack));
             context.execute(inventory::markDirty);
         } else
-            amount = 0;
+            quantity = 0;
 
-        return maxAmount - amount;
+        return maxQuantity - quantity;
     }
 
     @Override

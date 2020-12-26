@@ -47,13 +47,13 @@ public class LbaItemInvFromView
     }
 
     @Override
-    public ItemStack attemptExtraction(ItemFilter itemFilter, int maxAmount, Simulation simulation) {
+    public ItemStack attemptExtraction(ItemFilter itemFilter, int maxQuantity, Simulation simulation) {
         Context context = LbaCompatUtil.asStatelessContext(simulation);
 
         Content[] contentLock = {null};
         long extracted = ViewUtilities.extract(getDelegate(),
                 context,
-                maxAmount,
+                maxQuantity,
                 atom -> {
                     Content content = atom.getContent();
                     if (content.isEmpty() || content.getCategory() != Item.class)
@@ -113,8 +113,8 @@ public class LbaItemInvFromView
         List<? extends Atom> filtered = Streams.stream(getDelegate())
                 .filter(atom -> filter.matches(ItemContent.asStack(atom.getContent(), 1)))
                 .collect(ImmutableList.toImmutableList());
-        long amount = filtered.stream()
-                .mapToLong(Atom::getAmount)
+        long quantity = filtered.stream()
+                .mapToLong(Atom::getQuantity)
                 .sum();
         OptionalLong spaceTotal = filtered.stream()
                 .map(Atom::getCapacity)
@@ -122,8 +122,8 @@ public class LbaItemInvFromView
                 .mapToLong(OptionalLong::getAsLong)
                 .reduce(Long::sum);
         return new ItemInvStatistic(filter,
-                Ints.saturatedCast(amount),
-                Ints.saturatedCast(spaceTotal.orElse(amount) - amount),
+                Ints.saturatedCast(quantity),
+                Ints.saturatedCast(spaceTotal.orElse(quantity) - quantity),
                 spaceTotal.isPresent() ? Ints.saturatedCast(spaceTotal.getAsLong()) : -1);
     }
 
@@ -142,7 +142,7 @@ public class LbaItemInvFromView
                 .orElseThrow(AssertionError::new)
                 .getAtomList()
                 .get(slot);
-        return ItemContent.asStack(atom.getContent(), Ints.saturatedCast(atom.getAmount()));
+        return ItemContent.asStack(atom.getContent(), Ints.saturatedCast(atom.getQuantity()));
     }
 
     @Override

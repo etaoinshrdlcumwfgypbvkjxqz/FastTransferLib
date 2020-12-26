@@ -15,9 +15,9 @@ public interface View
 
     long estimateAtomSize();
 
-    long getAmount(Content content);
+    long getQuantity(Content content);
 
-    Object2LongMap<Content> getAmounts();
+    Object2LongMap<Content> getQuantitys();
 
     Set<Content> getContents();
 

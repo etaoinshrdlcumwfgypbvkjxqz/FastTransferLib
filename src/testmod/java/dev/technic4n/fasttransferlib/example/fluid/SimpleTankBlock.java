@@ -47,14 +47,14 @@ public class SimpleTankBlock extends Block implements BlockEntityProvider {
 					Content content = atom.getContent();
 					return content.getCategory() == Fluid.class ? content : null;
 				});
-				view.getAmounts().forEach((content, amount) -> {
+				view.getQuantitys().forEach((content, quantity) -> {
 					player.sendMessage(
 							new LiteralText(String.format("Tank Now At %s millibuckets of %s",
-									FluidTextUtilities.getUnicodeMillibuckets(amount, true), content)),
+									FluidTextUtilities.getUnicodeMillibuckets(quantity, true), content)),
 							false);
 					player.sendMessage(
 							new LiteralText(String.format("Tank Now At %s millibuckets of %s",
-									FluidTextUtilities.getUnicodeMillibuckets(amount, false), content)),
+									FluidTextUtilities.getUnicodeMillibuckets(quantity, false), content)),
 							false);
 				});
 			}

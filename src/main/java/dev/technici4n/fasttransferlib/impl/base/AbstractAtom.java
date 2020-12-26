@@ -9,22 +9,22 @@ public abstract class AbstractAtom
         extends AbstractView
         implements Atom {
     @Override
-    public final long insert(Context context, Content content, long maxAmount) {
+    public final long insert(Context context, Content content, long maxQuantity) {
         if (content.isEmpty())
-            return maxAmount;
+            return maxQuantity;
 
         Content atomContent = getContent();
 
         if (atomContent.isEmpty())
-            return insertNew(context, content, maxAmount);
+            return insertNew(context, content, maxQuantity);
         if (atomContent.equals(content))
-            return insertCurrent(context, maxAmount);
+            return insertCurrent(context, maxQuantity);
 
-        return maxAmount;
+        return maxQuantity;
     }
 
     @Override
-    public final long extract(Context context, Content content, long maxAmount) {
+    public final long extract(Context context, Content content, long maxQuantity) {
         if (content.isEmpty())
             return 0L;
 
@@ -33,14 +33,14 @@ public abstract class AbstractAtom
         if (atomContent.isEmpty())
             return 0L;
         if (atomContent.equals(content))
-            return extractCurrent(context, maxAmount);
+            return extractCurrent(context, maxQuantity);
 
         return 0L;
     }
 
-    protected abstract long extractCurrent(Context context, long maxAmount);
+    protected abstract long extractCurrent(Context context, long maxQuantity);
 
-    protected abstract long insertCurrent(Context context, long maxAmount);
+    protected abstract long insertCurrent(Context context, long maxQuantity);
 
-    protected abstract long insertNew(Context context, Content content, long maxAmount);
+    protected abstract long insertNew(Context context, Content content, long maxQuantity);
 }

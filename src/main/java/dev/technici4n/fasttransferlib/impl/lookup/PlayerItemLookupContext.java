@@ -19,20 +19,20 @@ public enum PlayerItemLookupContext {
                                                                                          Function<? super P, ? extends ItemStack> targetStackGetter,
                                                                                          BiConsumer<? super P, ? super ItemStack> targetStackSetter) {
         return GenericItemStackItemLookupContext.of(() -> targetStackGetter.apply(player),
-                (context, amount) -> {
+                (context, quantity) -> {
                     ItemStack targetStack = targetStackGetter.apply(player);
-                    if (targetStack.getCount() < amount)
+                    if (targetStack.getCount() < quantity)
                         return false;
-                    int amount1 = Math.toIntExact(amount); // should be within int range
-                    context.configure(() -> targetStack.decrement(amount1), () -> targetStack.increment(amount1));
+                    int quantity1 = Math.toIntExact(quantity); // should be within int range
+                    context.configure(() -> targetStack.decrement(quantity1), () -> targetStack.increment(quantity1));
                     return true;
                 },
                 (context, stack) -> {
-                    long amount = stack.getAmount();
-                    int amount1 = Math.toIntExact(amount);
-                    if (amount == amount1) {
+                    long quantity = stack.getQuantity();
+                    int quantity1 = Math.toIntExact(quantity);
+                    if (quantity == quantity1) {
                         ItemStack targetStack = targetStackGetter.apply(player);
-                        ItemStack stack1 = ItemContent.asStack(stack.getContent(), amount1);
+                        ItemStack stack1 = ItemContent.asStack(stack.getContent(), quantity1);
                         int maxCount = Math.min(stack1.getMaxCount(), player.inventory.getMaxCountPerStack());
 
                         // check target stack first
@@ -87,9 +87,9 @@ public enum PlayerItemLookupContext {
                     droppedEntityReference[0] = player.dropItem(stack, false);
                 break;
             } else {
-                int previousAmount = stack.getCount();
+                int previousQuantity = stack.getCount();
                 if (inventory.insertStack(slot, stack)) {
-                    int inserted = previousAmount - stack.getCount();
+                    int inserted = previousQuantity - stack.getCount();
                     insertionMap.put(slot, inserted);
                 }
             }

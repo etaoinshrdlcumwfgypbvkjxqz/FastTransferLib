@@ -43,14 +43,14 @@ public class CauldronAtomParticipant
     }
 
     @Override
-    protected long extractCurrent(Context context, long maxAmount) {
+    protected long extractCurrent(Context context, long maxQuantity) {
         WorldAccess world = getWorld();
         BlockPos position = getPosition();
         BlockState blockState = world.getBlockState(position);
 
         if (blockState.isOf(Blocks.CAULDRON)) {
             int level = blockState.get(CauldronBlock.LEVEL);
-            int extracted = Math.toIntExact(Math.min(level, maxAmount / FluidConstants.BOTTLE)); // should be within int range
+            int extracted = Math.toIntExact(Math.min(level, maxQuantity / FluidConstants.BOTTLE)); // should be within int range
             int resultLevel = level - extracted;
 
             setLevel(context, world, position, blockState, resultLevel);
@@ -62,29 +62,29 @@ public class CauldronAtomParticipant
     }
 
     @Override
-    protected long insertCurrent(Context context, long maxAmount) {
+    protected long insertCurrent(Context context, long maxQuantity) {
         WorldAccess world = getWorld();
         BlockPos position = getPosition();
         BlockState blockState = world.getBlockState(position);
 
         if (blockState.isOf(Blocks.CAULDRON)) {
             int level = blockState.get(CauldronBlock.LEVEL);
-            int inserted = Math.toIntExact(Math.min(maxAmount / FluidConstants.BOTTLE, 3 - level)); // should be within int range
+            int inserted = Math.toIntExact(Math.min(maxQuantity / FluidConstants.BOTTLE, 3 - level)); // should be within int range
             int resultLevel = level + inserted;
 
             setLevel(context, world, position, blockState, resultLevel);
 
-            return maxAmount - inserted * FluidConstants.BOTTLE;
+            return maxQuantity - inserted * FluidConstants.BOTTLE;
         }
 
-        return maxAmount;
+        return maxQuantity;
     }
 
     @Override
-    protected long insertNew(Context context, Content content, Fluid type, long maxAmount) {
+    protected long insertNew(Context context, Content content, Fluid type, long maxQuantity) {
         if (type != Fluids.WATER)
-            return maxAmount;
-        return insertCurrent(context, maxAmount);
+            return maxQuantity;
+        return insertCurrent(context, maxQuantity);
     }
 
     protected static void setLevel(Context context, WorldAccess world, BlockPos position, BlockState state, int level) {
@@ -113,7 +113,7 @@ public class CauldronAtomParticipant
     }
 
     @Override
-    public long getAmount() {
+    public long getQuantity() {
         BlockState blockState = getWorld().getBlockState(getPosition());
         if (blockState.isOf(Blocks.CAULDRON))
             return FluidConstants.BOTTLE * blockState.get(CauldronBlock.LEVEL);
@@ -139,7 +139,7 @@ public class CauldronAtomParticipant
     @Override
     public Object getRevisionFor(Class<?> event) {
         if (event == NetTransferEvent.class)
-            return getAmount();
+            return getQuantity();
         return super.getRevisionFor(event);
     }
 

@@ -6,15 +6,15 @@ import dev.technici4n.fasttransferlib.api.content.ContentStack;
 public final class ContentStackImpl
         implements ContentStack {
     private final Content content;
-    private final long amount;
+    private final long quantity;
 
-    private ContentStackImpl(Content content, long amount) {
+    private ContentStackImpl(Content content, long quantity) {
         this.content = content;
-        this.amount = amount;
+        this.quantity = quantity;
     }
 
-    public static ContentStackImpl of(Content content, long amount) {
-        return new ContentStackImpl(content, amount);
+    public static ContentStackImpl of(Content content, long quantity) {
+        return new ContentStackImpl(content, quantity);
     }
 
     @Override
@@ -23,7 +23,7 @@ public final class ContentStackImpl
     }
 
     @Override
-    public long getAmount() {
-        return amount;
+    public long getQuantity() {
+        return quantity;
     }
 }

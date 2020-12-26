@@ -50,7 +50,7 @@ public enum TransferUtilities {
                                     if (leftover == 0L) {
                                         atomTransaction.commitWith(transaction);
                                         result += actualExtract; // potential overflow, how to handle
-                                        if (fromAtom.getAmount() > 0L)
+                                        if (fromAtom.getQuantity() > 0L)
                                             continue; // might be more to extract
                                     }
                                 }
@@ -70,9 +70,9 @@ public enum TransferUtilities {
             return 0L;
         long result = 0L;
         try (TransactionContext transaction = new TransactionContext(2L)) {
-            for (long amount = atom.getAmount(); amount != 0L; amount = atom.getAmount()) {
-                assert amount > 0L;
-                long extracted = atom.extract(transaction, atom.getContent(), amount);
+            for (long quantity = atom.getQuantity(); quantity != 0L; quantity = atom.getQuantity()) {
+                assert quantity > 0L;
+                long extracted = atom.extract(transaction, atom.getContent(), quantity);
                 if (extracted == 0L)
                     break;
                 result += extracted;
@@ -83,47 +83,47 @@ public enum TransferUtilities {
     }
 
     @SuppressWarnings("UnstableApiUsage")
-    public static Iterator<TransferEvent> compileToTransferData(Content from, BigInteger fromAmount, Content to, BigInteger toAmount) {
-        if (from.isEmpty()) fromAmount = BigInteger.ZERO;
-        if (to.isEmpty()) toAmount = BigInteger.ZERO;
+    public static Iterator<TransferEvent> compileToTransferData(Content from, BigInteger fromQuantity, Content to, BigInteger toQuantity) {
+        if (from.isEmpty()) fromQuantity = BigInteger.ZERO;
+        if (to.isEmpty()) toQuantity = BigInteger.ZERO;
 
         if (from.equals(to)) {
             // insert/extract
             TransferAction action;
-            int comparison = toAmount.compareTo(fromAmount);
+            int comparison = toQuantity.compareTo(fromQuantity);
             if (comparison == 0) return Stream.<TransferEvent>empty().iterator(); // no delta
             else action = TransferAction.fromDifference(comparison > 0);
 
-            BigInteger diff = toAmount.subtract(fromAmount);
+            BigInteger diff = toQuantity.subtract(fromQuantity);
 
             return BigIntegerAsLongIterator.ofStream(diff.abs())
-                    .<TransferEvent>mapToObj(toAmount1 -> TransferEventImpl.of(action, from, toAmount1))
+                    .<TransferEvent>mapToObj(toQuantity1 -> TransferEventImpl.of(action, from, toQuantity1))
                     .iterator();
         } else {
             // extract and insert
             return Streams.concat(
-                    BigIntegerAsLongIterator.ofStream(fromAmount)
-                            .<TransferEvent>mapToObj(toAmount1 -> TransferEventImpl.ofExtraction(from, toAmount1)),
-                    BigIntegerAsLongIterator.ofStream(toAmount)
-                            .<TransferEvent>mapToObj(toAmount1 -> TransferEventImpl.ofInsertion(from, toAmount1))
+                    BigIntegerAsLongIterator.ofStream(fromQuantity)
+                            .<TransferEvent>mapToObj(toQuantity1 -> TransferEventImpl.ofExtraction(from, toQuantity1)),
+                    BigIntegerAsLongIterator.ofStream(toQuantity)
+                            .<TransferEvent>mapToObj(toQuantity1 -> TransferEventImpl.ofInsertion(from, toQuantity1))
             ).iterator();
         }
     }
 
-    public static boolean setAtomContent(Context context, Atom atom, Content content, BigInteger amount) {
-        if (content.isEmpty()) amount = BigInteger.ZERO;
+    public static boolean setAtomContent(Context context, Atom atom, Content content, BigInteger quantity) {
+        if (content.isEmpty()) quantity = BigInteger.ZERO;
 
         if (content.equals(atom.getContent())) {
             // insert/extract
-            BigInteger atomAmount = BigInteger.valueOf(atom.getAmount());
+            BigInteger atomQuantity = BigInteger.valueOf(atom.getQuantity());
 
             boolean extract;
-            int comparison = atomAmount.compareTo(amount);
+            int comparison = atomQuantity.compareTo(quantity);
             if (comparison > 0) extract = true;
             else if (comparison < 0) extract = false;
             else return true;
 
-            BigInteger diff = atomAmount.subtract(amount);
+            BigInteger diff = atomQuantity.subtract(quantity);
 
             try (TransactionContext transaction = new TransactionContext(1L)) {
                 if (BigIntegerAsLongIterator.ofStream(diff.abs())
@@ -141,8 +141,8 @@ public enum TransferUtilities {
             try (TransactionContext transaction = new TransactionContext(2L)) {
                 TransferUtilities.extractAll(transaction, atom);
                 if (Atom.isEmpty(atom)
-                        && BigIntegerAsLongIterator.ofStream(amount)
-                        .map(amount1 -> atom.insert(transaction, content, amount1))
+                        && BigIntegerAsLongIterator.ofStream(quantity)
+                        .map(quantity1 -> atom.insert(transaction, content, quantity1))
                         .allMatch(leftover -> leftover == 0L)) {
                     transaction.commitWith(context);
                     return true;

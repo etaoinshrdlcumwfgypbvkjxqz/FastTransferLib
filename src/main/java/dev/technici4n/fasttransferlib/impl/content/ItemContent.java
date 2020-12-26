@@ -40,10 +40,10 @@ public final class ItemContent
         return stack.isEmpty() ? EmptyContent.INSTANCE : of(stack.getItem(), stack.getTag());
     }
 
-    public static ItemStack asStack(Content content, int amount) {
+    public static ItemStack asStack(Content content, int quantity) {
         if (content.getCategory() != Item.class)
             throw new IllegalArgumentException();
-        ItemStack result = new ItemStack((Item) content.getType(), amount);
+        ItemStack result = new ItemStack((Item) content.getType(), quantity);
         result.setTag((CompoundTag) content.getData());
         return result;
     }

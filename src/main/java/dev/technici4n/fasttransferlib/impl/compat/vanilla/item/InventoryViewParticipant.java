@@ -102,7 +102,7 @@ public class InventoryViewParticipant
 		}
 
 		@Override
-		protected long getAmount(Content content, Item type) {
+		protected long getQuantity(Content content, Item type) {
 			Inventory delegate = getDelegate();
 			return IntStream.range(0, delegate.size())
 					.mapToObj(delegate::getStack)
@@ -112,7 +112,7 @@ public class InventoryViewParticipant
 		}
 
 		@Override
-		public Object2LongMap<Content> getAmounts() {
+		public Object2LongMap<Content> getQuantitys() {
 			Inventory delegate = getDelegate();
 			int size = delegate.size();
 			return Object2LongMaps.unmodifiable(
@@ -120,7 +120,7 @@ public class InventoryViewParticipant
 							.mapToObj(delegate::getStack)
 							.collect(() -> new Object2LongOpenHashMap<>(size),
 									(container, value) -> container.mergeLong(ItemContent.of(value), value.getCount(), Long::sum),
-									ViewImplUtilities.getAmountMapsMerger())
+									ViewImplUtilities.getQuantityMapsMerger())
 			);
 		}
 
@@ -167,13 +167,13 @@ public class InventoryViewParticipant
 		}
 
 		@Override
-		protected long insertMono(Context context, Content content, Item type, long maxAmount) {
+		protected long insertMono(Context context, Content content, Item type, long maxQuantity) {
 			Inventory delegate = getDelegate();
 			int size = delegate.size();
 
 			int maxCount = Math.min(delegate.getMaxCountPerStack(), type.getMaxCount());
 			Object2IntMap<ItemStack> incrementalActions = new Object2IntOpenCustomHashMap<>(
-					Math.min(size, Ints.saturatedCast(maxAmount / maxCount)),
+					Math.min(size, Ints.saturatedCast(maxQuantity / maxCount)),
 					Util.identityHashStrategy()
 			);
 
@@ -182,41 +182,41 @@ public class InventoryViewParticipant
 				int slot = index;
 				ItemStack stack = delegate.getStack(slot);
 
-				int amount;
+				int quantity;
 				if (stack.isEmpty())  {
-					amount = Math.toIntExact(Math.min(maxAmount, maxCount));
+					quantity = Math.toIntExact(Math.min(maxQuantity, maxCount));
 					context.configure(
-							() -> delegate.setStack(slot, ItemContent.asStack(content, amount)),
+							() -> delegate.setStack(slot, ItemContent.asStack(content, quantity)),
 							() -> delegate.setStack(slot, stack)
 					);
 				} else if (content.equals(ItemContent.of(stack))) {
-					amount = Math.toIntExact(Math.min(maxAmount, maxCount - stack.getCount()));
-					incrementalActions.put(stack, amount);
+					quantity = Math.toIntExact(Math.min(maxQuantity, maxCount - stack.getCount()));
+					incrementalActions.put(stack, quantity);
 				} else
-					amount = 0;
+					quantity = 0;
 
-				maxAmount -= amount;
-				assert maxAmount >= 0L;
-				if (maxAmount == 0L)
+				maxQuantity -= quantity;
+				assert maxQuantity >= 0L;
+				if (maxQuantity == 0L)
 					break;
 			}
 
 			context.configure(() -> incrementalActions.forEach(ItemStack::increment), () -> incrementalActions.forEach(ItemStack::decrement));
 			context.execute(delegate::markDirty);
 
-			return maxAmount;
+			return maxQuantity;
 		}
 
 		@Override
-		protected long extractMono(Context context, Content content, Item type, long maxAmount) {
-			long leftoverAmount = maxAmount;
+		protected long extractMono(Context context, Content content, Item type, long maxQuantity) {
+			long leftoverQuantity = maxQuantity;
 
 			Inventory delegate = getDelegate();
 			int size = delegate.size();
 
 			int maxCount = Math.min(delegate.getMaxCountPerStack(), type.getMaxCount());
 			Object2IntMap<ItemStack> incrementalActions = new Object2IntOpenCustomHashMap<>(
-					Math.min(size, Ints.saturatedCast(maxAmount / maxCount)),
+					Math.min(size, Ints.saturatedCast(maxQuantity / maxCount)),
 					Util.identityHashStrategy()
 			);
 
@@ -224,11 +224,11 @@ public class InventoryViewParticipant
 				ItemStack stack = delegate.getStack(index);
 				if (!stack.isEmpty() && content.equals(ItemContent.of(stack))) {
 					// stack is not empty, item matches, can extract
-					int amount = Math.toIntExact(Math.min(leftoverAmount, stack.getCount())); // COMMENT should be in int range, negative excluded
-					incrementalActions.put(stack, amount);
-					leftoverAmount -= amount;
-					assert leftoverAmount >= 0L;
-					if (leftoverAmount == 0L)
+					int quantity = Math.toIntExact(Math.min(leftoverQuantity, stack.getCount())); // COMMENT should be in int range, negative excluded
+					incrementalActions.put(stack, quantity);
+					leftoverQuantity -= quantity;
+					assert leftoverQuantity >= 0L;
+					if (leftoverQuantity == 0L)
 						break;
 				}
 			}
@@ -236,7 +236,7 @@ public class InventoryViewParticipant
 			context.configure(() -> incrementalActions.forEach(ItemStack::decrement), () -> incrementalActions.forEach(ItemStack::increment));
 			context.execute(delegate::markDirty);
 
-			return maxAmount - leftoverAmount;
+			return maxQuantity - leftoverQuantity;
 		}
 
 		@Override

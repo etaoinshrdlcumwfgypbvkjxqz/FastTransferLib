@@ -18,14 +18,14 @@ public abstract class AbstractMonoCategoryView<T>
     }
 
     @Override
-    public final long getAmount(Content content) {
+    public final long getQuantity(Content content) {
         Class<T> category = getCategory();
         if (content.getCategory() == category)
-            return getAmount(content, category.cast(content.getType()));
+            return getQuantity(content, category.cast(content.getType()));
         return 0L;
     }
 
-    protected abstract long getAmount(Content content, T type);
+    protected abstract long getQuantity(Content content, T type);
 
     @Override
     public TriState query(Query query) {

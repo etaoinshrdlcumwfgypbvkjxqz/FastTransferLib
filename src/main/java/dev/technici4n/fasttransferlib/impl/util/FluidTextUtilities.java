@@ -38,7 +38,7 @@ public enum FluidTextUtilities {
     }
 
     /**
-     * Convert a non negative fluid amount in droplets to a unicode string representing the amount in millibuckets.
+     * Convert a non negative fluid quantity in droplets to a unicode string representing the quantity in millibuckets.
      * For example, passing 163 will result in <pre>2 ¹⁄₈₁</pre>.
      */
     public static String getUnicodeMillibuckets(long droplets, boolean simplify) {

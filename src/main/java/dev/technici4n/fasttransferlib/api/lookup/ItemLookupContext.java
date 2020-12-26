@@ -5,13 +5,13 @@ import dev.technici4n.fasttransferlib.api.context.Context;
 import net.minecraft.nbt.CompoundTag;
 
 public interface ItemLookupContext {
-    long getAmount();
+    long getQuantity();
 
     CompoundTag getData();
 
     boolean transform(Context context, long fromCount, Content to, long toCount);
 
     static boolean isInvalid(ItemLookupContext instance) {
-        return instance.getAmount() == 0L;
+        return instance.getQuantity() == 0L;
     }
 }

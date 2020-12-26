@@ -93,7 +93,7 @@ public class MonoGroupedItemInvAtom
     }
 
     @Override
-    public long getAmount() {
+    public long getQuantity() {
         return getDelegate().getAmount(getKey());
     }
 
@@ -103,18 +103,18 @@ public class MonoGroupedItemInvAtom
     }
 
     @Override
-    protected long extractCurrent(Context context, long maxAmount) {
-        return LbaCompatUtil.genericExtractImpl(getDelegate(), context, getContent(), maxAmount);
+    protected long extractCurrent(Context context, long maxQuantity) {
+        return LbaCompatUtil.genericExtractImpl(getDelegate(), context, getContent(), maxQuantity);
     }
 
     @Override
-    protected long insertCurrent(Context context, long maxAmount) {
-        return LbaCompatUtil.genericInsertImpl(getDelegate(), context, getContent(), maxAmount);
+    protected long insertCurrent(Context context, long maxQuantity) {
+        return LbaCompatUtil.genericInsertImpl(getDelegate(), context, getContent(), maxQuantity);
     }
 
     @Override
-    protected long insertNew(Context context, Content content, Item type, long maxAmount) {
-        return maxAmount; // reject, only this content
+    protected long insertNew(Context context, Content content, Item type, long maxQuantity) {
+        return maxQuantity; // reject, only this content
     }
 
     @Override

@@ -23,13 +23,13 @@ public abstract class AbstractComposedViewParticipant
     protected abstract Participant getParticipant();
 
     @Override
-    public long insert(Context context, Content content, long maxAmount) {
-        return getParticipant().insert(context, content, maxAmount);
+    public long insert(Context context, Content content, long maxQuantity) {
+        return getParticipant().insert(context, content, maxQuantity);
     }
 
     @Override
-    public long extract(Context context, Content content, long maxAmount) {
-        return getParticipant().extract(context, content, maxAmount);
+    public long extract(Context context, Content content, long maxQuantity) {
+        return getParticipant().extract(context, content, maxQuantity);
     }
 
     @Override
@@ -48,13 +48,13 @@ public abstract class AbstractComposedViewParticipant
     }
 
     @Override
-    public long getAmount(Content content) {
-        return getView().getAmount(content);
+    public long getQuantity(Content content) {
+        return getView().getQuantity(content);
     }
 
     @Override
-    public Object2LongMap<Content> getAmounts() {
-        return getView().getAmounts();
+    public Object2LongMap<Content> getQuantitys() {
+        return getView().getQuantitys();
     }
 
     @Override

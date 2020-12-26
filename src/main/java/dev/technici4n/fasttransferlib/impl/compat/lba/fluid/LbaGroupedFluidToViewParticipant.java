@@ -99,7 +99,7 @@ public class LbaGroupedFluidToViewParticipant
                                     return;
 
                                 TransferAction action = TransferAction.fromDifference(diff.isPositive());
-                                TransferUtilities.BigIntegerAsLongIterator.ofStream(LbaCompatUtil.asBigAmount(LbaCompatUtil.abs(diff)))
+                                TransferUtilities.BigIntegerAsLongIterator.ofStream(LbaCompatUtil.asBigQuantity(LbaCompatUtil.abs(diff)))
                                         .mapToObj(diff1 -> TransferEventImpl.of(action, content1, diff1))
                                         .forEach(data -> {
                                             this1.revise(NetTransferEvent.class);
@@ -127,15 +127,15 @@ public class LbaGroupedFluidToViewParticipant
         }
 
         @Override
-        protected long getAmount(Content content, Fluid type) {
+        protected long getQuantity(Content content, Fluid type) {
             // must be fluid key
-            return LbaCompatUtil.asAmount(getDelegate().getAmount_F(LbaCompatUtil.asFluidKey(content)));
+            return LbaCompatUtil.asQuantity(getDelegate().getAmount_F(LbaCompatUtil.asFluidKey(content)));
         }
 
         @Override
-        public Object2LongMap<Content> getAmounts() {
+        public Object2LongMap<Content> getQuantitys() {
             return Object2LongMaps.unmodifiable(
-                    new Object2LongOpenHashMap<>(Maps.toMap(getContents(), this::getAmount))
+                    new Object2LongOpenHashMap<>(Maps.toMap(getContents(), this::getQuantity))
             );
         }
 
@@ -197,13 +197,13 @@ public class LbaGroupedFluidToViewParticipant
         }
 
         @Override
-        protected long insertMono(Context context, Content content, Fluid type, long maxAmount) {
-            return LbaCompatUtil.genericInsertImpl(getDelegate(), context, content, maxAmount);
+        protected long insertMono(Context context, Content content, Fluid type, long maxQuantity) {
+            return LbaCompatUtil.genericInsertImpl(getDelegate(), context, content, maxQuantity);
         }
 
         @Override
-        protected long extractMono(Context context, Content content, Fluid type, long maxAmount) {
-            return LbaCompatUtil.genericExtractImpl(getDelegate(), context, content, maxAmount);
+        protected long extractMono(Context context, Content content, Fluid type, long maxQuantity) {
+            return LbaCompatUtil.genericExtractImpl(getDelegate(), context, content, maxQuantity);
         }
 
         @Override

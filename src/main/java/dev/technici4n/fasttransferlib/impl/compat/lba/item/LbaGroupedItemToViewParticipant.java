@@ -128,14 +128,14 @@ public class LbaGroupedItemToViewParticipant
         }
 
         @Override
-        protected long getAmount(Content content, Item type) {
+        protected long getQuantity(Content content, Item type) {
             return getDelegate().getAmount(ItemContent.asStack(content, 1));
         }
 
         @Override
-        public Object2LongMap<Content> getAmounts() {
+        public Object2LongMap<Content> getQuantitys() {
             return Object2LongMaps.unmodifiable(
-                    new Object2LongOpenHashMap<>(Maps.toMap(getContents(), this::getAmount))
+                    new Object2LongOpenHashMap<>(Maps.toMap(getContents(), this::getQuantity))
             );
         }
 
@@ -192,13 +192,13 @@ public class LbaGroupedItemToViewParticipant
         }
 
         @Override
-        protected long insertMono(Context context, Content content, Item type, long maxAmount) {
-            return LbaCompatUtil.genericInsertImpl(getDelegate(), context, content, maxAmount);
+        protected long insertMono(Context context, Content content, Item type, long maxQuantity) {
+            return LbaCompatUtil.genericInsertImpl(getDelegate(), context, content, maxQuantity);
         }
 
         @Override
-        protected long extractMono(Context context, Content content, Item type, long maxAmount) {
-            return LbaCompatUtil.genericExtractImpl(getDelegate(), context, content, maxAmount);
+        protected long extractMono(Context context, Content content, Item type, long maxQuantity) {
+            return LbaCompatUtil.genericExtractImpl(getDelegate(), context, content, maxQuantity);
         }
 
         @Override

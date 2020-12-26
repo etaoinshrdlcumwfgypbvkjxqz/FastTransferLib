@@ -47,22 +47,22 @@ public class BucketAtomParticipant
     }
 
     @Override
-    protected long insertNew(Context context, Content content, Fluid type, long maxAmount) {
-        if (maxAmount < FluidConstants.BUCKET
+    protected long insertNew(Context context, Content content, Fluid type, long maxQuantity) {
+        if (maxQuantity < FluidConstants.BUCKET
                 || !getLookupContext().transform(context, 1L, ItemContent.of(type.getBucketItem()), 1L))
-            return maxAmount;
-        return maxAmount - FluidConstants.BUCKET;
+            return maxQuantity;
+        return maxQuantity - FluidConstants.BUCKET;
     }
 
     @Override
-    protected long insertCurrent(Context context, long maxAmount) {
+    protected long insertCurrent(Context context, long maxQuantity) {
         // already filled
-        return maxAmount;
+        return maxQuantity;
     }
 
     @Override
-    protected long extractCurrent(Context context, long maxAmount) {
-        if (maxAmount < FluidConstants.BUCKET
+    protected long extractCurrent(Context context, long maxQuantity) {
+        if (maxQuantity < FluidConstants.BUCKET
                 || !getLookupContext().transform(context, 1L, ItemContent.of(Items.BUCKET), 1L))
             return 0L;
         return FluidConstants.BUCKET;
@@ -82,7 +82,7 @@ public class BucketAtomParticipant
     }
 
     @Override
-    public long getAmount() {
+    public long getQuantity() {
         return getContent().isEmpty() ? 0L : FluidConstants.BUCKET;
     }
 

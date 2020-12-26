@@ -8,5 +8,5 @@ public interface TransferEvent {
 
     Content getContent();
 
-    long getAmount();
+    long getQuantity();
 }

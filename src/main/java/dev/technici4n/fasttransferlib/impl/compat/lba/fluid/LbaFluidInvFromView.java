@@ -50,7 +50,7 @@ public class LbaFluidInvFromView
     public FluidVolume attemptInsertion(FluidVolume fluid, Simulation simulation) {
         Context context = LbaCompatUtil.asStatelessContext(simulation);
 
-        long insert = LbaCompatUtil.asAmount(fluid);
+        long insert = LbaCompatUtil.asQuantity(fluid);
         long leftover = ViewUtilities.insert(getDelegate(),
                 context,
                 LbaCompatUtil.asFluidContent(fluid),
@@ -61,13 +61,13 @@ public class LbaFluidInvFromView
     }
 
     @Override
-    public FluidVolume attemptExtraction(FluidFilter filter, FluidAmount maxAmount, Simulation simulation) {
+    public FluidVolume attemptExtraction(FluidFilter filter, FluidAmount maxQuantity, Simulation simulation) {
         Context context = LbaCompatUtil.asStatelessContext(simulation);
 
         Content[] contentLock = {null};
         long extracted = ViewUtilities.extract(getDelegate(),
                 context,
-                LbaCompatUtil.asAmount(maxAmount),
+                LbaCompatUtil.asQuantity(maxQuantity),
                 atom -> {
                     Content content = atom.getContent();
                     if (content.isEmpty() || content.getCategory() != Fluid.class)
@@ -100,8 +100,8 @@ public class LbaFluidInvFromView
         List<? extends Atom> filtered = Streams.stream(getDelegate())
                 .filter(atom -> filter.matches(LbaCompatUtil.asFluidKey(atom.getContent())))
                 .collect(ImmutableList.toImmutableList());
-        long amount = filtered.stream()
-                .mapToLong(Atom::getAmount)
+        long quantity = filtered.stream()
+                .mapToLong(Atom::getQuantity)
                 .sum();
         OptionalLong spaceTotal = filtered.stream()
                 .map(Atom::getCapacity)
@@ -109,8 +109,8 @@ public class LbaFluidInvFromView
                 .mapToLong(OptionalLong::getAsLong)
                 .reduce(Long::sum);
         return new FluidInvStatistic(filter,
-                LbaCompatUtil.asFluidAmount(amount),
-                LbaCompatUtil.asFluidAmount(spaceTotal.orElse(amount) - amount),
+                LbaCompatUtil.asFluidAmount(quantity),
+                LbaCompatUtil.asFluidAmount(spaceTotal.orElse(quantity) - quantity),
                 spaceTotal.isPresent() ? LbaCompatUtil.asFluidAmount(spaceTotal.getAsLong()) : FluidAmount.NEGATIVE_ONE);
     }
 
@@ -131,7 +131,7 @@ public class LbaFluidInvFromView
                 .get(tank);
         return LbaCompatUtil.asFluidVolume(
                 atom.getContent(),
-                atom.getAmount()
+                atom.getQuantity()
         );
     }
 
@@ -155,7 +155,7 @@ public class LbaFluidInvFromView
                         .getAtomList()
                         .get(tank),
                 LbaCompatUtil.asFluidContent(to),
-                LbaCompatUtil.asBigAmount(to));
+                LbaCompatUtil.asBigQuantity(to));
     }
 
     protected static Optional<? extends ListModel> getDelegateListModel(LbaFluidInvFromView instance) {

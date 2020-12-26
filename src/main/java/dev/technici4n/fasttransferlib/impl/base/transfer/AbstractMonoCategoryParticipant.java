@@ -15,24 +15,24 @@ public abstract class AbstractMonoCategoryParticipant<T>
     }
 
     @Override
-    public final long insertNonEmpty(Context context, Content content, long maxAmount) {
+    public final long insertNonEmpty(Context context, Content content, long maxQuantity) {
         Class<T> category = getCategory();
         if (content.getCategory() == category)
-            return insertMono(context, content, category.cast(content.getType()), maxAmount);
-        return maxAmount;
+            return insertMono(context, content, category.cast(content.getType()), maxQuantity);
+        return maxQuantity;
     }
 
     @Override
-    public final long extractNonEmpty(Context context, Content content, long maxAmount) {
+    public final long extractNonEmpty(Context context, Content content, long maxQuantity) {
         Class<T> category = getCategory();
         if (content.getCategory() == category)
-            return extractMono(context, content, category.cast(content.getType()), maxAmount);
+            return extractMono(context, content, category.cast(content.getType()), maxQuantity);
         return 0L;
     }
 
-    protected abstract long insertMono(Context context, Content content, T type, long maxAmount);
+    protected abstract long insertMono(Context context, Content content, T type, long maxQuantity);
 
-    protected abstract long extractMono(Context context, Content content, T type, long maxAmount);
+    protected abstract long extractMono(Context context, Content content, T type, long maxQuantity);
 
     protected Class<T> getCategory() {
         return category;

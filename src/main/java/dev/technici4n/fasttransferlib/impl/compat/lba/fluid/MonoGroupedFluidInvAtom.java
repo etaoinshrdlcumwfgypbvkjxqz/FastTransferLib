@@ -59,7 +59,7 @@ public class MonoGroupedFluidInvAtom
                                 return;
 
                             TransferAction action = TransferAction.fromDifference(diff.isPositive());
-                            TransferUtilities.BigIntegerAsLongIterator.ofStream(LbaCompatUtil.asBigAmount(LbaCompatUtil.abs(diff)))
+                            TransferUtilities.BigIntegerAsLongIterator.ofStream(LbaCompatUtil.asBigQuantity(LbaCompatUtil.abs(diff)))
                                     .mapToObj(diff1 -> TransferEventImpl.of(action, content1, diff1))
                                     .forEach(data -> {
                                         this1.revise(NetTransferEvent.class);
@@ -99,28 +99,28 @@ public class MonoGroupedFluidInvAtom
     }
 
     @Override
-    public long getAmount() {
-        return LbaCompatUtil.asAmount(getDelegate().getAmount_F(getKey()));
+    public long getQuantity() {
+        return LbaCompatUtil.asQuantity(getDelegate().getAmount_F(getKey()));
     }
 
     @Override
     public OptionalLong getCapacity() {
-        return OptionalLong.of(LbaCompatUtil.asAmount(getDelegate().getCapacity_F(getKey())));
+        return OptionalLong.of(LbaCompatUtil.asQuantity(getDelegate().getCapacity_F(getKey())));
     }
 
     @Override
-    protected long insertCurrent(Context context, long maxAmount) {
-        return LbaCompatUtil.genericInsertImpl(getDelegate(), context, getContent(), maxAmount);
+    protected long insertCurrent(Context context, long maxQuantity) {
+        return LbaCompatUtil.genericInsertImpl(getDelegate(), context, getContent(), maxQuantity);
     }
 
     @Override
-    protected long insertNew(Context context, Content content, Fluid type, long maxAmount) {
-        return maxAmount; // reject
+    protected long insertNew(Context context, Content content, Fluid type, long maxQuantity) {
+        return maxQuantity; // reject
     }
 
     @Override
-    protected long extractCurrent(Context context, long maxAmount) {
-        return LbaCompatUtil.genericExtractImpl(getDelegate(), context, getContent(), maxAmount);
+    protected long extractCurrent(Context context, long maxQuantity) {
+        return LbaCompatUtil.genericExtractImpl(getDelegate(), context, getContent(), maxQuantity);
     }
 
     @Override
