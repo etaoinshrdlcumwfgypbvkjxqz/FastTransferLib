@@ -84,7 +84,7 @@ public class MonoGroupedFluidInvAtom
 
     @Override
     public Content getContent() {
-        return content;
+        return content; // locked
     }
 
     @Override

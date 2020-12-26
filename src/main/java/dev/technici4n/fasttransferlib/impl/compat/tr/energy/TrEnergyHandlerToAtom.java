@@ -5,12 +5,17 @@ import com.google.common.math.DoubleMath;
 import dev.technici4n.fasttransferlib.api.content.Content;
 import dev.technici4n.fasttransferlib.api.content.EnergyType;
 import dev.technici4n.fasttransferlib.api.context.Context;
+import dev.technici4n.fasttransferlib.api.query.ContentQuery;
+import dev.technici4n.fasttransferlib.api.query.Query;
+import dev.technici4n.fasttransferlib.api.query.StoreQuery;
+import dev.technici4n.fasttransferlib.api.query.TransferQuery;
 import dev.technici4n.fasttransferlib.api.view.View;
 import dev.technici4n.fasttransferlib.impl.base.AbstractMonoCategoryAtom;
-import dev.technici4n.fasttransferlib.impl.content.EmptyContent;
 import dev.technici4n.fasttransferlib.impl.content.EnergyContent;
 import dev.technici4n.fasttransferlib.impl.mixin.EnergyHandlerAccess;
 import dev.technici4n.fasttransferlib.impl.util.NumberUtilities;
+import dev.technici4n.fasttransferlib.impl.util.TriStateUtilities;
+import net.fabricmc.fabric.api.util.TriState;
 import team.reborn.energy.EnergyHandler;
 import team.reborn.energy.EnergyStorage;
 
@@ -43,7 +48,7 @@ public class TrEnergyHandlerToAtom
 
     @Override
     public Content getContent() {
-        return getAmount() == 0L ? EmptyContent.INSTANCE : EnergyContent.of(TrEnergyType.INSTANCE);
+        return EnergyContent.of(TrEnergyType.INSTANCE); // locked
     }
 
     @Override

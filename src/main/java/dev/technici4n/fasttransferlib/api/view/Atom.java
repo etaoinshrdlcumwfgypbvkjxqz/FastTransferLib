@@ -60,8 +60,7 @@ public interface Atom
     }
 
     static boolean isEmpty(Atom instance) {
-        boolean contentEmpty = instance.getContent().isEmpty();
-        assert contentEmpty == (instance.getAmount() == 0L);
-        return contentEmpty;
+        // do NOT use #getContent to test emptiness
+        return instance.getAmount() == 0L;
     }
 }

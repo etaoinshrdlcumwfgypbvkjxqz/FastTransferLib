@@ -80,7 +80,7 @@ public class MonoGroupedItemInvAtom
 
     @Override
     public Content getContent() {
-        return content;
+        return content; // locked
     }
 
     @Override

@@ -99,7 +99,7 @@ public class CauldronAtomParticipant
 
     @Override
     public Content getContent() {
-        return getAmount() == 0L ? EmptyContent.INSTANCE : FluidContent.of(Fluids.WATER);
+        return FluidContent.of(Fluids.WATER); // locked to water
     }
 
     @Override
