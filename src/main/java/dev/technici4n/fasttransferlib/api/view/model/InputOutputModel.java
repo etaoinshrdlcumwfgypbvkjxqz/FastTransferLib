@@ -4,9 +4,9 @@ import dev.technici4n.fasttransferlib.api.view.View;
 
 public interface InputOutputModel
         extends Model {
-    View getInput();
+    View getInputView();
 
-    View getOutput();
+    View getOutputView();
 
-    View getProcess();
+    View getProcessView();
 }
