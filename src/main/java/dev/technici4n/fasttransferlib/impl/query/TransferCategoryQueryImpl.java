@@ -4,7 +4,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Maps;
-import dev.technici4n.fasttransferlib.api.query.TransferCategoryQuery;
+import dev.technici4n.fasttransferlib.api.query.CategoryQuery;
 import dev.technici4n.fasttransferlib.api.transfer.TransferAction;
 
 import java.util.Arrays;
@@ -12,7 +12,7 @@ import java.util.Map;
 
 public class TransferCategoryQueryImpl
         extends TransferQueryImpl
-        implements TransferCategoryQuery {
+        implements CategoryQuery {
     @SuppressWarnings("UnstableApiUsage")
     private static final Map<TransferAction, LoadingCache<Class<?>, TransferCategoryQueryImpl>> CACHE = Maps.immutableEnumMap(
             Maps.toMap(Arrays.asList(TransferAction.values()),

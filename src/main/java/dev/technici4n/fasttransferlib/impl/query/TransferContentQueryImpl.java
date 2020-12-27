@@ -1,12 +1,12 @@
 package dev.technici4n.fasttransferlib.impl.query;
 
 import dev.technici4n.fasttransferlib.api.content.Content;
-import dev.technici4n.fasttransferlib.api.query.TransferContentQuery;
+import dev.technici4n.fasttransferlib.api.query.ContentQuery;
 import dev.technici4n.fasttransferlib.api.transfer.TransferAction;
 
 public class TransferContentQueryImpl
         extends TransferCategoryQueryImpl
-        implements TransferContentQuery {
+        implements ContentQuery {
     private final Content content;
 
     protected TransferContentQueryImpl(TransferAction action, Content content) {
