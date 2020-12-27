@@ -10,7 +10,7 @@ import java.util.List;
 
 public class TransactionContext
         implements Context {
-    private final Deque<Runnable> rollbackActions;
+    private final Deque<Runnable> reactions;
     private final List<Runnable> commitActions;
     private boolean committed = false;
 
@@ -18,14 +18,14 @@ public class TransactionContext
         // estimating number of actions is fruitless because implementations may add multiple actions
         // todo array deque or linked list
         int estimatedActions1 = Ints.saturatedCast(estimatedActions);
-        this.rollbackActions = new ArrayDeque<>(estimatedActions1);
+        this.reactions = new ArrayDeque<>(estimatedActions1);
         this.commitActions = new ArrayList<>(estimatedActions1);
     }
 
     @Override
-    public void configure(Runnable action, Runnable rollback) {
+    public void configure(Runnable action, Runnable reaction) {
         action.run();
-        getRollbackActions().push(rollback);
+        getReactions().push(reaction);
     }
 
     @Override
@@ -51,7 +51,7 @@ public class TransactionContext
 
     public void rollback() {
         // first is head
-        getRollbackActions().forEach(Runnable::run);
+        getReactions().forEach(Runnable::run);
     }
 
     protected void execute() {
@@ -70,8 +70,8 @@ public class TransactionContext
         this.committed = committed;
     }
 
-    protected Deque<Runnable> getRollbackActions() {
-        return rollbackActions;
+    protected Deque<Runnable> getReactions() {
+        return reactions;
     }
 
     protected List<Runnable> getCommitActions() {

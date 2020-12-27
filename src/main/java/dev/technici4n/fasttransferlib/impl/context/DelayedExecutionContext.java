@@ -18,13 +18,13 @@ public class DelayedExecutionContext
     }
 
     @Override
-    public void configure(Runnable action, Runnable rollback) {
+    public void configure(Runnable action, Runnable reaction) {
         getActions().add(action);
     }
 
     @Override
     public void execute(Runnable action) {
-
+        getActions().add(action);
     }
 
     @Override

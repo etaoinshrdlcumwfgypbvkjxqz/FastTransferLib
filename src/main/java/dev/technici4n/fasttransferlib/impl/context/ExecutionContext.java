@@ -11,7 +11,7 @@ public class ExecutionContext
     }
 
     @Override
-    public void configure(Runnable action, Runnable rollback) {
+    public void configure(Runnable action, Runnable reaction) {
         action.run();
     }
 
