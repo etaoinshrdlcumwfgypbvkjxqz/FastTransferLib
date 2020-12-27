@@ -132,7 +132,7 @@ public class SidedInventoryViewParticipant
 		}
 
 		@Override
-		public Object2LongMap<Content> getQuantitys() {
+		public Object2LongMap<Content> getQuantities() {
 			int[] slots = getSlots();
 			return Object2LongMaps.unmodifiable(
 					Arrays.stream(slots)

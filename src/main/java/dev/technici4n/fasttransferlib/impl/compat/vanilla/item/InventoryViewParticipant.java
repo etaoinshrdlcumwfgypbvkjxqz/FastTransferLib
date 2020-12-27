@@ -114,7 +114,7 @@ public class InventoryViewParticipant
 		}
 
 		@Override
-		public Object2LongMap<Content> getQuantitys() {
+		public Object2LongMap<Content> getQuantities() {
 			Inventory delegate = getDelegate();
 			int size = delegate.size();
 			return Object2LongMaps.unmodifiable(

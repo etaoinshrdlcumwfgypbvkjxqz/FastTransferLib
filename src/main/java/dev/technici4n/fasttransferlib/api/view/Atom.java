@@ -46,7 +46,7 @@ public interface Atom
     }
 
     @Override
-    default Object2LongMap<Content> getQuantitys() {
+    default Object2LongMap<Content> getQuantities() {
         return Object2LongMaps.unmodifiable(new Object2LongOpenHashMap<>(ImmutableMap.of(getContent(), getQuantity())));
     }
 

@@ -55,8 +55,8 @@ public abstract class AbstractComposedViewParticipant
     }
 
     @Override
-    public Object2LongMap<Content> getQuantitys() {
-        return getView().getQuantitys();
+    public Object2LongMap<Content> getQuantities() {
+        return getView().getQuantities();
     }
 
     @Override

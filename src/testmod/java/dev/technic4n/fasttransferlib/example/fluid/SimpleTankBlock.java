@@ -47,7 +47,7 @@ public class SimpleTankBlock extends Block implements BlockEntityProvider {
 					Content content = atom.getContent();
 					return content.getCategory() == Fluid.class ? content : null;
 				});
-				view.getQuantitys().forEach((content, quantity) -> {
+				view.getQuantities().forEach((content, quantity) -> {
 					player.sendMessage(
 							new LiteralText(String.format("Tank Now At %s millibuckets of %s",
 									FluidTextUtilities.getUnicodeMillibuckets(quantity, true), content)),

@@ -19,7 +19,7 @@ public interface View
 
     long getQuantity(Content content);
 
-    Object2LongMap<Content> getQuantitys();
+    Object2LongMap<Content> getQuantities();
 
     Set<Content> getContents();
 

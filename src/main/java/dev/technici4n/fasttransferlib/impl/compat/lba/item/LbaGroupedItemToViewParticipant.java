@@ -135,7 +135,7 @@ public class LbaGroupedItemToViewParticipant
         }
 
         @Override
-        public Object2LongMap<Content> getQuantitys() {
+        public Object2LongMap<Content> getQuantities() {
             return Object2LongMaps.unmodifiable(
                     new Object2LongOpenHashMap<>(Maps.toMap(getContents(), this::getQuantity))
             );
