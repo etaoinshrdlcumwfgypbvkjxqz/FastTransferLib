@@ -9,8 +9,10 @@ import dev.technici4n.fasttransferlib.api.query.ContentQuery;
 import dev.technici4n.fasttransferlib.api.query.Query;
 import dev.technici4n.fasttransferlib.api.query.StoreQuery;
 import dev.technici4n.fasttransferlib.api.query.TransferQuery;
-import dev.technici4n.fasttransferlib.api.view.event.NetTransferEvent;
+import dev.technici4n.fasttransferlib.api.view.event.PullEvent;
+import dev.technici4n.fasttransferlib.api.view.event.PushEvent;
 import dev.technici4n.fasttransferlib.api.view.event.TransferEvent;
+import dev.technici4n.fasttransferlib.api.view.event.TransferNetEvent;
 import dev.technici4n.fasttransferlib.impl.base.AbstractMonoCategoryAtom;
 import dev.technici4n.fasttransferlib.impl.compat.lba.LbaCompatUtil;
 import dev.technici4n.fasttransferlib.impl.util.OptionalWeakReference;
@@ -27,8 +29,8 @@ import java.util.Set;
 
 public class SingleFluidTankAtom
         extends AbstractMonoCategoryAtom<Fluid> {
-    private static final Set<Class<?>> SUPPORTED_PUSH_EVENTS = ImmutableSet.of(TransferEvent.class);
-    private static final Set<Class<?>> SUPPORTED_PULL_EVENTS = ImmutableSet.of(TransferEvent.class, NetTransferEvent.class);
+    private static final Set<Class<? extends PushEvent>> SUPPORTED_PUSH_EVENTS = ImmutableSet.of(TransferEvent.class);
+    private static final Set<Class<? extends PullEvent>> SUPPORTED_PULL_EVENTS = ImmutableSet.of(TransferEvent.class, TransferNetEvent.class);
     private final SingleFluidTankView delegate;
     private boolean hasTransferListener;
 
@@ -42,7 +44,7 @@ public class SingleFluidTankAtom
                                 LbaCompatUtil.asFluidContent(previous), LbaCompatUtil.asBigQuantity(previous),
                                 LbaCompatUtil.asFluidContent(current), LbaCompatUtil.asBigQuantity(current)
                         ).forEachRemaining(data -> {
-                            this1.revise(NetTransferEvent.class);
+                            this1.revise(TransferNetEvent.class);
                             this1.reviseAndNotify(TransferEvent.class, data);
                         })),
                 () -> weakThis.getOptional().ifPresent(SingleFluidTankAtom::onListenerRemoved));
@@ -99,12 +101,12 @@ public class SingleFluidTankAtom
     }
 
     @Override
-    protected Collection<? extends Class<?>> getSupportedPushEvents() {
+    protected Collection<? extends Class<? extends PushEvent>> getSupportedPushEvents() {
         return isHasTransferListener() ? SUPPORTED_PUSH_EVENTS : ImmutableSet.of();
     }
 
     @Override
-    protected Collection<? extends Class<?>> getSupportedPullEvents() {
+    protected Collection<? extends Class<? extends PullEvent>> getSupportedPullEvents() {
         return isHasTransferListener() ? SUPPORTED_PULL_EVENTS : ImmutableSet.of();
     }
 

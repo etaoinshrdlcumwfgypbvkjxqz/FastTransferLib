@@ -8,8 +8,7 @@ import dev.technici4n.fasttransferlib.api.lookup.ItemLookupContext;
 import dev.technici4n.fasttransferlib.api.query.Query;
 import dev.technici4n.fasttransferlib.api.query.StoreQuery;
 import dev.technici4n.fasttransferlib.api.query.TransferQuery;
-import dev.technici4n.fasttransferlib.api.view.event.CapacityChangeEvent;
-import dev.technici4n.fasttransferlib.api.view.event.NetTransferEvent;
+import dev.technici4n.fasttransferlib.api.view.event.*;
 import dev.technici4n.fasttransferlib.impl.base.AbstractMonoCategoryAtom;
 import dev.technici4n.fasttransferlib.impl.content.FluidContent;
 import dev.technici4n.fasttransferlib.impl.content.ItemContent;
@@ -29,8 +28,8 @@ import java.util.Set;
 
 public class BucketAtomParticipant
         extends AbstractMonoCategoryAtom<Fluid> {
-    private static final Set<Class<?>> SUPPORTED_PUSH_EVENTS = ImmutableSet.of(CapacityChangeEvent.class);
-    private static final Set<Class<?>> SUPPORTED_PULL_EVENTS = ImmutableSet.of(NetTransferEvent.class, CapacityChangeEvent.class);
+    private static final Set<Class<? extends PushEvent>> SUPPORTED_PUSH_EVENTS = ImmutableSet.of(CapacityChangeEvent.class);
+    private static final Set<Class<? extends PullEvent>> SUPPORTED_PULL_EVENTS = ImmutableSet.of(TransferNetEvent.class, CapacityChangeEvent.class, CapacityChangeNetEvent.class);
     private final ItemConvertible item;
     private final ItemLookupContext lookupContext;
 
@@ -92,19 +91,19 @@ public class BucketAtomParticipant
     }
 
     @Override
-    protected Collection<? extends Class<?>> getSupportedPushEvents() {
+    protected Collection<? extends Class<? extends PushEvent>> getSupportedPushEvents() {
         // capacity is fixed, supports effectively
         return SUPPORTED_PUSH_EVENTS; // item context
     }
 
     @Override
-    protected Collection<? extends Class<?>> getSupportedPullEvents() {
+    protected Collection<? extends Class<? extends PullEvent>> getSupportedPullEvents() {
         return SUPPORTED_PULL_EVENTS; // item context
     }
 
     @Override
-    public Object getRevisionFor(Class<?> event) {
-        if (event == NetTransferEvent.class)
+    public Object getRevisionFor(Class<? extends PullEvent> event) {
+        if (event == TransferNetEvent.class)
             return getContent(); // net change requires net content change
         return super.getRevisionFor(event);
     }

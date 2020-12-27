@@ -2,6 +2,8 @@ package dev.technici4n.fasttransferlib.api.view;
 
 import dev.technici4n.fasttransferlib.api.content.Content;
 import dev.technici4n.fasttransferlib.api.query.Queryable;
+import dev.technici4n.fasttransferlib.api.view.event.PullEvent;
+import dev.technici4n.fasttransferlib.api.view.event.PushEvent;
 import dev.technici4n.fasttransferlib.api.view.flow.Publisher;
 import dev.technici4n.fasttransferlib.api.view.model.Model;
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
@@ -23,7 +25,7 @@ public interface View
 
     Model getDirectModel();
 
-    Object getRevisionFor(Class<?> event);
+    Object getRevisionFor(Class<? extends PullEvent> event);
 
-    <T> Optional<? extends Publisher<T>> getPublisherFor(Class<T> event);
+    <T extends PushEvent> Optional<? extends Publisher<T>> getPublisherFor(Class<T> event);
 }

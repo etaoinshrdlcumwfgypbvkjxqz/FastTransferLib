@@ -3,6 +3,8 @@ package dev.technici4n.fasttransferlib.impl.base;
 import dev.technici4n.fasttransferlib.api.content.Content;
 import dev.technici4n.fasttransferlib.api.context.Context;
 import dev.technici4n.fasttransferlib.api.query.Query;
+import dev.technici4n.fasttransferlib.api.view.event.PullEvent;
+import dev.technici4n.fasttransferlib.api.view.event.PushEvent;
 import dev.technici4n.fasttransferlib.impl.util.TriStateUtilities;
 import net.fabricmc.fabric.api.util.TriState;
 import net.minecraft.nbt.CompoundTag;
@@ -65,12 +67,12 @@ public class MonoStorageAtom<T>
     }
 
     @Override
-    protected Collection<? extends Class<?>> getSupportedPushEvents() {
+    protected Collection<? extends Class<? extends PushEvent>> getSupportedPushEvents() {
         return getDelegate().getSupportedPushEvents();
     }
 
     @Override
-    protected Collection<? extends Class<?>> getSupportedPullEvents() {
+    protected Collection<? extends Class<? extends PullEvent>> getSupportedPullEvents() {
         return getDelegate().getSupportedPullEvents();
     }
 

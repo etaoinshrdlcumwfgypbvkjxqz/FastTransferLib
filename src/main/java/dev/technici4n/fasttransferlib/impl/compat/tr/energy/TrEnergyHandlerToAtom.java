@@ -10,7 +10,9 @@ import dev.technici4n.fasttransferlib.api.query.Query;
 import dev.technici4n.fasttransferlib.api.query.StoreQuery;
 import dev.technici4n.fasttransferlib.api.query.TransferQuery;
 import dev.technici4n.fasttransferlib.api.view.View;
-import dev.technici4n.fasttransferlib.api.view.event.NetTransferEvent;
+import dev.technici4n.fasttransferlib.api.view.event.PullEvent;
+import dev.technici4n.fasttransferlib.api.view.event.PushEvent;
+import dev.technici4n.fasttransferlib.api.view.event.TransferNetEvent;
 import dev.technici4n.fasttransferlib.impl.base.AbstractMonoCategoryAtom;
 import dev.technici4n.fasttransferlib.impl.content.EnergyContent;
 import dev.technici4n.fasttransferlib.impl.mixin.EnergyHandlerAccess;
@@ -28,7 +30,7 @@ import java.util.Set;
 public class TrEnergyHandlerToAtom
         extends AbstractMonoCategoryAtom<EnergyType>
         implements View {
-    private static final Set<Class<?>> SUPPORTED_PULL_EVENTS = ImmutableSet.of(NetTransferEvent.class);
+    private static final Set<Class<? extends PullEvent>> SUPPORTED_PULL_EVENTS = ImmutableSet.of(TransferNetEvent.class);
     private final EnergyHandler delegate;
 
     protected TrEnergyHandlerToAtom(EnergyHandler delegate) {
@@ -114,19 +116,19 @@ public class TrEnergyHandlerToAtom
     }
 
     @Override
-    public Object getRevisionFor(Class<?> event) {
-        if (event == NetTransferEvent.class)
+    public Object getRevisionFor(Class<? extends PullEvent> event) {
+        if (event == TransferNetEvent.class)
             return getDelegate().getEnergy();
         return super.getRevisionFor(event);
     }
 
     @Override
-    protected Collection<? extends Class<?>> getSupportedPushEvents() {
+    protected Collection<? extends Class<? extends PushEvent>> getSupportedPushEvents() {
         return ImmutableSet.of(); // energy storage
     }
 
     @Override
-    protected Collection<? extends Class<?>> getSupportedPullEvents() {
+    protected Collection<? extends Class<? extends PullEvent>> getSupportedPullEvents() {
         return SUPPORTED_PULL_EVENTS;
     }
 

@@ -12,6 +12,8 @@ import dev.technici4n.fasttransferlib.api.query.TransferQuery;
 import dev.technici4n.fasttransferlib.api.transfer.Participant;
 import dev.technici4n.fasttransferlib.api.view.Atom;
 import dev.technici4n.fasttransferlib.api.view.View;
+import dev.technici4n.fasttransferlib.api.view.event.PullEvent;
+import dev.technici4n.fasttransferlib.api.view.event.PushEvent;
 import dev.technici4n.fasttransferlib.api.view.model.ListModel;
 import dev.technici4n.fasttransferlib.api.view.model.Model;
 import dev.technici4n.fasttransferlib.impl.base.AbstractComposedViewParticipant;
@@ -158,12 +160,12 @@ public class SidedInventoryViewParticipant
 		}
 
 		@Override
-		protected Collection<? extends Class<?>> getSupportedPushEvents() {
+		protected Collection<? extends Class<? extends PushEvent>> getSupportedPushEvents() {
 			return ImmutableSet.of(); // inventory sucks
 		}
 
 		@Override
-		protected Collection<? extends Class<?>> getSupportedPullEvents() {
+		protected Collection<? extends Class<? extends PullEvent>> getSupportedPullEvents() {
 			return ImmutableSet.of(); // inventory sucks
 		}
 

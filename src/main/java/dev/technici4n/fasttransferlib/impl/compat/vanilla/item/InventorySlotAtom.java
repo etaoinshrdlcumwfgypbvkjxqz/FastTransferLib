@@ -6,7 +6,9 @@ import dev.technici4n.fasttransferlib.api.context.Context;
 import dev.technici4n.fasttransferlib.api.query.Query;
 import dev.technici4n.fasttransferlib.api.query.StoreQuery;
 import dev.technici4n.fasttransferlib.api.query.TransferQuery;
-import dev.technici4n.fasttransferlib.api.view.event.NetTransferEvent;
+import dev.technici4n.fasttransferlib.api.view.event.PullEvent;
+import dev.technici4n.fasttransferlib.api.view.event.PushEvent;
+import dev.technici4n.fasttransferlib.api.view.event.TransferNetEvent;
 import dev.technici4n.fasttransferlib.impl.base.AbstractMonoCategoryAtom;
 import dev.technici4n.fasttransferlib.impl.content.ItemContent;
 import dev.technici4n.fasttransferlib.impl.util.TriStateUtilities;
@@ -21,7 +23,7 @@ import java.util.Set;
 
 public class InventorySlotAtom
         extends AbstractMonoCategoryAtom<Item> {
-    private static final Set<Class<?>> SUPPORTED_PULL_EVENTS = ImmutableSet.of(NetTransferEvent.class);
+    private static final Set<Class<? extends PullEvent>> SUPPORTED_PULL_EVENTS = ImmutableSet.of(TransferNetEvent.class);
     private final Inventory inventory;
     private final int slot;
 
@@ -106,18 +108,18 @@ public class InventorySlotAtom
     }
 
     @Override
-    protected Collection<? extends Class<?>> getSupportedPushEvents() {
+    protected Collection<? extends Class<? extends PushEvent>> getSupportedPushEvents() {
         return ImmutableSet.of(); // inventory sucks
     }
 
     @Override
-    protected Collection<? extends Class<?>> getSupportedPullEvents() {
+    protected Collection<? extends Class<? extends PullEvent>> getSupportedPullEvents() {
         return SUPPORTED_PULL_EVENTS; // inventory sucks
     }
 
     @Override
-    public Object getRevisionFor(Class<?> event) {
-        if (event == NetTransferEvent.class)
+    public Object getRevisionFor(Class<? extends PullEvent> event) {
+        if (event == TransferNetEvent.class)
             return getInventory().getStack(getSlot()).copy(); // need to copy to avoid being modified
         return super.getRevisionFor(event);
     }

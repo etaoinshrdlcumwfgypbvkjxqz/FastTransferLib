@@ -13,8 +13,10 @@ import dev.technici4n.fasttransferlib.api.transfer.Participant;
 import dev.technici4n.fasttransferlib.api.transfer.TransferAction;
 import dev.technici4n.fasttransferlib.api.view.Atom;
 import dev.technici4n.fasttransferlib.api.view.View;
-import dev.technici4n.fasttransferlib.api.view.event.NetTransferEvent;
+import dev.technici4n.fasttransferlib.api.view.event.PullEvent;
+import dev.technici4n.fasttransferlib.api.view.event.PushEvent;
 import dev.technici4n.fasttransferlib.api.view.event.TransferEvent;
+import dev.technici4n.fasttransferlib.api.view.event.TransferNetEvent;
 import dev.technici4n.fasttransferlib.api.view.model.MapModel;
 import dev.technici4n.fasttransferlib.api.view.model.Model;
 import dev.technici4n.fasttransferlib.impl.base.AbstractComposedViewParticipant;
@@ -42,8 +44,8 @@ import java.util.Set;
 public class LbaGroupedItemToViewParticipant
         extends AbstractComposedViewParticipant
         implements MapModel {
-    private static final Set<Class<?>> SUPPORTED_PUSH_EVENTS = ImmutableSet.of(TransferEvent.class);
-    private static final Set<Class<?>> SUPPORTED_PULL_EVENTS = ImmutableSet.of(TransferEvent.class, NetTransferEvent.class);
+    private static final Set<Class<? extends PushEvent>> SUPPORTED_PUSH_EVENTS = ImmutableSet.of(TransferEvent.class);
+    private static final Set<Class<? extends PullEvent>> SUPPORTED_PULL_EVENTS = ImmutableSet.of(TransferEvent.class, TransferNetEvent.class);
     private final GroupedItemInvView delegate;
     private final View view;
     private final Participant participant;
@@ -98,7 +100,7 @@ public class LbaGroupedItemToViewParticipant
                                 if (diff == 0)
                                     return;
 
-                                this1.revise(NetTransferEvent.class);
+                                this1.revise(TransferNetEvent.class);
                                 this1.reviseAndNotify(TransferEvent.class,
                                         TransferEventImpl.of(TransferAction.fromDifference(diff > 0), content1, Math.abs(diff)));
                             }),
@@ -153,12 +155,12 @@ public class LbaGroupedItemToViewParticipant
         }
 
         @Override
-        protected Collection<? extends Class<?>> getSupportedPushEvents() {
+        protected Collection<? extends Class<? extends PushEvent>> getSupportedPushEvents() {
             return isHasTransferListener() ? SUPPORTED_PUSH_EVENTS : ImmutableSet.of();
         }
 
         @Override
-        protected Collection<? extends Class<?>> getSupportedPullEvents() {
+        protected Collection<? extends Class<? extends PullEvent>> getSupportedPullEvents() {
             return isHasTransferListener() ? SUPPORTED_PULL_EVENTS : ImmutableSet.of();
         }
 

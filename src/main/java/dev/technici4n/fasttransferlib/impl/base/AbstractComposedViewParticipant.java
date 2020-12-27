@@ -6,6 +6,8 @@ import dev.technici4n.fasttransferlib.api.query.Query;
 import dev.technici4n.fasttransferlib.api.transfer.Participant;
 import dev.technici4n.fasttransferlib.api.view.Atom;
 import dev.technici4n.fasttransferlib.api.view.View;
+import dev.technici4n.fasttransferlib.api.view.event.PullEvent;
+import dev.technici4n.fasttransferlib.api.view.event.PushEvent;
 import dev.technici4n.fasttransferlib.api.view.flow.Publisher;
 import dev.technici4n.fasttransferlib.api.view.model.Model;
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
@@ -68,12 +70,12 @@ public abstract class AbstractComposedViewParticipant
     }
 
     @Override
-    public Object getRevisionFor(Class<?> event) {
+    public Object getRevisionFor(Class<? extends PullEvent> event) {
         return getView().getRevisionFor(event);
     }
 
     @Override
-    public <T> Optional<? extends Publisher<T>> getPublisherFor(Class<T> event) {
+    public <T extends PushEvent> Optional<? extends Publisher<T>> getPublisherFor(Class<T> event) {
         return getView().getPublisherFor(event);
     }
 

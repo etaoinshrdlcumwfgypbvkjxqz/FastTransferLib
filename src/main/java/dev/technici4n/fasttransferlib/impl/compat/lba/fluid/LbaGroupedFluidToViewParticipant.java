@@ -14,8 +14,10 @@ import dev.technici4n.fasttransferlib.api.transfer.Participant;
 import dev.technici4n.fasttransferlib.api.transfer.TransferAction;
 import dev.technici4n.fasttransferlib.api.view.Atom;
 import dev.technici4n.fasttransferlib.api.view.View;
-import dev.technici4n.fasttransferlib.api.view.event.NetTransferEvent;
+import dev.technici4n.fasttransferlib.api.view.event.PullEvent;
+import dev.technici4n.fasttransferlib.api.view.event.PushEvent;
 import dev.technici4n.fasttransferlib.api.view.event.TransferEvent;
+import dev.technici4n.fasttransferlib.api.view.event.TransferNetEvent;
 import dev.technici4n.fasttransferlib.api.view.model.MapModel;
 import dev.technici4n.fasttransferlib.api.view.model.Model;
 import dev.technici4n.fasttransferlib.impl.base.AbstractComposedViewParticipant;
@@ -46,8 +48,8 @@ public class LbaGroupedFluidToViewParticipant
     private final GroupedFluidInvView delegate;
     private final View view;
     private final Participant participant;
-    private static final Set<Class<?>> SUPPORTED_PUSH_EVENTS = ImmutableSet.of(TransferEvent.class);
-    private static final Set<Class<?>> SUPPORTED_PULL_EVENTS = ImmutableSet.of(TransferEvent.class, NetTransferEvent.class);
+    private static final Set<Class<? extends PushEvent>> SUPPORTED_PUSH_EVENTS = ImmutableSet.of(TransferEvent.class);
+    private static final Set<Class<? extends PullEvent>> SUPPORTED_PULL_EVENTS = ImmutableSet.of(TransferEvent.class, TransferNetEvent.class);
 
     protected LbaGroupedFluidToViewParticipant(GroupedFluidInvView delegate) {
         this.delegate = delegate;
@@ -102,7 +104,7 @@ public class LbaGroupedFluidToViewParticipant
                                 TransferUtilities.BigIntegerAsLongIterator.ofStream(LbaCompatUtil.asBigQuantity(LbaCompatUtil.abs(diff)))
                                         .mapToObj(diff1 -> TransferEventImpl.of(action, content1, diff1))
                                         .forEach(data -> {
-                                            this1.revise(NetTransferEvent.class);
+                                            this1.revise(TransferNetEvent.class);
                                             this1.reviseAndNotify(TransferEvent.class, data);
                                         });
                             }),
@@ -158,12 +160,12 @@ public class LbaGroupedFluidToViewParticipant
         }
 
         @Override
-        protected Collection<? extends Class<?>> getSupportedPushEvents() {
+        protected Collection<? extends Class<? extends PushEvent>> getSupportedPushEvents() {
             return isHasTransferListener() ? SUPPORTED_PUSH_EVENTS : ImmutableSet.of();
         }
 
         @Override
-        protected Collection<? extends Class<?>> getSupportedPullEvents() {
+        protected Collection<? extends Class<? extends PullEvent>> getSupportedPullEvents() {
             return isHasTransferListener() ? SUPPORTED_PULL_EVENTS : ImmutableSet.of();
         }
 

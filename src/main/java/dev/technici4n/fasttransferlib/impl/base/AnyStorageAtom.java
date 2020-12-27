@@ -7,9 +7,7 @@ import dev.technici4n.fasttransferlib.api.context.Context;
 import dev.technici4n.fasttransferlib.api.query.Query;
 import dev.technici4n.fasttransferlib.api.query.StoreQuery;
 import dev.technici4n.fasttransferlib.api.query.TransferQuery;
-import dev.technici4n.fasttransferlib.api.view.event.CapacityChangeEvent;
-import dev.technici4n.fasttransferlib.api.view.event.NetTransferEvent;
-import dev.technici4n.fasttransferlib.api.view.event.TransferEvent;
+import dev.technici4n.fasttransferlib.api.view.event.*;
 import dev.technici4n.fasttransferlib.impl.content.EmptyContent;
 import dev.technici4n.fasttransferlib.impl.view.event.TransferEventImpl;
 import net.fabricmc.fabric.api.util.TriState;
@@ -21,8 +19,8 @@ import java.util.Set;
 
 public class AnyStorageAtom
         extends AbstractAtom {
-    private static final Set<Class<?>> SUPPORTED_PUSH_EVENTS = ImmutableSet.of(TransferEvent.class, CapacityChangeEvent.class);
-    private static final Set<Class<?>> SUPPORTED_PULL_EVENTS = ImmutableSet.of(TransferEvent.class, NetTransferEvent.class, CapacityChangeEvent.class);
+    private static final Set<Class<? extends PushEvent>> SUPPORTED_PUSH_EVENTS = ImmutableSet.of(TransferEvent.class, CapacityChangeEvent.class);
+    private static final Set<Class<? extends PullEvent>> SUPPORTED_PULL_EVENTS = ImmutableSet.of(TransferEvent.class, TransferNetEvent.class, CapacityChangeEvent.class, CapacityChangeNetEvent.class);
     private Content content = EmptyContent.INSTANCE;
     private final long internalCapacity;
     private long quantity;
@@ -65,7 +63,7 @@ public class AnyStorageAtom
         Content content = getContent();
         context.configure(() -> setQuantity(quantity + inserted), () -> setQuantity(quantity));
         context.execute(() -> {
-            revise(NetTransferEvent.class);
+            revise(TransferNetEvent.class);
             reviseAndNotify(TransferEvent.class, TransferEventImpl.ofInsertion(content, inserted));
         });
         return maxQuantity - inserted;
@@ -119,13 +117,13 @@ public class AnyStorageAtom
     }
 
     @Override
-    protected Collection<? extends Class<?>> getSupportedPushEvents() {
+    protected Collection<? extends Class<? extends PushEvent>> getSupportedPushEvents() {
         // fixed capacity
         return SUPPORTED_PUSH_EVENTS;
     }
 
     @Override
-    protected Collection<? extends Class<?>> getSupportedPullEvents() {
+    protected Collection<? extends Class<? extends PullEvent>> getSupportedPullEvents() {
         // fixed capacity
         return SUPPORTED_PULL_EVENTS;
     }
